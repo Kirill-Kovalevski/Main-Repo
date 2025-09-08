@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <link rel="stylesheet" href="/Calendar/dist/styles.css">
+  <title>Daily Plan – Sheilla</title>
+
+  <!-- Rubik (similar vibe to your mock) -->
+  <link href="https://fonts.googleapis.com/css2?family=Rubik:wght@300;400;500;700&display=swap" rel="stylesheet" />
+
+  <!-- Compiled CSS from styles.scss -->
+  <link rel="stylesheet" href="./styles.css" />
+</head>
+<body>
+
+  <main class="phone">
+    <!-- Header gradient strip with name + small icons -->
+    <header class="app-header">
+      <div class="header-top">
+        <span class="brand-mark">ש</span>
+        <h1 class="name">Sheilla</h1>
+        <button class="chevron" aria-label="Open menu">▾</button>
+      </div>
+
+      <div class="nav-letters">
+        <span class="nav-left">S</span>
+        <span class="screen-title">search</span>
+        <span class="nav-right">P</span>
+      </div>
+    </header>
+
+    <!-- Content -->
+    <section class="content">
+      <!-- participants badge on the left with a star -->
+      <aside class="participants-note">
+        <span class="pill">משתתפים</span>
+        <span class="star" aria-hidden="true">★</span>
+      </aside>
+
+      <!-- Big date + headline -->
+      <div class="date-block">
+        <div class="date-line">
+          <span class="weekday">שבת,</span>
+          <span class="date-num">6.09.2025</span>
+        </div>
+
+        <p class="headline">
+          איזה כיף שחזרתם, דניאלה<br />
+          <span class="subline">זה מה שעושים היום</span>
+        </p>
+      </div>
+
+      <!-- Events list -->
+      <ul id="events" class="events"></ul>
+    </section>
+
+    <!-- Create new event CTA -->
+    <button id="newEventBtn" class="new-event-btn" type="button">
+      יצירת אירוע חדש
+      <span class="dot" aria-hidden="true"></span>
+    </button>
+
+    <!-- Rounded gradient footer background -->
+    <div class="footer-curve" aria-hidden="true"></div>
+  </main>
+
+  <script src="./app.js" defer></script>
+</body>
+</html>
