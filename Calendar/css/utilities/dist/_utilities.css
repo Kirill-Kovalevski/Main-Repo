@@ -1,0 +1,24 @@
+.white-font {
+  color: #ffffff;
+}
+
+.blue-bg {
+  background: #1e1e30;
+}
+
+.underline {
+  text-decoration: underline;
+}
+
+.grey-text {
+  color: #959595;
+}
+
+.is-hidden {
+  display: none !important;
+}
+
+.u-rtl {
+  direction: rtl;
+  text-align: right;
+}

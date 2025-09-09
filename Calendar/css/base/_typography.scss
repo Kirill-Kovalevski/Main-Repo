@@ -1,0 +1,23 @@
+@use '../settings/tokens' as *;
+
+// ==============================
+// TYPOGRAPHY
+// ==============================
+
+h1, h2, h3, h4, h5, h6 {
+  margin: 0;
+  font-weight: 600;
+  line-height: 1.2;
+}
+
+p {
+  margin: 0;
+  line-height: 1.5;
+  color: $neutral-900;
+}
+
+.c-app-title {
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: $brand-600;
+}

@@ -1,0 +1,48 @@
+/* Root font sizing: 1rem = 16px */
+:root {
+  --app-bg: #f7f7f7;
+}
+
+/* Brand & neutrals */
+/* Accents */
+/* Typography */
+/* Font sizes (rem) */
+/* 10px */
+/* 12px */
+/* 14px */
+/* 16px */
+/* 18px */
+/* 20px */
+/* 24px */
+/* 32px */
+/* 36px */
+/* Spacing (rem) */
+/* 27px */
+/* Radii */
+/* Shadows */
+/* Motion */
+.search-box {
+  display: flex;
+  align-items: center;
+  width: 22.375rem;
+  /* 358px container */
+  height: 3.5rem;
+  /* 56px */
+  border-radius: 0.75rem;
+  background: #ffffff;
+  margin: 0;
+}
+.search-box .search-icon {
+  width: 1.75rem;
+  /* 28px */
+  height: 1.75rem;
+}
+.search-box .search-input {
+  width: 9.25rem;
+  /* 148px */
+  height: 1.3125rem;
+  /* 21px */
+  border: none;
+  text-align: right;
+  text-transform: capitalize;
+}

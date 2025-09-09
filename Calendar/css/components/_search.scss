@@ -1,0 +1,24 @@
+@use '../settings/tokens' as *;
+
+.search-box {
+  display: flex;
+  align-items: center;
+  width: 22.375rem;    /* 358px container */
+  height: 3.5rem;      /* 56px */
+  border-radius: $radius-12;
+  background: $neutral-100;
+  margin: 0;
+
+  .search-icon {
+    width: 1.75rem;    /* 28px */
+    height: 1.75rem;
+  }
+
+  .search-input {
+    width: 9.25rem;    /* 148px */
+    height: 1.3125rem; /* 21px */
+    border: none;
+    text-align: right;
+    text-transform: capitalize;
+  }
+}

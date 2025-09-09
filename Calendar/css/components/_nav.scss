@@ -1,0 +1,46 @@
+@use '../settings/tokens' as *;
+@use '../tools/mixins' as *;
+
+// ==============================
+// NAV COMPONENT
+// ==============================
+
+.c-nav {
+  max-height: 0;
+  overflow: hidden;
+  background: $neutral-100;
+  border-bottom: 1px solid $neutral-500;
+  @include slide-y(max-height);
+
+  &.is-open {
+    max-height: 6rem;
+  }
+
+  &__inner {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: $sp-16;
+    padding: $sp-12;
+  }
+}
+
+.c-search {
+  position: relative;
+  flex: 1;
+
+  &__input {
+    width: 100%;
+    padding: $sp-8 $sp-32 $sp-8 $sp-8;
+    border: 1px solid $neutral-500;
+    border-radius: 0.75rem;
+    font-size: 0.875rem;
+  }
+
+  &__icon {
+    position: absolute;
+    top: 50%;
+    left: $sp-8;
+    transform: translateY(-50%);
+  }
+}

@@ -1,0 +1,61 @@
+@use '../settings/tokens' as *;
+@use '../tools/mixins' as m;
+
+/* ================================
+   COMPONENTS / Buttons
+   ================================ */
+
+.c-cta {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+
+  padding-inline: $sp-24;
+  padding-block: $sp-12;
+
+  border: 0.0625rem solid transparent;
+  border-radius: $radius-12;
+
+  font-family: $font-family-base;
+  font-size: $font-size-16;
+  font-weight: 600;
+  line-height: 1;
+
+  color: $neutral-100;
+  background: linear-gradient(135deg, $brand 0%, $teal 100%);
+
+  box-shadow:
+    0 0.25rem 0.5rem rgba($brand-700, 0.15),
+    0 0 0 0 rgba($brand-600, 0); /* placeholder for focus ring */
+
+  cursor: pointer;
+  user-select: none;
+
+  transition:
+    transform $motion-150 $ease-out,
+    box-shadow $motion-150 $ease-out,
+    opacity $motion-150 $ease-out;
+
+  &:hover {
+    transform: translateY(-0.03125rem);
+    box-shadow:
+      0 0.5rem 1rem rgba($brand-700, 0.18),
+      0 0 0 0 rgba($brand-600, 0);
+  }
+
+  &:active {
+    transform: translateY(0);
+    opacity: 0.9;
+  }
+
+  &:focus-visible {
+    @include m.focus-ring;
+  }
+
+  /* Disabled state (if you ever need it) */
+  &[disabled] {
+    opacity: 0.55;
+    cursor: not-allowed;
+    filter: grayscale(20%);
+  }
+}

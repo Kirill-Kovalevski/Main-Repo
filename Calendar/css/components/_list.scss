@@ -1,0 +1,141 @@
+@use '../settings/tokens' as *;
+@use '../tools/mixins' as m;
+
+/* ================================
+   COMPONENTS / Task List
+   ================================ */
+
+.c-list {
+  /* Section spacing inside the phone viewport card */
+  padding-inline: $sp-16;
+  padding-block: $sp-16;
+
+  /* Keep content centered in narrow phone screens */
+  display: grid;
+  justify-items: center;
+  gap: $sp-20;
+}
+
+.c-list__items {
+  /* Reset list and keep a tidy stack */
+  list-style: none;
+  margin: 0;
+  padding: 0;
+
+  display: grid;
+  gap: $sp-18;
+  width: 100%;
+
+  /* Optional subtle divider look */
+  border-top: 0.0625rem solid $ink-10;
+  padding-top: $sp-16;
+}
+
+/* Completed section (appears above “Tasks” when there are completed items) */
+.c-list__completed {
+  width: 100%;
+  margin: 0;
+  padding: 0;
+
+  list-style: none;
+  display: grid;
+  gap: $sp-12;
+
+  border: 0.0625rem solid $ink-10;
+  border-radius: $radius-12;
+  background-color: $neutral-200;
+  padding: $sp-16;
+}
+
+/* A single task row */
+.c-item {
+  /* RTL: checkbox on the right, text to the left of it */
+  direction: rtl;
+
+  /* Make the clickable area large and comfy */
+  .c-item__label {
+    display: flex;
+    flex-direction: row-reverse; /* checkbox -> text */
+    align-items: center;
+    gap: $sp-12;
+
+    width: 100%;
+    cursor: pointer;
+    user-select: none;
+  }
+
+  /* Checkbox look (browser accent color, plus size) */
+  .c-item__check {
+    inline-size: 1.25rem;
+    block-size: 1.25rem;
+
+    accent-color: $brand;
+    cursor: pointer;
+
+    /* Keep keyboard users happy */
+    &:focus-visible {
+      @include m.focus-ring;
+    }
+  }
+
+  /* The task text */
+  .c-item__text {
+    margin: 0;
+
+    font-family: $font-family-base;
+    font-size: $font-size-16;
+    color: $neutral-800;
+    text-align: right;
+
+    /* Smooth color/opacity when state changes */
+    transition:
+      color $motion-200 $ease-in-out,
+      opacity $motion-200 $ease-in-out,
+      text-decoration-color $motion-200 $ease-in-out;
+  }
+}
+
+/* When a task becomes completed (JS toggles this class on the <li>) */
+.c-item--completed {
+  .c-item__text {
+    /* remove the strike for the completed list if you move the node there;
+       keep it here for the fade-out animation before moving */
+    text-decoration: line-through;
+    text-decoration-thickness: 0.09375rem;
+    text-decoration-color: rgba($teal, 0.9);
+    color: $neutral-600;
+    opacity: 0.15;
+
+    /* Vibrant fade-out sweep */
+    animation: sweep-out 600ms $ease-out forwards;
+  }
+}
+
+/* How a completed item should look when it sits inside .c-list__completed */
+.c-list__completed .c-item__text {
+  text-decoration: none;
+  color: $success; /* communicates “done” without strike */
+  opacity: 1;
+}
+
+/* Keyframes for the colorful fade on completion */
+@keyframes sweep-out {
+  0% {
+    background: linear-gradient(
+      90deg,
+      rgba($teal, 0.22),
+      rgba($brand, 0.22)
+    );
+    background-size: 200% 100%;
+    background-position: 0% 0%;
+    opacity: 1;
+  }
+  50% {
+    background-position: 100% 0%;
+    opacity: 0.5;
+  }
+  100% {
+    background: transparent;
+    opacity: 0; /* fades before JS moves it to the completed list */
+  }
+}

@@ -1,91 +1,114 @@
-/* =========================================================
-   app.js – tiny data + rendering + simple interactions
-   Audience: beginner-friendly, clean & commented
-   ========================================================= */
+// Calendar/app.js
+document.addEventListener('DOMContentLoaded', () => {
+  // ---------- Dom refs ----------
+  const lemonToggle     = document.getElementById('lemonToggle');
+  const appNav          = document.getElementById('appNav');
 
-// Mock “today plan” events (what you showed in the screenshot)
-const EVENTS = [
-  { time: "16:30", title: "אימון",       checked: true  },
-  { time: "18:00", title: "סקייט",       checked: false },
-  { time: "קבלת ערב", title: "עם בעלולי", checked: false }, // split line feeling
-  { time: "על הראש", title: "",           checked: false },
-  { time: "22:35", title: "מסאג' כפות הרגליים", checked: false }
-];
+  const taskList        = document.getElementById('taskList');
+  const completedList   = document.getElementById('completedList');
+  const completedSection= document.getElementById('completedSection');
 
-// Render a single event item (HTML string)
-function eventTemplate(e) {
-  // If an event is “checked”, show a tiny red check badge like in your mock
-  const checkHTML = e.checked ? `<span class="check">✓</span>` : "";
+  const addEventBtn     = document.getElementById('addEventBtn');
+  const modal           = document.getElementById('newEventModal');
+  const modalBackdrop   = modal?.querySelector('[data-close]');
+  const modalCloseBtn   = modal?.querySelector('.c-btn--ghost[data-close]');
+  const modalForm       = document.getElementById('newEventForm');
+  const titleInput      = document.getElementById('evtTitle');
+  const dateInput       = document.getElementById('evtDate');
+  const timeInput       = document.getElementById('evtTime');
 
-  // Some lines in your mock look like “title-only” items.
-  // If there’s a time, show “time title”. Otherwise show only title.
-  const line = e.time && e.title
-    ? `<span class="time">${e.time}</span> <span class="title">${e.title}</span>`
-    : `<span class="title">${e.time || e.title}</span>`;
+  // ---------- Helpers ----------
+  const open = (el)  => el?.classList.remove('u-hidden');
+  const close = (el) => el?.classList.add('u-hidden');
 
-  return `
-    <li class="event">
-      <span class="flag" aria-hidden="true"></span>
+  const showCompleted = () => completedSection?.classList.remove('u-hidden');
 
-      <div class="text">
-        ${line}
-        ${checkHTML}
+  function taskItemTemplate(text) {
+    const li = document.createElement('li');
+    li.className = 'c-item';
+    li.innerHTML = `
+      <label class="c-item__label">
+        <input class="c-item__check" type="checkbox" />
+        <p class="c-item__text">${text}</p>
+      </label>
+    `;
+    return li;
+  }
+
+  function completedItemTemplate(text) {
+    const li = document.createElement('li');
+    li.className = 'c-item';
+    li.innerHTML = `
+      <div class="c-item__label">
+        <p class="c-item__text">${text}</p>
       </div>
+    `;
+    return li;
+  }
 
-      <i class="avatar" aria-hidden="true"></i>
-    </li>
-  `;
-}
-
-// Render the full list into UL#events
-function renderEvents(list) {
-  const ul = document.getElementById("events");
-  if (!ul) return;
-  ul.innerHTML = list.map(eventTemplate).join("");
-}
-
-// Example “new event” action (very simple prompt -> append)
-function wireNewEvent() {
-  const btn = document.getElementById("newEventBtn");
-  if (!btn) return;
-
-  btn.addEventListener("click", () => {
-    const time = window.prompt("שעת האירוע? (לדוגמה 19:45)");
-    const title = window.prompt("שם האירוע?");
-    if (!time && !title) return;
-
-    EVENTS.push({
-      time: (time || "").trim(),
-      title: (title || "").trim(),
-      checked: false
-    });
-
-    renderEvents(EVENTS);
+  // ---------- Nav (lemon) ----------
+  lemonToggle?.addEventListener('click', () => {
+    appNav?.classList.toggle('u-is-collapsed');
   });
-}
 
-// Toggle “checked” by clicking on the red check (for demo)
-function wireToggleChecks() {
-  const ul = document.getElementById("events");
-  if (!ul) return;
+  // ---------- Check-off flow ----------
+  taskList?.addEventListener('change', (e) => {
+    const chk = e.target;
+    if (!chk.matches('.c-item__check')) return;
 
-  ul.addEventListener("click", (e) => {
-    const li = e.target.closest(".event");
-    if (!li) return;
+    const li   = chk.closest('.c-item');
+    const text = li?.querySelector('.c-item__text')?.textContent?.trim() || '';
 
-    const idx = Array.from(ul.children).indexOf(li);
-    if (idx < 0) return;
+    // 1) play crossing + rainbow fade
+    li.classList.add('is-completing');
 
-    // If you clicked the text area, flip the checked state.
-    // (Keeps it playful—click again to uncheck.)
-    EVENTS[idx].checked = !EVENTS[idx].checked;
-    renderEvents(EVENTS);
+    // 2) when animation ends, move to Completed
+    const onDone = () => {
+      li.removeEventListener('animationend', onDone);
+      // Remove from task list
+      li.remove();
+      // Add to Completed
+      showCompleted();
+      completedList.appendChild(completedItemTemplate(text));
+    };
+
+    li.addEventListener('animationend', onDone, { once: true });
   });
-}
 
-// Boot
-document.addEventListener("DOMContentLoaded", () => {
-  renderEvents(EVENTS);
-  wireNewEvent();
-  wireToggleChecks();
+  // ---------- Modal: open / close ----------
+  addEventBtn?.addEventListener('click', () => {
+    open(modal);
+    titleInput?.focus();
+  });
+
+  modalBackdrop?.addEventListener('click', () => close(modal));
+  modalCloseBtn?.addEventListener('click', () => close(modal));
+
+  document.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape') close(modal);
+  });
+
+  // ---------- Modal: submit new event ----------
+  modalForm?.addEventListener('submit', (e) => {
+    e.preventDefault();
+    const title = (titleInput.value || '').trim();
+    const date  = (dateInput.value || '').trim();
+    const time  = (timeInput.value || '').trim();
+
+    if (!title || !date || !time) return;
+
+    // Format: "כותרת HH:MM (DD/MM/YY)"
+    const dt = new Date(date);
+    const dd = String(dt.getDate()).padStart(2, '0');
+    const mm = String(dt.getMonth() + 1).padStart(2, '0');
+    const yy = String(dt.getFullYear()).slice(-2);
+
+    const label = `${title} ${time} (${dd}/${mm}/${yy})`;
+
+    taskList.appendChild(taskItemTemplate(label));
+
+    // reset + close
+    modalForm.reset();
+    close(modal);
+  });
 });

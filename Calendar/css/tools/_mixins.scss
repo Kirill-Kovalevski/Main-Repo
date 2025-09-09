@@ -1,0 +1,31 @@
+@use '../settings/tokens' as *;
+
+// ==============================
+// MIXINS: Helpers
+// ==============================
+
+@mixin focus-ring {
+  outline: none;
+  box-shadow:
+    0 0 0 0.125rem rgba(0, 0, 0, 0.06),
+    0 0 0 0.25rem rgba($brand-600, 0.35);
+}
+
+@mixin slide-y($prop: max-height, $duration: $motion-200, $easing: $ease-out) {
+  transition: #{$prop} #{$duration} #{$easing};
+}
+
+@mixin truncate {
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+
+@mixin tap-target {
+  min-width: 2.75rem;
+  min-height: 2.75rem;
+}
+
+@mixin pill($radius: 999rem) {
+  border-radius: $radius;
+}

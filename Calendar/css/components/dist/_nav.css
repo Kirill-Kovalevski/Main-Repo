@@ -1,0 +1,35 @@
+.c-nav {
+  max-height: 0;
+  overflow: hidden;
+  background: #ffffff;
+  border-bottom: 1px solid #959595;
+  transition: max-height 200ms cubic-bezier(0.16, 1, 0.3, 1);
+}
+.c-nav.is-open {
+  max-height: 6rem;
+}
+.c-nav__inner {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 1rem;
+  padding: 0.75rem;
+}
+
+.c-search {
+  position: relative;
+  flex: 1;
+}
+.c-search__input {
+  width: 100%;
+  padding: 0.5rem 2rem 0.5rem 0.5rem;
+  border: 1px solid #959595;
+  border-radius: 0.75rem;
+  font-size: 0.875rem;
+}
+.c-search__icon {
+  position: absolute;
+  top: 50%;
+  left: 0.5rem;
+  transform: translateY(-50%);
+}

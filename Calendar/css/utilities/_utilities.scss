@@ -1,0 +1,17 @@
+@use '../settings/tokens' as *;
+
+// ==============================
+// UTILITIES
+// ==============================
+
+.white-font { color: $neutral-100; }
+.blue-bg    { background: $brand-700; }
+.underline  { text-decoration: underline; }
+.grey-text  { color: $neutral-500; }
+
+.is-hidden  { display: none !important; }
+
+.u-rtl {
+  direction: rtl;
+  text-align: right;
+}

@@ -1,0 +1,22 @@
+@use '../settings/tokens' as *;
+
+// ==============================
+// GENERIC RESET
+// ==============================
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+html, body {
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  font-family: 'Rubik', sans-serif;
+  background: $neutral-100;
+  color: $neutral-900;
+}
