@@ -36,30 +36,20 @@
   color: transparent;
 }
 
-/* List container */
 .c-list__items {
   list-style: none;
   margin: 0;
   padding: 0;
-  direction: rtl;
-  display: grid;
-  gap: $sp-12;
 }
-
-/* ==============================
-   ROW LAYOUT (RTL GRID)
-   minus → text → checkbox
-   ============================== */
 
 .c-item {
   display: grid;
-  grid-template-columns: auto 1fr auto;   /* col1 minus, col2 text, col3 checkbox */
+  grid-template-columns: auto 1fr auto; /* col1 = left, col3 = right (grid is LTR) */
   align-items: center;
+  justify-content: center;
   gap: 0.5rem;
   padding: 0.5rem 0.375rem;
-  background: $neutral-100;
-  border: 1px solid $ink-10;
-  border-radius: $radius-12;
+  border-bottom: 1px solid rgba(0,0,0,.06);
 }
 
 /* Let label’s children participate in the grid */
@@ -67,10 +57,10 @@
   display: contents; /* allows checkbox + text to place into grid columns */
 }
 
-/* Column placement (RTL: column 1 is the right-most edge) */
-.c-item__remove { grid-column: 1; }
-.c-item__text   { grid-column: 2; justify-self: start; }
-.c-item__check  { grid-column: 3; }
+/* Place each piece explicitly */
+.c-item__remove { grid-column: 1; justify-self: start; } /* LEFT edge */
+.c-item__text   { grid-column: 2; justify-self: start; } /* middle */
+.c-item__check  { grid-column: 3; justify-self: end;   }
 
 /* Text */
 .c-item__text {
@@ -105,32 +95,30 @@
   &:focus-visible { @include focus-ring; }
 }
 
-/* Checkbox — soft gold pastel glow when checked */
+/* Checkbox: soft gold pastel glow when checked */
 .c-item__check {
   inline-size: 1.25rem;
   block-size: 1.25rem;
   margin: 0;
-  accent-color: #F7C843;          /* pastel gold */
-  border-radius: 0.375rem;
+  accent-color: #F7C843; /* pastel gold */
+  border-radius: .375rem;
   box-shadow: 0 0 0 0 rgba(247,200,67,0);
-  transition:
-    box-shadow $motion-150 $ease-out,
-    transform  120ms $ease-out;
-
+  transition: box-shadow 180ms cubic-bezier(.16,1,.3,1),
+              transform 120ms cubic-bezier(.16,1,.3,1);
   &:focus-visible {
     outline: none;
     box-shadow:
-      0 0 0 0.125rem rgba(0,0,0,.05),
-      0 0 0 0.35rem rgba(247,200,67,.35);
+      0 0 0 .125rem rgba(0,0,0,.05),
+      0 0 0 .35rem rgba(247,200,67,.35);
   }
-
   &:checked {
     box-shadow:
-      0 0 0 0.125rem rgba(247,200,67,.25),
-      0 0 0.75rem 0.15rem rgba(247,200,67,.35);
-    transform: translateY(-0.5px);
+      0 0 0 .125rem rgba(247,200,67,.25),
+      0 0 .75rem .15rem rgba(247,200,67,.35);
+    transform: translateY(-.5px);
   }
 }
+
 
 /* ==============================
    COMPLETION: strike & fade

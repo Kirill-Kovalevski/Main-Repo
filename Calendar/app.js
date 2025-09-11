@@ -280,3 +280,133 @@
     });
   }
 })();
+// Calendar/app.js
+document.addEventListener('DOMContentLoaded', () => {
+  // ----- Nav (lemon) + date slide -----
+  const lemonToggle = document.getElementById('lemonToggle');
+  const appNav      = document.getElementById('appNav');
+  const header      = document.querySelector('.o-header'); // for a tiny date shift
+
+  function toggleNav() {
+    if (!appNav) return;
+    const isCollapsed = appNav.classList.toggle('u-is-collapsed');
+    // When nav opens, nudge the date down a bit; when it closes, bring it back up
+    if (header) header.classList.toggle('is-nav-open', !isCollapsed);
+  }
+  if (lemonToggle) lemonToggle.addEventListener('click', toggleNav);
+
+  // ----- Bottom sheet controls -----
+  const addEventBtn   = document.getElementById('addEventBtn');
+  const sheet         = document.getElementById('eventSheet');
+  const sheetBackdrop = sheet ? sheet.querySelector('[data-close]') : null;
+  const sheetCloseBtn = sheet ? sheet.querySelector('.c-icon-btn--ghost[data-close]') : null;
+
+  const sheetForm   = document.getElementById('sheetForm');
+  const titleInput  = document.getElementById('evtTitle');
+  const dateInput   = document.getElementById('evtDate');
+  const timeInput   = document.getElementById('evtTime');
+
+  function openSheet()  { if (sheet) { sheet.classList.remove('u-hidden'); if (titleInput) titleInput.focus(); } }
+  function closeSheet() { if (sheet) sheet.classList.add('u-hidden'); }
+
+  if (addEventBtn)   addEventBtn.addEventListener('click', openSheet);
+  if (sheetBackdrop) sheetBackdrop.addEventListener('click', closeSheet);
+  if (sheetCloseBtn) sheetCloseBtn.addEventListener('click', closeSheet);
+  document.addEventListener('keydown', (e) => { if (e.key === 'Escape') closeSheet(); });
+
+  // ----- Add new task from sheet -----
+  const taskList = document.getElementById('taskList');
+
+  function makeTaskItem(text) {
+    const li = document.createElement('li');
+    li.className = 'c-item';
+    li.innerHTML = `
+      <button class="c-item__remove" type="button" aria-label="הסר">−</button>
+      <label class="c-item__label">
+        <span class="c-item__text"></span>
+        <input class="c-item__check" type="checkbox" />
+      </label>
+    `;
+    li.querySelector('.c-item__text').textContent = text;
+    return li;
+  }
+
+  if (sheetForm) {
+    sheetForm.addEventListener('submit', (e) => {
+      e.preventDefault();
+      const t = titleInput ? titleInput.value.trim() : '';
+      const d = dateInput  ? dateInput.value.trim()  : '';
+      const h = timeInput  ? timeInput.value.trim()  : '';
+      if (!t || !d || !h || !taskList) return;
+
+      // Format label: "כותרת HH:MM (DD/MM/YY)"
+      const dt = new Date(d);
+      const dd = String(dt.getDate()).padStart(2, '0');
+      const mm = String(dt.getMonth() + 1).padStart(2, '0');
+      const yy = String(dt.getFullYear()).slice(-2);
+      const label = `${t} ${h} (${dd}/${mm}/${yy})`;
+
+      taskList.appendChild(makeTaskItem(label));
+      sheetForm.reset();
+      closeSheet();
+    });
+  }
+
+  // ----- Remove / complete handlers (event delegation) -----
+  // Confetti: larger, more visible
+  function confettiAt(el) {
+    if (!el) return;
+    const r = el.getBoundingClientRect();
+    const x = r.left + r.width / 2 + window.scrollX;
+    const y = r.top  + r.height / 2 + window.scrollY;
+
+    const colors = ['#FF6B6B','#FFD93D','#6BCB77','#4D96FF','#B8C0FF','#F896D8'];
+    const COUNT = 40, MIN = 80, MAX = 180, DUR = 1100;
+
+    for (let i = 0; i < COUNT; i++) {
+      const p = document.createElement('span');
+      p.className = 'c-confetti';
+      p.style.position = 'absolute';
+      p.style.left = `${x}px`;
+      p.style.top  = `${y}px`;
+      p.style.width = p.style.height = `${6 + Math.random() * 6}px`;
+      p.style.borderRadius = '50%';
+      p.style.background = colors[i % colors.length];
+      p.style.pointerEvents = 'none';
+      p.style.zIndex = 9999;
+      document.body.appendChild(p);
+
+      const ang = Math.random() * Math.PI * 2;
+      const dist = MIN + Math.random() * (MAX - MIN);
+      const tx = Math.cos(ang) * dist;
+      const ty = Math.sin(ang) * dist;
+
+      p.animate(
+        [{ transform: 'translate(0,0) scale(1)', opacity: 1 },
+         { transform: `translate(${tx}px, ${ty}px) scale(.6)`, opacity: 0 }],
+        { duration: DUR, easing: 'cubic-bezier(.2,.7,.2,1)' }
+      ).finished.finally(() => p.remove());
+    }
+  }
+
+  if (taskList) {
+    taskList.addEventListener('click', (e) => {
+      const btn = e.target.closest('.c-item__remove');
+      if (!btn) return;
+      const row = btn.closest('.c-item');
+      if (row) row.remove();
+    });
+
+    taskList.addEventListener('change', (e) => {
+      const chk = e.target;
+      if (!chk.classList.contains('c-item__check')) return;
+      const row = chk.closest('.c-item');
+      if (!row) return;
+
+      // play completion effect then remove row (or you can move it to "completed")
+      confettiAt(chk);
+      row.classList.add('is-completing');
+      row.addEventListener('animationend', () => row.remove(), { once: true });
+    });
+  }
+});
