@@ -1,114 +1,282 @@
 // Calendar/app.js
-document.addEventListener('DOMContentLoaded', () => {
-  // ---------- Dom refs ----------
-  const lemonToggle     = document.getElementById('lemonToggle');
-  const appNav          = document.getElementById('appNav');
+(() => {
+  // ============ DOM REFS ============
+  const lemonToggle      = document.getElementById('lemonToggle');
+  const appNav           = document.getElementById('appNav');
 
-  const taskList        = document.getElementById('taskList');
-  const completedList   = document.getElementById('completedList');
-  const completedSection= document.getElementById('completedSection');
+  const titleDate        = document.querySelector('.c-title--date');
 
-  const addEventBtn     = document.getElementById('addEventBtn');
-  const modal           = document.getElementById('newEventModal');
-  const modalBackdrop   = modal?.querySelector('[data-close]');
-  const modalCloseBtn   = modal?.querySelector('.c-btn--ghost[data-close]');
-  const modalForm       = document.getElementById('newEventForm');
-  const titleInput      = document.getElementById('evtTitle');
-  const dateInput       = document.getElementById('evtDate');
-  const timeInput       = document.getElementById('evtTime');
+  const taskList         = document.getElementById('taskList');       // <ul>
+  const completedList    = document.getElementById('completedList');  // <ul>
+  const completedToggle  = document.getElementById('completedToggle'); // "בוצע" button
+  const completedSection = document.getElementById('completedSection');
 
-  // ---------- Helpers ----------
-  const open = (el)  => el?.classList.remove('u-hidden');
-  const close = (el) => el?.classList.add('u-hidden');
+  const addEventBtn      = document.getElementById('addEventBtn');
+  const sheet            = document.getElementById('eventSheet');
+  const sheetBackdrop    = sheet ? sheet.querySelector('[data-close]') : null;
+  const sheetCloseBtn    = sheet ? sheet.querySelector('.c-icon-btn--ghost[data-close]') : null;
+  const sheetForm        = document.getElementById('sheetForm');
 
-  const showCompleted = () => completedSection?.classList.remove('u-hidden');
+  const titleInput       = document.getElementById('evtTitle');
+  const dateInput        = document.getElementById('evtDate');
+  const timeInput        = document.getElementById('evtTime');
+  const peopleBtn        = document.getElementById('addPeopleBtn');
+  const peopleHint       = document.getElementById('peopleHint');
 
-  function taskItemTemplate(text) {
+  // ============ SMALL STATE ============
+  let peopleCount = 0;
+
+  // ============ HELPERS ============
+  function show(el) { if (el) el.classList.remove('u-hidden'); }
+  function hide(el) { if (el) el.classList.add('u-hidden'); }
+
+  function openSheet() {
+    if (!sheet) return;
+    show(sheet);
+    sheet.setAttribute('aria-hidden', 'false');
+
+    const panel = sheet.querySelector('.c-sheet__panel');
+    if (panel) {
+      panel.animate(
+        [{ transform: 'translateY(20px)', opacity: 0 }, { transform: 'translateY(0)', opacity: 1 }],
+        { duration: 220, easing: 'cubic-bezier(.16,1,.3,1)' }
+      );
+    }
+    const bd = sheet.querySelector('.c-sheet__backdrop');
+    if (bd) {
+      bd.animate([{ opacity: 0 }, { opacity: 1 }], { duration: 220, easing: 'linear' });
+    }
+    if (titleInput) titleInput.focus();
+  }
+
+  function closeSheet() {
+    if (!sheet) return;
+    sheet.setAttribute('aria-hidden', 'true');
+
+    const panel = sheet.querySelector('.c-sheet__panel');
+    const bd = sheet.querySelector('.c-sheet__backdrop');
+
+    let done = 0;
+    const maybeHide = () => { done += 1; if (done >= 2) hide(sheet); };
+
+    if (panel) {
+      panel.animate(
+        [{ transform: 'translateY(0)', opacity: 1 }, { transform: 'translateY(20px)', opacity: 0 }],
+        { duration: 180, easing: 'cubic-bezier(.2,.7,.2,1)' }
+      ).finished.then(maybeHide);
+    } else {
+      maybeHide();
+    }
+
+    if (bd) {
+      bd.animate([{ opacity: 1 }, { opacity: 0 }], { duration: 180, easing: 'linear' })
+        .finished.then(maybeHide);
+    } else {
+      maybeHide();
+    }
+  }
+
+  // Big, visible confetti burst from an element
+  function confettiAtEl(el) {
+    if (!el) return;
+    const r = el.getBoundingClientRect();
+    const originX = r.left + r.width / 2 + window.scrollX;
+    const originY = r.top  + r.height / 2 + window.scrollY;
+
+    const colors = ['#FF6B6B','#FFD93D','#6BCB77','#4D96FF','#B8C0FF','#F896D8'];
+    const COUNT = 48;
+    const MIN = 80, MAX = 200, DURATION = 1200;
+
+    for (let i = 0; i < COUNT; i++) {
+      const s = document.createElement('span');
+      s.className = 'c-confetti';
+      s.style.left = originX + 'px';
+      s.style.top  = originY + 'px';
+      s.style.width = s.style.height = (6 + Math.random() * 6) + 'px';
+      s.style.background = colors[i % colors.length];
+      document.body.appendChild(s);
+
+      const angle = Math.random() * Math.PI * 2;
+      const dist  = MIN + Math.random() * (MAX - MIN);
+      const tx = Math.cos(angle) * dist;
+      const ty = Math.sin(angle) * dist;
+
+      s.animate(
+        [
+          { transform: 'translate(0,0) scale(1)', opacity: 1 },
+          { transform: 'translate(' + tx + 'px,' + ty + 'px) scale(0.6)', opacity: 0 }
+        ],
+        { duration: DURATION, easing: 'cubic-bezier(.2,.7,.2,1)' }
+      ).finished.then(() => s.remove());
+    }
+  }
+
+  // Build an ACTIVE row (minus → text → checkbox)
+  function makeActiveItem(text) {
     const li = document.createElement('li');
     li.className = 'c-item';
-    li.innerHTML = `
-      <label class="c-item__label">
-        <input class="c-item__check" type="checkbox" />
-        <p class="c-item__text">${text}</p>
-      </label>
-    `;
+    li.innerHTML = [
+      '<button class="c-item__remove" type="button" aria-label="הסר">−</button>',
+      '<label class="c-item__label">',
+      '  <span class="c-item__text"></span>',
+      '  <input class="c-item__check" type="checkbox" />',
+      '</label>'
+    ].join('');
+    const span = li.querySelector('.c-item__text');
+    if (span) span.textContent = text;
     return li;
   }
 
-  function completedItemTemplate(text) {
+  // Build a COMPLETED row (minus → text → phantom)
+  function makeCompletedItem(text) {
     const li = document.createElement('li');
-    li.className = 'c-item';
-    li.innerHTML = `
-      <div class="c-item__label">
-        <p class="c-item__text">${text}</p>
-      </div>
-    `;
+    li.className = 'c-item c-item--done';
+    li.innerHTML = [
+      '<button class="c-item__remove" type="button" aria-label="הסר">−</button>',
+      '<span class="c-item__text"></span>',
+      '<span class="c-item__phantom" aria-hidden="true"></span>'
+    ].join('');
+    const span = li.querySelector('.c-item__text');
+    if (span) span.textContent = text;
     return li;
   }
 
-  // ---------- Nav (lemon) ----------
-  lemonToggle?.addEventListener('click', () => {
-    appNav?.classList.toggle('u-is-collapsed');
-  });
+  function ensureCompletedVisible() {
+    if (!completedSection) return;
+    completedSection.classList.remove('u-hidden');
+  }
 
-  // ---------- Check-off flow ----------
-  taskList?.addEventListener('change', (e) => {
-    const chk = e.target;
-    if (!chk.matches('.c-item__check')) return;
+  // ============ NAV (LEMON) ============
 
-    const li   = chk.closest('.c-item');
-    const text = li?.querySelector('.c-item__text')?.textContent?.trim() || '';
+  function toggleNav() {
+    if (!appNav) return;
+    const collapsed = appNav.classList.contains('u-is-collapsed');
+    appNav.classList.toggle('u-is-collapsed');
 
-    // 1) play crossing + rainbow fade
-    li.classList.add('is-completing');
+    // gently shift the date up/down to make room
+    if (titleDate) {
+      const moveDown = collapsed; // we are opening → move down
+      titleDate.animate(
+        moveDown
+          ? [{ transform: 'translateY(0)' }, { transform: 'translateY(10px)' }]
+          : [{ transform: 'translateY(10px)' }, { transform: 'translateY(0)' }],
+        { duration: 220, easing: 'cubic-bezier(.16,1,.3,1)', fill: 'forwards' }
+      );
+    }
+  }
 
-    // 2) when animation ends, move to Completed
-    const onDone = () => {
-      li.removeEventListener('animationend', onDone);
-      // Remove from task list
-      li.remove();
-      // Add to Completed
-      showCompleted();
-      completedList.appendChild(completedItemTemplate(text));
-    };
+  if (lemonToggle) {
+    lemonToggle.addEventListener('click', toggleNav);
+  }
 
-    li.addEventListener('animationend', onDone, { once: true });
-  });
+  // ============ COMPLETED toggle ============
+  if (completedToggle && completedList) {
+    completedToggle.addEventListener('click', () => {
+      const isHidden = completedList.classList.contains('u-hidden');
+      completedList.classList.toggle('u-hidden');
 
-  // ---------- Modal: open / close ----------
-  addEventBtn?.addEventListener('click', () => {
-    open(modal);
-    titleInput?.focus();
-  });
+      // Elegant little expand/collapse animation
+      completedList.animate(
+        isHidden
+          ? [{ opacity: 0, transform: 'translateY(-6px)' }, { opacity: 1, transform: 'translateY(0)' }]
+          : [{ opacity: 1, transform: 'translateY(0)' }, { opacity: 0, transform: 'translateY(-6px)' }],
+        { duration: 200, easing: 'cubic-bezier(.2,.7,.2,1)' }
+      );
 
-  modalBackdrop?.addEventListener('click', () => close(modal));
-  modalCloseBtn?.addEventListener('click', () => close(modal));
+      completedToggle.setAttribute('aria-expanded', String(isHidden));
+    });
+  }
 
+  // ============ TASKS: remove / complete ============
+  if (taskList) {
+    // remove (minus)
+    taskList.addEventListener('click', (e) => {
+      const t = e.target;
+      if (!t || !t.classList.contains('c-item__remove')) return;
+      const li = t.closest('.c-item');
+      if (li) li.remove();
+    });
+
+    // complete (checkbox)
+    taskList.addEventListener('change', (e) => {
+      const t = e.target;
+      if (!t || !t.classList.contains('c-item__check')) return;
+
+      const li   = t.closest('.c-item');
+      if (!li) return;
+      const span = li.querySelector('.c-item__text');
+      const text = span ? (span.textContent || '').trim() : '';
+
+      // strike + fade + confetti
+      li.classList.add('is-completing');
+      confettiAtEl(t);
+
+      li.addEventListener('animationend', function onEnd() {
+        li.removeEventListener('animationend', onEnd);
+        // remove from tasks
+        li.remove();
+        // add to completed
+        ensureCompletedVisible();
+        if (completedList) completedList.appendChild(makeCompletedItem(text));
+      }, { once: true });
+    });
+  }
+
+  // Completed list: allow removing too
+  if (completedList) {
+    completedList.addEventListener('click', (e) => {
+      const t = e.target;
+      if (!t || !t.classList.contains('c-item__remove')) return;
+      const li = t.closest('.c-item');
+      if (li) li.remove();
+    });
+  }
+
+  // ============ BOTTOM SHEET ============
+
+  if (addEventBtn) {
+    addEventBtn.addEventListener('click', openSheet);
+  }
+  if (sheetBackdrop) {
+    sheetBackdrop.addEventListener('click', closeSheet);
+  }
+  if (sheetCloseBtn) {
+    sheetCloseBtn.addEventListener('click', closeSheet);
+  }
   document.addEventListener('keydown', (e) => {
-    if (e.key === 'Escape') close(modal);
+    if (e.key === 'Escape') closeSheet();
   });
 
-  // ---------- Modal: submit new event ----------
-  modalForm?.addEventListener('submit', (e) => {
-    e.preventDefault();
-    const title = (titleInput.value || '').trim();
-    const date  = (dateInput.value || '').trim();
-    const time  = (timeInput.value || '').trim();
+  // Add participants (tiny demo counter)
+  if (peopleBtn && peopleHint) {
+    peopleBtn.addEventListener('click', () => {
+      peopleCount += 1;
+      peopleHint.textContent = peopleCount + ' משתתפים';
+    });
+  }
 
-    if (!title || !date || !time) return;
+  // Submit new event
+  if (sheetForm && taskList) {
+    sheetForm.addEventListener('submit', (e) => {
+      e.preventDefault();
 
-    // Format: "כותרת HH:MM (DD/MM/YY)"
-    const dt = new Date(date);
-    const dd = String(dt.getDate()).padStart(2, '0');
-    const mm = String(dt.getMonth() + 1).padStart(2, '0');
-    const yy = String(dt.getFullYear()).slice(-2);
+      const title = (titleInput && titleInput.value || '').trim();
+      const date  = (dateInput && dateInput.value || '').trim();
+      const time  = (timeInput && timeInput.value || '').trim();
+      if (!title || !date || !time) return;
 
-    const label = `${title} ${time} (${dd}/${mm}/${yy})`;
+      const dt = new Date(date);
+      const dd = String(dt.getDate()).padStart(2,'0');
+      const mm = String(dt.getMonth()+1).padStart(2,'0');
+      const yy = String(dt.getFullYear()).slice(-2);
 
-    taskList.appendChild(taskItemTemplate(label));
+      const label = title + ' ' + time + ' (' + dd + '/' + mm + '/' + yy + ')';
+      taskList.appendChild(makeActiveItem(label));
 
-    // reset + close
-    modalForm.reset();
-    close(modal);
-  });
-});
+      sheetForm.reset();
+      peopleCount = 0;
+      if (peopleHint) peopleHint.textContent = '—';
+      closeSheet();
+    });
+  }
+})();

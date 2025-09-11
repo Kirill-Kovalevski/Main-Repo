@@ -1,0 +1,134 @@
+@charset "UTF-8";
+/* settings/_tokens.scss  ------------------------------------ */
+/* Brand */
+/* Accent / feedback */
+/* Neutrals */
+/* “Ink” utility tints */
+/* Spacing scale (all in rems) */
+/* Radii */
+/* Motion & easing */
+/* Typography */
+/* Colors (the ones your partials reference) */
+/* light gray borders */
+/* φ-driven spacing + gentle gradient coloring for titles */
+.c-title {
+  margin-block: 1.618rem 0.75rem;
+  text-align: center;
+  font-weight: 700;
+  line-height: 1.2;
+  /* === Fibonacci spacing scale (in rem) ===
+   3, 5, 8, 13, 21, 34px  →  rem @ 16px base  */
+}
+.c-title--date {
+  font-size: 1.125rem;
+  color: #1f2937;
+  opacity: 0.85;
+}
+.c-title--tasks, .c-title--completed {
+  display: inline-block;
+  padding-inline: 0.75rem;
+  padding-block: 0.375rem;
+  border-radius: 0.75rem;
+  background: linear-gradient(90deg, #8ecae6, #219ebc, #ffb703, #fb8500);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+  /* gradient text */
+  letter-spacing: 0.015em;
+}
+.c-title--completed {
+  margin-top: 1.75rem;
+  margin-bottom: 0.875rem;
+}
+.c-title--tasks {
+  margin-top: 1.5rem;
+  margin-bottom: 0.625rem;
+}
+
+/* Header layout – phone width, RTL */
+.o-header {
+  position: relative;
+  width: 100%;
+  max-width: 22.5rem;
+  margin-inline: auto;
+  padding-inline: 1rem;
+  /* when nav opens, nudge the day down a bit */
+}
+.o-header.is-nav-open .c-title__day {
+  transform: translateY(0.375rem);
+}
+
+/* Title centered, elegant serif */
+.c-app-title {
+  margin: 0;
+  padding-block: 1rem 0.5rem;
+  text-align: center;
+  font-family: "Cormorant Garamond", serif;
+  font-weight: 600;
+  letter-spacing: 0.01em;
+  /* color rhythm using soft gradient (subtle) */
+  background: linear-gradient(90deg, #446A46, #2E8B57, #3AAFA9);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+  /* size guided by Fibonacci feel ~ 34px */
+  font-size: 2.125rem;
+  line-height: 1.1;
+}
+
+/* Lemon button on the right (RTL) under the title */
+.c-icon-btn--lemon {
+  position: relative;
+  display: grid;
+  place-items: center;
+  inline-size: 2.25rem;
+  block-size: 2.25rem;
+  margin-inline-start: auto;
+  border: 1px solid rgba(197, 154, 33, 0.4);
+  border-radius: 0.75rem;
+  /* Soft crafted surface */
+  background: radial-gradient(80% 80% at 30% 20%, #FFFFFF 0%, rgba(255, 255, 255, 0.85) 50%, rgba(255, 255, 255, 0) 100%), linear-gradient(180deg, #FBF7EE, #EEE4D3);
+  box-shadow: inset 0 0.1rem 0.25rem rgba(255, 255, 255, 0.6), 0 0.15rem 0.4rem rgba(0, 0, 0, 0.08);
+  transition: box-shadow 150ms cubic-bezier(0.16, 1, 0.3, 1), transform 150ms cubic-bezier(0.16, 1, 0.3, 1), border-color 150ms cubic-bezier(0.16, 1, 0.3, 1);
+  /* ensure the SVG is centered perfectly */
+}
+.c-icon-btn--lemon svg {
+  display: block;
+  width: 1.5rem;
+  height: 1.5rem;
+}
+.c-icon-btn--lemon:hover {
+  box-shadow: inset 0 0.1rem 0.25rem rgba(255, 255, 255, 0.7), 0 0.35rem 0.7rem rgba(0, 0, 0, 0.1);
+  border-color: rgba(197, 154, 33, 0.55);
+  transform: translateY(-1px);
+}
+.c-icon-btn--lemon:focus-visible {
+  outline: none;
+  box-shadow: 0 0 0 0.125rem rgba(0, 0, 0, 0.06), 0 0 0 0.25rem rgba(50, 50, 76, 0.35);
+}
+.c-icon-btn--lemon:active {
+  transform: translateY(1px);
+}
+
+/* Date/subtitle spacing harmony (Fibonacci-ish spacing) */
+.c-title--date {
+  margin: 0;
+  padding-block: 0.625rem 0.375rem;
+  text-align: center;
+  color: #4b5563;
+  font-family: "Rubik", system-ui, sans-serif;
+}
+
+.c-title__day {
+  display: inline-block;
+  transition: transform 200ms cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.c-subtitle {
+  margin: 0;
+  padding-block-end: 1rem;
+  text-align: center;
+  color: #6b7280;
+  font-family: "Rubik", system-ui, sans-serif;
+  line-height: 1.2;
+}

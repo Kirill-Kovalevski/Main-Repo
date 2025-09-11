@@ -4,30 +4,19 @@
 // LAYOUT OBJECTS
 // ==============================
 
-.o-header {
-  display: flex;
-  flex-direction: column;
-  align-items: flex-start;
-  gap: $sp-12;
-  margin-bottom: $sp-16;
-}
+@use '../settings/tokens' as *;
 
 .o-page {
-  /* Full-viewport center */
-  min-height: 100dvh;
+  min-block-size: 100svh;
   display: grid;
-  place-items: center;
-  background:
-    radial-gradient(120rem 120rem at 50% -10%, rgba(50, 50, 76, 0.05), transparent 40%),
-    #eef2f7;
-
-  /* iPhone-like card */
-  width: 24.5625rem; /* 393px */
-  max-width: 100%;
-  background: #fff;
-  border-radius: $radius-12;
-  box-shadow:
-    0 10px 30px rgba(0, 0, 0, 0.08),
-    0 2px 10px rgba(0, 0, 0, 0.04);
-  padding: $sp-24 $sp-16 $sp-24;
+  justify-content: center;   /* center the column */
+  padding: $sp-16;
+  background: linear-gradient(180deg, #f6f8fb, #eef2f7);
 }
+
+.o-header,
+.c-list,
+.c-completed {
+  inline-size: min(22.5rem, 100%); /* iPhone column width */
+}
+

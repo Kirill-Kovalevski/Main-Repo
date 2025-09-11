@@ -1,18 +1,24 @@
-/* ================================
-   SETTINGS / TOKENS
-   Design system variables
-   ================================ */
-/* --- Brand colors --- */
-/* --- Neutral palette --- */
-/* --- Ink scale (light border grays) --- */
-/* --- Status colors --- */
-/* --- Radius --- */
-/* --- Spacing scale --- */
-/* --- Typography --- */
-/* --- Motion / easing --- */
+@charset "UTF-8";
+/* settings/_tokens.scss ----------------------------------- */
+/* Brand */
+/* Accent / feedback */
+/* Neutrals */
+/* “Ink” utility tints */
+/* Spacing scale (rems @ 16px) */
+/* Fibonacci spacing (rems @ 16px) */
+/* Radii */
+/* Motion & easing */
+/* Typography */
+/* Gradient colors for headings (tokens only) */
 /* ================================
    COMPONENTS / Buttons
    ================================ */
+.c-cta-wrap {
+  display: grid;
+  place-items: center;
+  margin-block: 1.25rem 1.75rem;
+}
+
 .c-cta {
   display: inline-flex;
   align-items: center;
@@ -21,22 +27,22 @@
   padding-block: 0.75rem;
   border: 0.0625rem solid transparent;
   border-radius: 0.75rem;
-  font-family: "Rubik", sans-serif;
+  font-family: "Rubik", system-ui, -apple-system, "Segoe UI", "Noto Sans", Arial, sans-serif;
   font-size: 1rem;
   font-weight: 600;
   line-height: 1;
   color: #ffffff;
   background: linear-gradient(135deg, #32324C 0%, #36ADC1 100%);
-  box-shadow: 0 0.25rem 0.5rem rgba(42, 42, 60, 0.15), 0 0 0 0 rgba(74, 74, 106, 0);
+  box-shadow: 0 0.25rem 0.5rem rgba(43, 43, 68, 0.15), 0 0 0 0 rgba(58, 58, 85, 0);
   /* placeholder for focus ring */
   cursor: pointer;
   user-select: none;
-  transition: transform 150ms cubic-bezier(0, 0, 0.2, 1), box-shadow 150ms cubic-bezier(0, 0, 0.2, 1), opacity 150ms cubic-bezier(0, 0, 0.2, 1);
+  transition: transform 150ms cubic-bezier(0.16, 1, 0.3, 1), box-shadow 150ms cubic-bezier(0.16, 1, 0.3, 1), opacity 150ms cubic-bezier(0.16, 1, 0.3, 1);
   /* Disabled state (if you ever need it) */
 }
 .c-cta:hover {
   transform: translateY(-0.03125rem);
-  box-shadow: 0 0.5rem 1rem rgba(42, 42, 60, 0.18), 0 0 0 0 rgba(74, 74, 106, 0);
+  box-shadow: 0 0.5rem 1rem rgba(43, 43, 68, 0.18), 0 0 0 0 rgba(58, 58, 85, 0);
 }
 .c-cta:active {
   transform: translateY(0);
@@ -44,10 +50,28 @@
 }
 .c-cta:focus-visible {
   outline: none;
-  box-shadow: 0 0 0 0.125rem rgba(0, 0, 0, 0.06), 0 0 0 0.25rem rgba(74, 74, 106, 0.35);
+  box-shadow: 0 0 0 0.125rem rgba(0, 0, 0, 0.06), 0 0 0 0.25rem rgba(58, 58, 85, 0.35);
 }
 .c-cta[disabled] {
   opacity: 0.55;
   cursor: not-allowed;
   filter: grayscale(20%);
+}
+
+.c-cta {
+  inline-size: max-content;
+  padding: 0.625rem 1.25rem;
+  border: 0;
+  border-radius: 0.75rem;
+  color: #fff;
+  cursor: pointer;
+  background: linear-gradient(135deg, #2f4f7f, #1ea8b3);
+  box-shadow: 0 0.5rem 1.25rem rgba(0, 0, 0, 0.12);
+  transition: transform 150ms cubic-bezier(0.16, 1, 0.3, 1), box-shadow 150ms cubic-bezier(0.16, 1, 0.3, 1);
+}
+.c-cta:hover {
+  transform: translateY(-1px);
+}
+.c-cta:active {
+  transform: translateY(1px);
 }

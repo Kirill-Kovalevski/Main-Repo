@@ -1,5 +1,4 @@
-/* settings/_tokens.scss  ------------------------------------ */
-
+/* settings/_tokens.scss ----------------------------------- */
 /* Brand */
 $brand:       #32324C;   // deep indigo used across the app
 $brand-700:   #2b2b44;
@@ -10,6 +9,7 @@ $teal:        #36ADC1;
 $success:     #22c55e;
 
 /* Neutrals */
+$neutral-050: #f9fafb;
 $neutral-100: #ffffff;
 $neutral-200: #f7f7f7;
 $neutral-300: #eef2f7;
@@ -23,20 +23,35 @@ $neutral-900: #1f2937;
 /* “Ink” utility tints */
 $ink-10: rgba($neutral-900, 0.08);
 
-/* Spacing (4px scale) */
-$sp-4:  0.25rem;
-$sp-6:  0.375rem;
-$sp-8:  0.5rem;
-$sp-10: 0.625rem;
-$sp-12: 0.75rem;
-$sp-16: 1rem;
-$sp-18: 1.125rem;
-$sp-20: 1.25rem;
-$sp-24: 1.5rem;
+/* Spacing scale (rems @ 16px) */
+$sp-2:   0.125rem; // 2px
+$sp-4:   0.25rem;  // 4px
+$sp-6:   0.375rem; // 6px
+$sp-8:   0.5rem;   // 8px
+$sp-10:  0.625rem; // 10px
+$sp-12:  0.75rem;  // 12px
+$sp-14:  0.875rem; // 14px
+$sp-16:  1rem;     // 16px
+$sp-18:  1.125rem; // 18px
+$sp-20:  1.25rem;  // 20px
+$sp-24:  1.5rem;   // 24px
+$sp-28:  1.75rem;  // 28px
+$sp-32:  2rem;     // 32px
+$sp-36:  2.25rem;  // 36px
+$sp-40:  2.5rem;   // 40px
+
+/* Fibonacci spacing (rems @ 16px) */
+$sp-f3:   0.1875rem; // 3px
+$sp-f5:   0.3125rem; // 5px
+$sp-f8:   0.5rem;    // 8px
+$sp-f13:  0.8125rem; // 13px
+$sp-f21:  1.3125rem; // 21px
+$sp-f34:  2.125rem;  // 34px
 
 /* Radii */
-$radius-8:  0.5rem;
-$radius-12: 0.75rem;
+$radius-8:   0.5rem;
+$radius-10:  0.625rem;
+$radius-12:  0.75rem;
 
 /* Motion & easing */
 $motion-150: 150ms;
@@ -51,3 +66,17 @@ $font-size-20: 1.25rem;
 $font-size-24: 1.5rem;
 $font-size-32: 2rem;
 $font-size-40: 2.5rem;
+
+/* Gradient colors for headings (tokens only) */
+$grad-a: #8ecae6;
+$grad-b: #219ebc;
+$grad-c: #ffb703;
+$grad-d: #fb8500;
+/* classy-sport palette */
+$brand-700: #2b2b44;  // deep indigo (primary)
+$brand-600: #32324C;
+$accent-1:  #36ADC1;  // teal / sport
+$accent-2:  #80E27E;  // fresh green
+$accent-3:  #F2C94C;  // warm lemon
+$muted-1:   #edf2f7;  // card bg
+$muted-2:   #e7ecf2;  // strokes

@@ -1,0 +1,97 @@
+@use '../settings/tokens' as *;
+@use '../tools/mixins' as *;
+
+/* The whole completed section sits centered on the page */
+.c-completed {
+  display: grid;
+  justify-items: center;
+  text-align: center;
+
+  /* small, harmonious spacing using your Fibonacci tokens */
+  gap: $sp-f5;                       /* 5px between button and list */
+  margin-block: $sp-f13 $sp-f8;      /* 13px top, 8px bottom */
+  margin-inline: auto;
+
+  /* entrance animation container class (JS adds it once when revealed) */
+  &.is-appearing {
+    animation: completedAppear 360ms $ease-out both;
+  }
+}
+
+@keyframes completedAppear {
+  from {
+    opacity: 0;
+    transform: translateY(-$sp-f5);  /* gentle lift-in */
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* The "בוצע" button */
+.c-completed__btn {
+  min-inline-size: 8.75rem;          /* ~140px */
+  inline-size: auto;
+  padding: $sp-f8 $sp-f13;           /* 8px x 13px */
+  border-radius: $radius-12;
+  border: 1px solid rgba(0,0,0,.08);
+
+  background:
+    linear-gradient(180deg, #ffffff, #f7f7fa);
+  color: $neutral-900;
+  font-weight: 600;
+  letter-spacing: .015em;
+
+  box-shadow:
+    inset 0 0 .25rem rgba(255,255,255,.65),
+    0 .2rem .45rem rgba(0,0,0,.08);
+
+  transition:
+    transform $motion-150 $ease-out,
+    box-shadow $motion-150 $ease-out;
+
+  &:hover {
+    transform: translateY(-1px);
+    box-shadow:
+      inset 0 0 .25rem rgba(255,255,255,.75),
+      0 .35rem .6rem rgba(0,0,0,.12);
+  }
+
+  &:focus-visible {
+    @include focus-ring;
+  }
+}
+
+/* The completed list sits tight under the button when expanded */
+.c-completed__list {
+  display: grid;
+  gap: $sp-f5;                       /* tidy vertical rhythm */
+  margin: 0;
+  padding: 0;
+  list-style: none;
+
+  /* subtle reveal when user expands it */
+  &.is-revealing {
+    animation: completedListReveal 260ms $ease-out both;
+  }
+}
+
+@keyframes completedListReveal {
+  from {
+    opacity: 0;
+    transform: translateY(-$sp-f3);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* completed items get a gentle "done" vibe (not crossed) */
+.c-item.c-item--done {
+  background: rgba(54,173,193,.08);  /* calm hint of success */
+  border-radius: $radius-12;
+  padding: $sp-f8 $sp-f13;
+  color: $neutral-900;
+}

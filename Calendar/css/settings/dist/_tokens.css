@@ -1,10 +1,13 @@
 @charset "UTF-8";
-/* settings/_tokens.scss  ------------------------------------ */
+/* settings/_tokens.scss ----------------------------------- */
 /* Brand */
 /* Accent / feedback */
 /* Neutrals */
 /* “Ink” utility tints */
-/* Spacing (4px scale) */
+/* Spacing scale (rems @ 16px) */
+/* Fibonacci spacing (rems @ 16px) */
 /* Radii */
 /* Motion & easing */
 /* Typography */
+/* Gradient colors for headings (tokens only) */
+/* classy-sport palette */

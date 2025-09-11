@@ -4,7 +4,11 @@
 /* ================================
    COMPONENTS / Buttons
    ================================ */
-
+.c-cta-wrap {
+  display: grid;
+  place-items: center;
+  margin-block: $sp-20 $sp-28;
+}
 .c-cta {
   display: inline-flex;
   align-items: center;
@@ -58,4 +62,18 @@
     cursor: not-allowed;
     filter: grayscale(20%);
   }
+}
+.c-cta {
+  inline-size: max-content;
+  padding: $sp-10 $sp-20;
+  border: 0;
+  border-radius: $radius-12;
+  color: #fff;
+  cursor: pointer;
+  background: linear-gradient(135deg, #2f4f7f, #1ea8b3);
+  box-shadow: 0 .5rem 1.25rem rgba(0,0,0,.12);
+  transition: transform $motion-150 $ease-out, box-shadow $motion-150 $ease-out;
+
+  &:hover  { transform: translateY(-1px); }
+  &:active { transform: translateY( 1px); }
 }

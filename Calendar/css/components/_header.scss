@@ -1,0 +1,80 @@
+@use '../settings/tokens' as *;
+@use '../tools/mixins' as *;
+
+/* Header layout – phone width, RTL */
+.o-header {
+  display: grid;
+  justify-items: center;
+  align-items: start;
+  gap: $sp-f8;               /* 8px rhythm between header blocks */
+  text-align: center;
+
+
+  /* when nav opens, nudge the day down a bit */
+  &.is-nav-open .c-title__day {
+    transform: translateY($sp-6);
+  }
+}
+
+/* Title centered, elegant serif */
+.c-app-title {
+  margin: 0 0 $sp-f5 0;      /* slight space above lemon */
+  font-weight: 600;
+  letter-spacing: 0.015em;
+}
+
+/* Lemon button — perfectly centered content */
+.c-icon-btn--lemon {
+  inline-size: 2rem;
+  block-size: 2rem;
+  display: grid;
+  place-items: center;
+  border: 0;
+
+  /* refined frame */
+  border-radius: 0.75rem;
+  background:
+    radial-gradient(120% 120% at 40% 30%, rgba(255,255,255,.85), rgba(255,255,255,0)),
+    linear-gradient(160deg, #FFF6CC, #FFE37A);
+  box-shadow:
+    inset 0 0 0.25rem rgba(255,255,255,.7),
+    0 0.15rem 0.35rem rgba(0,0,0,.08);
+
+  transition:
+    box-shadow $motion-150 $ease-out,
+    transform  $motion-150 $ease-out;
+
+  &:hover {
+    box-shadow:
+      inset 0 0 0.25rem rgba(255,255,255,.8),
+      0 0.35rem 0.6rem rgba(0,0,0,.12);
+  }
+
+  &:focus-visible { @include focus-ring; }
+  &:active { transform: translateY(1px); }
+}
+
+/* Date/subtitle spacing harmony (Fibonacci-ish spacing) */
+.c-title--date {
+  margin: $sp-f5 0 0 0;      /* 5px gap below lemon */
+  line-height: 1.15;
+}
+/* The day label (“שבת”) aligns right under the lemon */
+.c-title__day {
+  display: inline-block;
+  margin-block-start: $sp-f3; /* 3px micro-gap for visual glue */
+}
+
+.c-subtitle {
+  margin: 0;
+  padding-block-end: $sp-16;
+  text-align: center;
+  color: $neutral-600;
+  font-family: 'Rubik', system-ui, sans-serif;
+  line-height: 1.2;
+}
+/* When nav opens, nudge the date line slightly */
+.o-header.is-nav-open .c-title--date {
+  transform: translateY($sp-f3);   /* gentle 3px nudge */
+  transition: transform 200ms $ease-out;
+}

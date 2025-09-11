@@ -1,0 +1,158 @@
+@use '../settings/tokens' as *;
+@use '../tools/mixins' as *;
+
+/* -------- Centered CTA + “mini-bang” feedback -------- */
+.c-cta-wrap {
+  display: grid;
+  place-items: center;
+  margin-block: $sp-24;
+}
+.c-cta {
+  inline-size: max(12rem, 52%);
+  block-size: 2.75rem;
+  border: 0;
+  border-radius: $radius-12;
+  color: $neutral-100;
+  cursor: pointer;
+  background: linear-gradient(135deg, $brand 0%, $teal 100%);
+  box-shadow: 0 0.5rem 1.25rem rgba(0,0,0,.12);
+  transition: transform $motion-150 $ease-out, box-shadow $motion-150 $ease-out;
+  &:hover { transform: translateY(-1px); }
+  &:focus-visible { @include focus-ring; }
+  &:active { transform: translateY(1px); }
+}
+/* “mini-bang” pop */
+.c-cta--bang.is-bang::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  box-shadow: 0 0 0 .125rem rgba($teal, .55), 0 0 2.5rem rgba($teal, .35) inset;
+  animation: bang 320ms $ease-out forwards;
+}
+@keyframes bang {
+  0%   { transform: scale(.98); opacity: .9; }
+  60%  { transform: scale(1.05); opacity: 1; }
+  100% { transform: scale(1);   opacity: 0; box-shadow: none; }
+}
+
+/* -------- Bottom sheet -------- */
+.c-sheet {
+  position: fixed;
+  inset-inline: 0;
+  inset-block-end: 0;
+  z-index: 60;
+  pointer-events: none; /* only panel/backdrop will accept */
+}
+.c-sheet__backdrop {
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,.25);
+  opacity: 0;
+  transition: opacity $motion-200 $ease-in-out;
+  pointer-events: none;
+}
+.c-sheet__panel {
+  position: relative;
+  margin-inline: auto;
+  inline-size: min(28rem, 100%);
+  background: linear-gradient(180deg, #ffffff, #f7f9fc);
+  border: 1px solid $ink-10;
+  border-radius: $radius-12 $radius-12 0 0;
+  box-shadow: 0 -0.75rem 2rem rgba(0,0,0,.18);
+  transform: translateY(102%);
+  transition: transform 300ms $ease-out;
+  pointer-events: auto;
+  padding: $sp-16;
+}
+
+/* open state */
+.c-sheet.is-open .c-sheet__panel { transform: translateY(0%); }
+.c-sheet.is-open .c-sheet__backdrop {
+  opacity: 1;
+  pointer-events: auto;
+}
+
+/* header */
+.c-sheet__header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: $sp-12;
+  margin-block-end: $sp-12;
+}
+.c-sheet__title {
+  margin: 0;
+  font-weight: 700;
+  color: $brand;
+}
+
+/* form */
+.c-sheet__form { display: grid; gap: $sp-12; }
+.f-field { display: grid; gap: $sp-6; }
+.f-label { color: $neutral-700; font-size: .875rem; }
+.f-input {
+  inline-size: 100%;
+  block-size: 2.5rem;
+  border: 1px solid $ink-10;
+  border-radius: $radius-12;
+  padding-inline: $sp-12;
+  background: #fff;
+  &:focus { @include focus-ring; }
+}
+
+/* icon inside field */
+.f-field--icon {
+  position: relative;
+  .f-input { padding-inline-start: $sp-36; } /* room for icon (RTL start) */
+  .f-icon {
+    position: absolute;
+    inset-inline-start: $sp-10;
+    inset-block-start: 50%;
+    transform: translateY(-50%);
+    color: $neutral-600;
+    pointer-events: none;
+  }
+}
+
+.f-row { display: flex; align-items: center; gap: $sp-12; }
+.c-chip {
+  padding: $sp-6 $sp-12;
+  border-radius: $radius-12;
+  border: 1px dashed $teal;
+  background: rgba($teal, .08);
+  color: $brand;
+  cursor: pointer;
+}
+.f-hint { color: $neutral-600; font-size: .875rem; }
+
+/* actions */
+.c-sheet__actions {
+  display: flex; gap: $sp-12; justify-content: flex-start;
+  margin-block-start: $sp-10;
+}
+.c-btn {
+  inline-size: auto;
+  min-inline-size: 6.5rem;
+  block-size: 2.5rem;
+  border-radius: $radius-12;
+  border: 1px solid transparent;
+  cursor: pointer;
+}
+.c-btn--ghost {
+  background: transparent;
+  border-color: $ink-10;
+  color: $brand;
+}
+.c-btn--primary {
+  background: linear-gradient(135deg, $brand 0%, $teal 100%);
+  color: $neutral-100;
+}
+
+/* small ghost icon button */
+.c-icon-btn--ghost{
+  inline-size: 2rem; block-size: 2rem;
+  display:grid; place-items:center;
+  border-radius: $radius-12;
+  border: 1px solid $ink-10; background: #fff;
+}

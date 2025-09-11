@@ -1,0 +1,39 @@
+/* components/_titles.scss */
+@use '../settings/tokens' as *;
+
+.c-title {
+  margin-block: 0;
+  text-align: center;
+  font-weight: 700;
+  line-height: 1.2;
+
+  &--date {
+    font-size: 1.125rem;
+    color: $neutral-900;
+    opacity: .85;
+    margin: 0;
+  }
+
+  &--tasks,
+  &--completed {
+    display: inline-block;
+    padding-inline: $sp-12;
+    padding-block: $sp-6;
+    border-radius: $radius-12;
+    background: linear-gradient(90deg, $grad-a, $grad-b, $grad-c, $grad-d);
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent; /* gradient text */
+    letter-spacing: .015em;
+  }
+
+  &--completed {
+    margin-top: $sp-28;
+    margin-bottom: $sp-14;
+  }
+
+  &--tasks {
+    margin-top: $sp-24;
+    margin-bottom: $sp-10;
+  }
+}

@@ -1,0 +1,7 @@
+@charset "UTF-8";
+/* If your rainbow/strike animation exists elsewhere, keep it.
+   This just ensures it’s not too fast so confetti feels synchronized. */
+.c-item.is-completing {
+  /* example: extend duration slightly if you want */
+  animation-duration: 900ms;
+}
