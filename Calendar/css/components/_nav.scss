@@ -1,167 +1,140 @@
 @use '../settings/tokens' as *;
 @use '../tools/mixins' as *;
 
-/* NAV wrapper just controls collapsed state */
-.c-nav {
-  position: relative;
-  width: 100%;
-  max-width: 22.5rem;
-  margin-inline: auto;
-
-  /* collapse/expand via panel */
-  &.u-is-collapsed .c-nav__panel {
-    max-height: 0;
-    opacity: 0;
-    transform: translateY(-0.25rem);
-    pointer-events: none;
-  }
-}
-
-
-
-/* Space between title and lemon */
-.c-app-title {
-  margin-block-end: $sp-10; // tighter under the title
-}
-/* Date sits close to the lemon; moves down when nav opens */
-.o-header {
-  --nav-shift: 0rem; // JS sets this when needed
-}
-
-.c-title--date {
-  margin-top: 0.5rem;                // close to the lemon by default
-  transition: transform 220ms $ease-out, margin-top 220ms $ease-out;
-  transform: translateY(0);
-}
-
-/* when nav is open we push the date down */
-.o-header.is-nav-open .c-title--date {
-  transform: translateY(var(--nav-shift, 2.25rem));
-}
-
-
+/* =========================
+   Lemon button (centered)
+   ========================= */
 .c-icon-btn--lemon {
   inline-size: 2rem;
   block-size: 2rem;
   display: grid;
   place-items: center;
-  border: 1px solid rgba(0,0,0,.06);
+  border: 0;
   border-radius: $radius-12;
   background:
-    radial-gradient(circle at 40% 35%, #fff, rgba(255,255,255,.2)),
-    linear-gradient(180deg, #FFF7D1, #FFE48A);
+    radial-gradient(120% 120% at 40% 30%, rgba(255,255,255,.85), rgba(255,255,255,0)),
+    linear-gradient(160deg, #FFF6CC, #FFE37A);
   box-shadow:
-    0 .25rem .6rem rgba(0,0,0,.08),
-    inset 0 0 .35rem rgba(255,255,255,.7);
+    inset 0 0 .35rem rgba(255,255,255,.7),
+    0 .25rem .6rem rgba(0,0,0,.08);
   transition: transform $motion-150 $ease-out, box-shadow $motion-150 $ease-out;
 
-  &:hover   { transform: translateY(-1px); }
-  &:active  { transform: translateY( 1px); }
+  &:hover  { transform: translateY(-1px); }
+  &:active { transform: translateY( 1px); }
   &:focus-visible { @include focus-ring; }
 }
 
-/* Keep nav hidden until lemon is clicked */
-.c-nav.u-is-collapsed .c-nav__panel {
-  max-height: 0;
-  opacity: 0;
-  transform: translateY(-.25rem);
-  pointer-events: none;
+/* ==============================================
+   Nav container (fixed slot under the lemon)
+   ============================================== */
+.c-nav {
+  position: relative;
+  width: 100%;
+  max-width: 22.5rem;
+  margin-inline: auto;
+  min-block-size: 2.6rem; /* reserve the slot even when collapsed */
 }
 
-/* Smooth open/close */
+/* The expanding/collapsing panel */
 .c-nav__panel {
+  overflow: hidden;
   margin-block-start: $sp-10;
   background: rgba(255,255,255,.82);
   backdrop-filter: blur(8px);
   border: 1px solid rgba(0,0,0,.06);
   border-radius: $radius-12;
   padding: $sp-10;
+
+  /* collapsed by default; header class will expand it */
+  max-height: 0;
+  opacity: 0;
+  transform: translateY(-.15rem);
+
   transition:
     max-height 260ms $ease-out,
     opacity    180ms $ease-out,
     transform  260ms $ease-out;
 
-  /* allows the expand animation */
-  max-height: 8rem;
+  @media (prefers-reduced-motion: reduce) { transition: none; }
+}
+
+/* When header toggles .is-nav-open, expand the panel */
+.o-header.is-nav-open .c-nav__panel {
+  max-height: var(--nav-shift); /* set by JS */
   opacity: 1;
   transform: translateY(0);
 }
 
-
-/* row: [profile] [search] [settings] */
+/* Nav row content: [profile] [search] [settings] */
 .c-nav__row {
   display: grid;
   grid-template-columns: auto 1fr auto;
   align-items: center;
-  gap: $sp-f8;  /* 8px between items for harmony */
+  gap: $sp-10;
 }
 
-/* shared icon button styling */
+/* Shared small icon buttons (profile/settings) */
 .c-icon-btn {
   inline-size: 2rem;
   block-size: 2rem;
   display: grid;
   place-items: center;
-
-  border: 1px solid rgba(50,50,70,0.15);
-  border-radius: 0.75rem;
-
+  border: 1px solid rgba(50,50,70,.15);
+  border-radius: .75rem;
   background:
     radial-gradient(circle at 30% 20%, rgba(255,255,255,.85), rgba(255,255,255,0)),
     linear-gradient(145deg, #F8F5EF, #EDE7DC);
-
   box-shadow:
-    inset 0 0 0.25rem rgba(255,255,255,.55),
+    inset 0 0 .25rem rgba(255,255,255,.55),
     0 .15rem .35rem rgba(0,0,0,.08);
-
   transition: transform $motion-150 $ease-out, box-shadow $motion-150 $ease-out;
 
   svg { display: block; }
-
-  &:hover   { transform: translateY(-1px); }
+  &:hover { transform: translateY(-1px); }
   &:focus-visible { @include focus-ring; }
 }
 
-/* center search */
-.c-search {
-  position: relative;
-  display: block;
-}
-
+/* Search field in the middle */
+.c-search { position: relative; display: block; }
 .c-search__input {
   inline-size: 100%;
   block-size: 2.25rem;
-  padding-inline: $sp-28 $sp-12;  // space for icon
+  padding-inline: $sp-28 $sp-12; /* icon padding (RTL: on right) */
   border-radius: $radius-12;
-
-  border: 1px solid rgba(0,0,0,0.08);
+  border: 1px solid rgba(0,0,0,.08);
   background: linear-gradient(180deg, #FFFFFF, #F7F7FA);
   color: $neutral-900;
-
   font-family: 'Rubik', system-ui, sans-serif;
   font-size: .95rem;
-
   transition: border-color $motion-150 $ease-out, box-shadow $motion-150 $ease-out;
 
   &::placeholder { color: $neutral-500; }
-  &:focus        { @include focus-ring; }
+  &:focus { @include focus-ring; }
 }
-
 .c-search__icon {
   position: absolute;
-  inset-inline-start: $sp-10;  // RTL: inside on the right
+  inset-inline-start: $sp-10;  /* RTL: inside on the right */
   inset-block-start: 50%;
   transform: translateY(-50%);
   opacity: .65;
   pointer-events: none;
 }
-/* Date sits tight under the lemon by default (nav collapsed)
-   When nav opens (no .u-is-collapsed), we push the date down smoothly. */
-.c-nav + .c-title--date {
-  margin-block-start: 0.3125rem; // tight under lemon
-  transition: margin 220ms cubic-bezier(.16,1,.3,1);
+
+/* ==============================================
+   Date block shares the slot with the nav panel
+   (visible when nav is collapsed, slides down when open)
+   ============================================== */
+.c-meta-block {
+  text-align: center;
+  margin:auto;         /* small gap under title/lemon */
+  transform: translateY(0);
+  transition: transform 260ms $ease-out;
 }
 
-.c-nav:not(.u-is-collapsed) + .c-title--date {
-  margin-block-start: 1rem; // drops down when nav is visible
+/* Push date down by the panel height when nav opens */
+.o-header.is-nav-open .c-meta-block {
+  transform: translateY(var(--nav-shift));
 }
+
+/* Optional: title spacing above lemon */
+.c-app-title { margin: 0 0 $sp-8 0; text-align: center; }

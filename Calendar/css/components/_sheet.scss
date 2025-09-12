@@ -156,3 +156,23 @@
   border-radius: $radius-12;
   border: 1px solid $ink-10; background: #fff;
 }
+
+.c-cta-wrap{ position: sticky; inset-block-end: 0; display: grid; place-items: center; padding: $sp-16; }
+.c-cta{ min-inline-size: 13rem; padding: $sp-10 $sp-16; border: 0; border-radius: $radius-12; color:#fff;
+  background: linear-gradient(135deg, #2b2b44, #36ADC1);
+  box-shadow: 0 .5rem 1.25rem rgba(0,0,0,.12), inset 0 1px 0 rgba(255,255,255,.25);
+}
+
+.c-sheet{ position: fixed; inset: 0; z-index: 60; }
+.c-sheet.u-hidden{ display: none; }
+.c-sheet__backdrop{ position: absolute; inset: 0; background: rgba(0,0,0,.35); }
+.c-sheet__panel{
+  position: absolute; inset-inline: 0; inset-block-end: 0;
+  background: #fff; border-radius: $radius-12 $radius-12 0 0;
+  box-shadow: 0 -1rem 2rem rgba(0,0,0,.2);
+  transform: translateY(100%); opacity: 0;
+  transition: transform 280ms cubic-bezier(.16,1,.3,1), opacity 180ms $ease-out;
+  padding: $sp-16; max-inline-size: 28rem; margin-inline: auto;
+}
+.c-sheet.is-open .c-sheet__panel{ transform: translateY(0); opacity: 1; }
+.c-sheet.is-open{ display: block; }

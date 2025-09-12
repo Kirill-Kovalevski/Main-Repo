@@ -39,6 +39,9 @@ $sp-28:  1.75rem;  // 28px
 $sp-32:  2rem;     // 32px
 $sp-36:  2.25rem;  // 36px
 $sp-40:  2.5rem;   // 40px
+/* Calendar/css/settings/_tokens.scss (or wherever your tokens are) */
+$radius-pill: 9999px; // fully rounded for pill buttons
+
 
 /* Fibonacci spacing (rems @ 16px) */
 $sp-f3:   0.1875rem; // 3px

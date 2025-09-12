@@ -37,3 +37,14 @@
     margin-bottom: $sp-10;
   }
 }
+/* Date sits in the “nav slot” when nav is closed; drops when nav opens */
+.c-title--date {
+  transform: translateY(-2.25rem);             /* up into the nav space by default */
+  transition: transform $motion-200 $ease-out;
+}
+
+/* when nav is OPEN (no .u-is-collapsed) push the date down below it */
+.c-nav:not(.u-is-collapsed) + .c-title--date {
+  transform: translateY(0);                    /* back to normal under the nav panel */
+}
+

@@ -10,6 +10,7 @@
 /* Motion & easing */
 /* Typography */
 /* Gradient colors for headings (tokens only) */
+/* classy-sport palette */
 /* -------- Centered CTA + “mini-bang” feedback -------- */
 .c-cta-wrap {
   display: grid;
@@ -33,7 +34,7 @@
 }
 .c-cta:focus-visible {
   outline: none;
-  box-shadow: 0 0 0 0.125rem rgba(0, 0, 0, 0.06), 0 0 0 0.25rem rgba(58, 58, 85, 0.35);
+  box-shadow: 0 0 0 0.125rem rgba(0, 0, 0, 0.06), 0 0 0 0.25rem rgba(50, 50, 76, 0.35);
 }
 .c-cta:active {
   transform: translateY(1px);
@@ -148,7 +149,7 @@
 }
 .f-input:focus {
   outline: none;
-  box-shadow: 0 0 0 0.125rem rgba(0, 0, 0, 0.06), 0 0 0 0.25rem rgba(58, 58, 85, 0.35);
+  box-shadow: 0 0 0 0.125rem rgba(0, 0, 0, 0.06), 0 0 0 0.25rem rgba(50, 50, 76, 0.35);
 }
 
 /* icon inside field */
@@ -225,4 +226,62 @@
   border-radius: 0.75rem;
   border: 1px solid rgba(31, 41, 55, 0.08);
   background: #fff;
+}
+
+.c-cta-wrap {
+  position: sticky;
+  inset-block-end: 0;
+  display: grid;
+  place-items: center;
+  padding: 1rem;
+}
+
+.c-cta {
+  min-inline-size: 13rem;
+  padding: 0.625rem 1rem;
+  border: 0;
+  border-radius: 0.75rem;
+  color: #fff;
+  background: linear-gradient(135deg, #2b2b44, #36ADC1);
+  box-shadow: 0 0.5rem 1.25rem rgba(0, 0, 0, 0.12), inset 0 1px 0 rgba(255, 255, 255, 0.25);
+}
+
+.c-sheet {
+  position: fixed;
+  inset: 0;
+  z-index: 60;
+}
+
+.c-sheet.u-hidden {
+  display: none;
+}
+
+.c-sheet__backdrop {
+  position: absolute;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.35);
+}
+
+.c-sheet__panel {
+  position: absolute;
+  inset-inline: 0;
+  inset-block-end: 0;
+  background: #fff;
+  border-radius: 0.75rem 0.75rem 0 0;
+  box-shadow: 0 -1rem 2rem rgba(0, 0, 0, 0.2);
+  transform: translateY(100%);
+  opacity: 0;
+  transition: transform 280ms cubic-bezier(0.16, 1, 0.3, 1), opacity 180ms cubic-bezier(0.16, 1, 0.3, 1);
+  padding: 1rem;
+  max-inline-size: 28rem;
+  margin-inline: auto;
+}
+
+.c-sheet.is-open .c-sheet__panel {
+  transform: translateY(0);
+  opacity: 1;
+}
+
+.c-sheet.is-open {
+  display: block;
 }

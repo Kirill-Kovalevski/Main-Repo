@@ -10,6 +10,7 @@
 /* Motion & easing */
 /* Typography */
 /* Gradient colors for headings (tokens only) */
+/* classy-sport palette */
 /* components/_titles.scss */
 .c-title {
   margin-block: 0;
@@ -42,4 +43,17 @@
 .c-title--tasks {
   margin-top: 1.5rem;
   margin-bottom: 0.625rem;
+}
+
+/* Date sits in the “nav slot” when nav is closed; drops when nav opens */
+.c-title--date {
+  transform: translateY(-2.25rem);
+  /* up into the nav space by default */
+  transition: transform 200ms cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+/* when nav is OPEN (no .u-is-collapsed) push the date down below it */
+.c-nav:not(.u-is-collapsed) + .c-title--date {
+  transform: translateY(0);
+  /* back to normal under the nav panel */
 }

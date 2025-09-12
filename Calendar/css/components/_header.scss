@@ -6,78 +6,81 @@
   display: grid;
   justify-items: center;
   align-items: start;
-  gap: $sp-f8;               /* 8px rhythm between header blocks */
+  gap: $sp-2;                  /* simple 8px rhythm */
   text-align: center;
 
-
-  /* when nav opens, nudge the day down a bit */
-  &.is-nav-open .c-title__day {
-    transform: translateY($sp-6);
+  /* Single source of truth: when nav opens, everything below lemon shifts by --nav-shift */
+  &.is-nav-open #dateBlock {
+    transform: translateY(var(--nav-shift, 2.25rem));
   }
 }
 
-/* Title centered, elegant serif */
+/* Title (elegant serif) */
 .c-app-title {
-  margin: 0 0 $sp-f5 0;      /* slight space above lemon */
+  margin: 0 0 $sp-6 0;         /* slight space above the lemon */
   font-weight: 600;
-  letter-spacing: 0.015em;
+  letter-spacing: .015em;
 }
 
-/* Lemon button — perfectly centered content */
+/* Lemon button */
 .c-icon-btn--lemon {
   inline-size: 2rem;
   block-size: 2rem;
   display: grid;
   place-items: center;
   border: 0;
-
-  /* refined frame */
-  border-radius: 0.75rem;
+  border-radius: .75rem;
   background:
     radial-gradient(120% 120% at 40% 30%, rgba(255,255,255,.85), rgba(255,255,255,0)),
     linear-gradient(160deg, #FFF6CC, #FFE37A);
   box-shadow:
-    inset 0 0 0.25rem rgba(255,255,255,.7),
-    0 0.15rem 0.35rem rgba(0,0,0,.08);
+    inset 0 0 .25rem rgba(255,255,255,.7),
+    0 .15rem .35rem rgba(0,0,0,.08);
+  transition: box-shadow $motion-150 $ease-out, transform $motion-150 $ease-out;
 
-  transition:
-    box-shadow $motion-150 $ease-out,
-    transform  $motion-150 $ease-out;
-
-  &:hover {
-    box-shadow:
-      inset 0 0 0.25rem rgba(255,255,255,.8),
-      0 0.35rem 0.6rem rgba(0,0,0,.12);
-  }
-
+  &:hover { box-shadow: inset 0 0 .25rem rgba(255,255,255,.8), 0 .35rem .6rem rgba(0,0,0,.12); }
   &:focus-visible { @include focus-ring; }
   &:active { transform: translateY(1px); }
 }
 
-/* Date/subtitle spacing harmony (Fibonacci-ish spacing) */
-.c-title--date {
-  margin: $sp-f5 0 0 0;      /* 5px gap below lemon */
-  line-height: 1.15;
+/* Date + subtitle block that lives right under the lemon/nav */
+#dateBlock {
+  text-align: center;
+  margin-block-start: .25rem;  /* tiny gap under lemon */
+  transform: translateY(0);
+  transition: transform 220ms cubic-bezier(.16,1,.3,1);
+
+  .c-title--date {
+    margin: $sp-2;      /* tiny gap above subtitle */
+    line-height: 1.15;
+  }
+
+  .c-title__day {               /* “שבת” */
+    display: inline-block;
+    margin-block-start: .15rem; /* micro glue to the date */
+  }
+
+  .c-subtitle {
+    margin: 0;                 /* small, elegant spacing */
+    color: $neutral-600;
+    font-family: 'Rubik', system-ui, sans-serif;
+    line-height: 1.3;
+  }
 }
-/* The day label (“שבת”) aligns right under the lemon */
-.c-title__day {
-  display: inline-block;
-  margin-block-start: $sp-f3; /* 3px micro-gap for visual glue */
+#dateBlock {
+  margin-block-start: 0.25rem;
+  height:100px;
 }
 
-.c-subtitle {
+#dateBlock .c-title--date {
+  margin: 0 0 0.1rem 0; /* very small gap between date & subtitle */
+}
+
+#dateBlock .c-subtitle {
   margin: 0;
-  padding-block-end: $sp-16;
-  text-align: center;
+  font-size: 0.9rem;
+  line-height: 1.25;
   color: $neutral-600;
-  font-family: 'Rubik', system-ui, sans-serif;
-  line-height: 1.2;
 }
-/* When nav opens, nudge the date line slightly */
-.o-header.is-nav-open .c-title--date {
-  transform: translateY($sp-f3);   /* gentle 3px nudge */
-  transition: transform 200ms $ease-out;
-}
-/* Date nudges down a bit only when nav is open */
-.o-header .c-title--date { transition: transform 220ms cubic-bezier(.16,1,.3,1); }
-.o-header.is-nav-open .c-title--date { transform: translateY(10px); }
+
+/* Remove duplicates: no other transforms/margins for .c-title--date elsewhere */
