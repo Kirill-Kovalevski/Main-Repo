@@ -220,6 +220,52 @@ p {
   text-align: center;
 }
 
+/* Keep the panel hidden when collapsed */
+.c-nav.u-is-collapsed .c-nav__panel {
+  max-height: 0;
+  opacity: 0;
+  transform: translateY(-0.25rem);
+  pointer-events: none;
+}
+
+/* Align content in the row perfectly */
+.c-nav__row {
+  display: grid;
+  grid-template-columns: auto 1fr auto;
+  /* [profile] [search] [settings] */
+  align-items: center;
+  gap: 0.625rem;
+}
+
+.c-search {
+  position: relative;
+  display: block;
+}
+
+.c-search__input {
+  inline-size: 100%;
+  block-size: 2.25rem;
+  padding-inline: 1.75rem 0.75rem;
+  /* room for the icon inside */
+  border-radius: 0.75rem;
+  border: 1px solid rgba(0, 0, 0, 0.08);
+  background: linear-gradient(180deg, #FFFFFF, #F7F7FA);
+}
+.c-search__input:focus {
+  outline: none;
+  box-shadow: 0 0 0 0.125rem rgba(0, 0, 0, 0.06), 0 0 0 0.25rem rgba(50, 50, 76, 0.35);
+}
+
+.c-search__icon {
+  position: absolute;
+  inset-inline-start: 0.625rem;
+  /* sits inside on the right in RTL UIs */
+  inset-block-start: 50%;
+  transform: translateY(-50%);
+  opacity: 0.65;
+  pointer-events: none;
+}
+
 .search-box {
   display: flex;
   align-items: center;
@@ -640,7 +686,19 @@ p {
   color: #6b7280;
 }
 
-/* Remove duplicates: no other transforms/margins for .c-title--date elsewhere */
+/* Adds an elegant gap between nav-bar and date */
+#dateBlock {
+  margin-top: 0.5rem;
+  /* ≈8px – adjust to taste */
+  transition: margin-top 220ms cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+/* When nav is open and pushing date down, preserve the gap */
+.o-header.is-nav-open #dateBlock {
+  margin-top: 0.75rem;
+  /* slightly more space when shifted */
+}
+
 /* If your rainbow/strike animation exists elsewhere, keep it.
    This just ensures it’s not too fast so confetti feels synchronized. */
 .c-item.is-completing {
@@ -1082,7 +1140,7 @@ p {
   text-align: center;
   font-family: "Cormorant Garamond", serif;
   font-weight: 600;
-  font-size: 1.75rem;
+  font-size: 2.75rem;
   letter-spacing: 0.02em;
 }
 
@@ -1110,7 +1168,7 @@ p {
 
 /* DATE + SUBTEXT under lemon */
 .c-title--date {
-  margin: 0.75rem 0 0.25rem;
+  margin-top: 50px;
   text-align: center;
   font-weight: 700;
   color: #1f2937;
@@ -1126,6 +1184,9 @@ p {
 /* NAV (smooth drop) */
 .c-nav {
   width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
 .c-nav.u-is-collapsed .c-nav__panel {
@@ -1136,6 +1197,9 @@ p {
 }
 
 .c-nav__panel {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
   max-height: 8rem;
   opacity: 1;
   transform: translateY(0);
@@ -1145,8 +1209,6 @@ p {
   border-radius: 0.75rem;
   padding: 0.75rem;
   margin-block: 0.5rem;
-  display: flex;
-  align-items: center;
   transition: max-height 260ms cubic-bezier(0.16, 1, 0.3, 1), opacity 180ms cubic-bezier(0.16, 1, 0.3, 1), transform 260ms cubic-bezier(0.16, 1, 0.3, 1);
 }
 
@@ -1155,7 +1217,7 @@ p {
   grid-template-columns: auto 1fr auto;
   /* RTL layout */
   align-items: center;
-  gap: 0.75rem;
+  gap: 0.125rem;
 }
 
 .c-icon-btn {
@@ -1231,7 +1293,6 @@ p {
 
 .c-item__label {
   display: flex;
-  flex-direction: row-reverse;
   /* checkbox on the right */
   align-items: center;
   gap: 0.5rem;

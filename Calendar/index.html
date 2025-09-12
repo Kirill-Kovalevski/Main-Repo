@@ -35,7 +35,7 @@
   </button>
 
   <!-- Nav lives in the "slot" under the lemon -->
-  <nav id="appNav" class="c-nav" aria-label="ראשי">
+  <nav id="appNav" class="c-nav u-is-collapsed" aria-label="ראשי">
     <div class="c-nav__panel" id="navPanel">
       <div class="c-nav__row">
         <button class="c-icon-btn" aria-label="פרופיל">
@@ -75,7 +75,7 @@
     <span class="c-title__date">6.09.2025</span>
   </p>
   <p class="c-subtitle">
-    נדיר שחזרת, <br/>
+    נדיר שחזרת,  <br/>
     זה מה שעושים 
   </p>
 </div>
@@ -91,55 +91,50 @@
         <circle cx="12" cy="12" r="10" fill="none" stroke="currentColor"/>
         <path d="M8 12l3 3 5-5" stroke="currentColor" stroke-width="2" fill="none"/>
       </svg>
-      בוצע
+      
     </button>
   </div>
 
   <ul id="taskList" class="c-list__items">
-    <li class="c-item">
-  <label class="c-item__label">
-    <!-- Checkbox comes first (right side in RTL) -->
-    <input class="c-item__check" type="checkbox" aria-label="סמן משימה" />
-    <!-- Task text comes after checkbox -->
-    <span class="c-item__text">שם המשימה…</span>
-  </label>
-
-  <!-- Minus button on far left -->
-  <button class="c-item__remove" type="button" aria-label="הסר">−</button>
-</li>
   <li class="c-item">
   <label class="c-item__label">
-    <!-- Checkbox comes first (right side in RTL) -->
-    <input class="c-item__check" type="checkbox" aria-label="סמן משימה" />
-    <!-- Task text comes after checkbox -->
-    <span class="c-item__text">שם המשימה…</span>
+    <input class="c-item__check" type="checkbox" />
+    <span class="c-item__text">קפה </span>
   </label>
-
-  <!-- Minus button on far left -->
   <button class="c-item__remove" type="button" aria-label="הסר">−</button>
 </li>
-  <li class="c-item">
+
+<li class="c-item">
   <label class="c-item__label">
-    <!-- Checkbox comes first (right side in RTL) -->
-    <input class="c-item__check" type="checkbox" aria-label="סמן משימה" />
-    <!-- Task text comes after checkbox -->
-    <span class="c-item__text">שם המשימה…</span>
+    <input class="c-item__check" type="checkbox" />
+    <span class="c-item__text">ים </span>
   </label>
-
-  <!-- Minus button on far left -->
   <button class="c-item__remove" type="button" aria-label="הסר">−</button>
 </li>
-  <li class="c-item">
+
+<li class="c-item">
   <label class="c-item__label">
-    <!-- Checkbox comes first (right side in RTL) -->
-    <input class="c-item__check" type="checkbox" aria-label="סמן משימה" />
-    <!-- Task text comes after checkbox -->
-    <span class="c-item__text">שם המשימה…</span>
+    <input class="c-item__check" type="checkbox" />
+    <span class="c-item__text">טיול </span>
   </label>
-
-  <!-- Minus button on far left -->
   <button class="c-item__remove" type="button" aria-label="הסר">−</button>
 </li>
+<li class="c-item">
+  <label class="c-item__label">
+    <input class="c-item__check" type="checkbox" />
+    <span class="c-item__text">שנץ </span>
+  </label>
+  <button class="c-item__remove" type="button" aria-label="הסר">−</button>
+</li>
+<li class="c-item">
+  <label class="c-item__label">
+    <input class="c-item__check" type="checkbox" />
+    <span class="c-item__text">שם המשימה…</span>
+  </label>
+  <button class="c-item__remove" type="button" aria-label="הסר">−</button>
+</li>
+
+ 
 
   </ul>
 

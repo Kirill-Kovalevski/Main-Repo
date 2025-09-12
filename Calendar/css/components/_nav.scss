@@ -138,3 +138,37 @@
 
 /* Optional: title spacing above lemon */
 .c-app-title { margin: 0 0 $sp-8 0; text-align: center; }
+/* Keep the panel hidden when collapsed */
+.c-nav.u-is-collapsed .c-nav__panel {
+  max-height: 0;
+  opacity: 0;
+  transform: translateY(-.25rem);
+  pointer-events: none;
+}
+
+/* Align content in the row perfectly */
+.c-nav__row {
+  display: grid;
+  grid-template-columns: auto 1fr auto; /* [profile] [search] [settings] */
+  align-items: center;
+  gap: $sp-10;
+}
+
+.c-search { position: relative; display: block; }
+.c-search__input {
+  inline-size: 100%;
+  block-size: 2.25rem;
+  padding-inline: $sp-28 $sp-12; /* room for the icon inside */
+  border-radius: $radius-12;
+  border: 1px solid rgba(0,0,0,.08);
+  background: linear-gradient(180deg, #FFFFFF, #F7F7FA);
+  &:focus { @include focus-ring; }
+}
+.c-search__icon {
+  position: absolute;
+  inset-inline-start: $sp-10;  /* sits inside on the right in RTL UIs */
+  inset-block-start: 50%;
+  transform: translateY(-50%);
+  opacity: .65;
+  pointer-events: none;
+}

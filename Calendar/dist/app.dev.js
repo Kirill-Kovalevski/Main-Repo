@@ -2,16 +2,16 @@
 
 // Calendar/app.js
 (function () {
-  'use strict'; // ---------- DOM ----------
+  'use strict'; // ---------- DOM refs ----------
 
-  var header = document.querySelector('.o-header');
   var lemonToggle = document.getElementById('lemonToggle');
   var appNav = document.getElementById('appNav');
-  var navPanel = appNav ? appNav.querySelector('.c-nav__panel') : null;
   var taskList = document.getElementById('taskList');
+  var completedWrap = document.getElementById('completedSection');
   var completedList = document.getElementById('completedList');
   var completedToggle = document.getElementById('completedToggle');
-  var addEventBtn = document.getElementById('addEventBtn');
+  var addEventBtn = document.getElementById('addEventBtn'); // Bottom sheet (new event)
+
   var sheet = document.getElementById('eventSheet');
   var sheetBackdrop = sheet ? sheet.querySelector('[data-close]') : null;
   var sheetCloseBtn = sheet ? sheet.querySelector('.c-icon-btn--ghost[data-close]') : null;
@@ -21,90 +21,100 @@
   var dateInput = document.getElementById('evtDate');
   var timeInput = document.getElementById('evtTime'); // ---------- helpers ----------
 
-  function setHeaderShift(px) {
-    if (!header) return;
-    header.style.setProperty('--nav-shift', (px || 0) + 'px');
+  function hasClass(el, c) {
+    return el && el.classList && el.classList.contains(c);
   }
 
-  function openSheet() {
-    if (!sheet) return;
-    sheet.classList.remove('u-hidden');
-    sheet.classList.add('is-open');
-    if (titleInput) titleInput.focus();
+  function addClass(el, c) {
+    if (el && el.classList) el.classList.add(c);
   }
 
-  function closeSheet() {
-    if (!sheet) return;
-    sheet.classList.remove('is-open');
-    setTimeout(function () {
-      sheet.classList.add('u-hidden');
-    }, 220);
-  }
+  function remClass(el, c) {
+    if (el && el.classList) el.classList.remove(c);
+  } // Build an active task row: [checkbox | text | minus]
+
 
   function buildTaskItem(text) {
     var li = document.createElement('li');
     li.className = 'c-item';
-    li.innerHTML = '<label class="c-item__label">' + '<input class="c-item__check" type="checkbox" aria-label="סמן משימה" />' + '<span class="c-item__text"></span>' + '</label>' + '<button class="c-item__remove" type="button" aria-label="הסר">−</button>';
-    li.querySelector('.c-item__text').textContent = text || '';
+    li.innerHTML = '<label class="c-item__label">' + '<input class="c-item__check" type="checkbox" />' + '<span class="c-item__text"></span>' + '</label>' + '<button class="c-item__remove" type="button" aria-label="הסר">−</button>';
+    var span = li.querySelector('.c-item__text');
+    if (span) span.textContent = text || '';
     return li;
-  }
+  } // Build a completed row with a phantom cell to keep width the same
+
 
   function buildCompletedItem(text) {
     var li = document.createElement('li');
     li.className = 'c-item c-item--done';
-    li.innerHTML = // phantom keeps the same 3-column rhythm as tasks
-    '<span class="c-item__phantom" aria-hidden="true"></span>' + '<span class="c-item__text"></span>' + '<button class="c-item__remove" type="button" aria-label="הסר">−</button>';
-    li.querySelector('.c-item__text').textContent = text || '';
+    li.innerHTML = '<span class="c-item__phantom" aria-hidden="true"></span>' + '<span class="c-item__text"></span>' + '<button class="c-item__remove" type="button" aria-label="הסר">−</button>';
+    var span = li.querySelector('.c-item__text');
+    if (span) span.textContent = text || '';
     return li;
-  } // normalize any existing rows to [checkbox | text | minus]
+  } // Tiny confetti burst near an element (fun but light)
 
 
-  function normalizeRows(listEl) {
-    if (!listEl) return;
-    listEl.querySelectorAll('.c-item').forEach(function (li) {
-      var label = li.querySelector('.c-item__label') || document.createElement('label');
-      label.classList.add('c-item__label');
-      var check = li.querySelector('.c-item__check') || document.createElement('input');
-      check.type = 'checkbox';
-      check.classList.add('c-item__check');
-      var text = li.querySelector('.c-item__text') || document.createElement('span');
-      text.classList.add('c-item__text');
-      if (!text.textContent) text.textContent = 'שם המשימה…';
-      label.innerHTML = '';
-      label.appendChild(check);
-      label.appendChild(text);
-      if (label.parentNode !== li) li.insertBefore(label, li.firstChild);
-      var minus = li.querySelector('.c-item__remove');
+  function confettiAtEl(el) {
+    if (!el) return;
+    var r = el.getBoundingClientRect();
+    var originX = r.left + r.width / 2 + window.scrollX;
+    var originY = r.top + r.height / 2 + window.scrollY;
+    var colors = ['#FF6B6B', '#FFD93D', '#6BCB77', '#4D96FF', '#B8C0FF', '#F896D8'];
+    var COUNT = 22;
+    var MAX_DIST = 110;
+    var MIN_DIST = 45;
+    var DURATION = 1000;
 
-      if (!minus) {
-        minus = document.createElement('button');
-        minus.type = 'button';
-        minus.className = 'c-item__remove';
-        minus.setAttribute('aria-label', 'הסר');
-        minus.textContent = '−';
-      }
+    for (var i = 0; i < COUNT; i++) {
+      var p = document.createElement('span');
+      p.className = 'c-confetti';
+      p.style.position = 'absolute';
+      p.style.left = originX + 'px';
+      p.style.top = originY + 'px';
+      var s = 5 + Math.random() * 5;
+      p.style.width = s + 'px';
+      p.style.height = s + 'px';
+      p.style.borderRadius = '2px';
+      p.style.background = colors[i % colors.length];
+      p.style.pointerEvents = 'none';
+      p.style.zIndex = 9999;
+      document.body.appendChild(p);
 
-      if (li.lastElementChild !== minus) li.appendChild(minus);
-    });
-  } // ---------- Lemon toggles NAV (cap the shift so it never hits the chip) ----------
+      (function (node) {
+        var angle = Math.random() * Math.PI * 2;
+        var dist = MIN_DIST + Math.random() * (MAX_DIST - MIN_DIST);
+        var tx = Math.cos(angle) * dist;
+        var ty = Math.sin(angle) * dist;
+        var start = null;
 
+        function step(ts) {
+          if (!start) start = ts;
+          var t = Math.min(1, (ts - start) / DURATION);
+          var x = tx * t;
+          var y = ty * t;
+          var op = 1 - t;
+          node.style.transform = 'translate(' + x + 'px,' + y + 'px) scale(' + (1 - 0.4 * t) + ')';
+          node.style.opacity = op;
+          if (t < 1) requestAnimationFrame(step);else node.parentNode && node.parentNode.removeChild(node);
+        }
+
+        requestAnimationFrame(step);
+      })(p);
+    }
+  } // ---------- NAV: start hidden, toggle on lemon ----------
+  // Ensure collapsed on load (also set in HTML class)
+
+
+  if (appNav && !hasClass(appNav, 'u-is-collapsed')) {
+    addClass(appNav, 'u-is-collapsed');
+  }
 
   if (lemonToggle && appNav) {
     lemonToggle.addEventListener('click', function () {
-      var willOpen = appNav.classList.contains('u-is-collapsed'); // opening now?
-
-      appNav.classList.toggle('u-is-collapsed'); // Only add .is-nav-open when opening; remove when closing
-
-      if (header) header.classList.toggle('is-nav-open', willOpen);
-
-      if (willOpen && navPanel) {
-        // panel height + tiny breathing; cap so it won’t overlap the chip
-        var raw = navPanel.scrollHeight + 8;
-        var shift = Math.min(raw, 44); // <= adjust cap if you ever change the panel height
-
-        setHeaderShift(shift);
+      if (hasClass(appNav, 'u-is-collapsed')) {
+        remClass(appNav, 'u-is-collapsed');
       } else {
-        setHeaderShift(0);
+        addClass(appNav, 'u-is-collapsed');
       }
     });
   } // ---------- Completed chip toggle ----------
@@ -112,36 +122,71 @@
 
   if (completedToggle && completedList) {
     completedToggle.addEventListener('click', function () {
-      var isHidden = completedList.classList.contains('u-hidden');
-      completedList.classList.toggle('u-hidden', !isHidden);
-      completedToggle.setAttribute('aria-expanded', isHidden ? 'true' : 'false');
+      var hidden = hasClass(completedList, 'u-hidden');
+
+      if (hidden) {
+        remClass(completedList, 'u-hidden');
+        completedToggle.setAttribute('aria-expanded', 'true');
+      } else {
+        addClass(completedList, 'u-hidden');
+        completedToggle.setAttribute('aria-expanded', 'false');
+      }
     });
-  } // ---------- Bottom sheet ----------
+  } // ---------- Bottom sheet: open / close ----------
 
 
-  if (addEventBtn) addEventBtn.addEventListener('click', openSheet);
+  function openSheet() {
+    if (!sheet) return;
+    remClass(sheet, 'u-hidden');
+    addClass(sheet, 'is-open');
+    if (titleInput) try {
+      titleInput.focus();
+    } catch (e) {}
+  }
+
+  function closeSheet() {
+    if (!sheet) return;
+    remClass(sheet, 'is-open'); // allow closing animation (CSS) to finish
+
+    setTimeout(function () {
+      addClass(sheet, 'u-hidden');
+    }, 220);
+  }
+
+  if (addEventBtn) {
+    addEventBtn.addEventListener('click', function (e) {
+      e.preventDefault();
+      openSheet();
+    });
+  }
+
   if (sheetBackdrop) sheetBackdrop.addEventListener('click', closeSheet);
   if (sheetCloseBtn) sheetCloseBtn.addEventListener('click', closeSheet);
   document.addEventListener('keydown', function (e) {
     if (e.key === 'Escape') closeSheet();
   });
-  if (sheetPanel) sheetPanel.addEventListener('click', function (e) {
-    e.stopPropagation();
-  });
 
-  if (sheetForm && taskList) {
+  if (sheetPanel) {
+    // prevent backdrop click from closing immediately when clicking inside
+    sheetPanel.addEventListener('click', function (e) {
+      e.stopPropagation();
+    });
+  } // ---------- Submit new event -> add to task list ----------
+
+
+  if (sheetForm) {
     sheetForm.addEventListener('submit', function (e) {
       e.preventDefault();
-      var t = (titleInput && titleInput.value || '').trim();
-      var d = (dateInput && dateInput.value || '').trim();
-      var h = (timeInput && timeInput.value || '').trim();
+      var t = titleInput && titleInput.value ? titleInput.value.trim() : '';
+      var d = dateInput && dateInput.value ? dateInput.value.trim() : '';
+      var h = timeInput && timeInput.value ? timeInput.value.trim() : '';
       if (!t || !d || !h) return;
       var dt = new Date(d);
       var dd = String(dt.getDate()).padStart(2, '0');
       var mm = String(dt.getMonth() + 1).padStart(2, '0');
       var yy = String(dt.getFullYear()).slice(-2);
       var label = t + ' ' + h + ' (' + dd + '/' + mm + '/' + yy + ')';
-      taskList.appendChild(buildTaskItem(label));
+      if (taskList) taskList.appendChild(buildTaskItem(label));
       sheetForm.reset();
       closeSheet();
     });
@@ -149,46 +194,56 @@
 
 
   if (taskList) {
+    // remove with minus
     taskList.addEventListener('click', function (e) {
-      var btn = e.target;
+      var target = e.target || e.srcElement;
+      if (!target || !target.classList) return;
 
-      if (btn.classList && btn.classList.contains('c-item__remove')) {
-        var row = btn.closest('.c-item');
+      if (target.classList.contains('c-item__remove')) {
+        var row = target.closest('.c-item');
         if (row && row.parentNode) row.parentNode.removeChild(row);
       }
-    });
+    }); // complete with checkbox
+
     taskList.addEventListener('change', function (e) {
-      var chk = e.target;
-      if (!chk.classList || !chk.classList.contains('c-item__check')) return;
+      var chk = e.target || e.srcElement;
+      if (!chk || !chk.classList || !chk.classList.contains('c-item__check')) return;
+      confettiAtEl(chk);
       var li = chk.closest('.c-item');
-      var tEl = li ? li.querySelector('.c-item__text') : null;
-      var text = tEl ? (tEl.textContent || '').trim() : '';
+      var txtEl = li ? li.querySelector('.c-item__text') : null;
+      var text = txtEl && txtEl.textContent ? txtEl.textContent.trim() : '';
       if (li) li.classList.add('is-completing');
 
-      function onEnd() {
+      function onAnimEnd() {
         if (!li) return;
-        li.removeEventListener('animationend', onEnd);
-        if (completedList) completedList.appendChild(buildCompletedItem(text));
+        li.removeEventListener('animationend', onAnimEnd);
+        if (completedWrap) remClass(completedWrap, 'u-hidden');
+
+        if (completedList) {
+          var doneRow = buildCompletedItem(text); // optional: disabled/checked-looking “checkbox space” already handled by phantom
+
+          completedList.appendChild(doneRow);
+        }
+
         if (li.parentNode) li.parentNode.removeChild(li);
       }
 
-      if (li) li.addEventListener('animationend', onEnd, {
+      if (li) li.addEventListener('animationend', onAnimEnd, {
         once: true
       });
     });
-  }
+  } // ---------- Completed list: remove with minus ----------
+
 
   if (completedList) {
     completedList.addEventListener('click', function (e) {
-      var btn = e.target;
+      var btn = e.target || e.srcElement;
+      if (!btn || !btn.classList) return;
 
-      if (btn.classList && btn.classList.contains('c-item__remove')) {
+      if (btn.classList.contains('c-item__remove')) {
         var row = btn.closest('.c-item');
         if (row && row.parentNode) row.parentNode.removeChild(row);
       }
     });
-  } // normalize existing HTML rows on load
-
-
-  normalizeRows(taskList);
+  }
 })();

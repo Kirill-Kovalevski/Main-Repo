@@ -101,4 +101,15 @@
   color: #6b7280;
 }
 
-/* Remove duplicates: no other transforms/margins for .c-title--date elsewhere */
+/* Adds an elegant gap between nav-bar and date */
+#dateBlock {
+  margin-top: 0.5rem;
+  /* ≈8px – adjust to taste */
+  transition: margin-top 220ms cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+/* When nav is open and pushing date down, preserve the gap */
+.o-header.is-nav-open #dateBlock {
+  margin-top: 0.75rem;
+  /* slightly more space when shifted */
+}
