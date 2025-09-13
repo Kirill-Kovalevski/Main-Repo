@@ -19,6 +19,8 @@
 @use 'components/completed';
 @use 'components/titles';
 @use 'components/sheet';
+@use 'components/auth';
+
 
 /* === PHONE CANVAS (iPhone 14 Pro ~393px) === */
 .o-page {
@@ -217,4 +219,9 @@
 /* Confetti particle (JS sets inline transforms) */
 .c-confetti {
   position: absolute; width: 10px; height: 10px; border-radius: 50%; pointer-events: none;
+}
+.c-btn .c-btn--ghost{
+    justify-self: flex-start;
+    align-self: flex-start;
+    padding: 0;
 }

@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <title>LooZ — התחברות / הרשמה</title>
+
+  <!-- Fonts to match the app -->
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@500;600&family=Rubik:wght@400;500;700&display=swap" rel="stylesheet">
+
+  <!-- Your compiled CSS -->
+  <link rel="stylesheet" href="/Calendar/css/dist/main.css" />
+</head>
+<body>
+  <main class="auth-page">
+    <header class="auth-header">
+      <h1 class="auth-brand">LooZ</h1>
+      <div class="auth-lemon" aria-hidden="true">
+        <svg viewBox="0 0 24 24" width="24" height="24">
+          <defs>
+            <radialGradient id="authLemon" cx="50%" cy="40%" r="70%">
+              <stop offset="0%" stop-color="#FFF8C6"/>
+              <stop offset="60%" stop-color="#FFE36E"/>
+              <stop offset="100%" stop-color="#F7C843"/>
+            </radialGradient>
+          </defs>
+          <path d="M19 7c-3-3-8-3-11 0-2 2.3-2 6 0 8 2.2 2.1 5.8 2.4 8 0 2.2-2.1 2.6-5.4 1-7.6" fill="url(#authLemon)" stroke="#C59A21" stroke-width="1"/>
+          <path d="M18 6c.9-.9 1.7-1.8 2.3-2.8" stroke="#6FA14D" stroke-linecap="round" />
+        </svg>
+      </div>
+    </header>
+
+    <section class="auth-card" aria-label="התחברות והרשמה">
+      <div class="auth-tabs" role="tablist">
+        <button id="tab-login" class="auth-tab is-active" role="tab" aria-controls="panel-login" aria-selected="true">התחברות</button>
+        <button id="tab-register" class="auth-tab" role="tab" aria-controls="panel-register" aria-selected="false">הרשמה</button>
+      </div>
+
+      <!-- Login Panel -->
+      <section id="panel-login" class="auth-panel is-active" role="tabpanel" aria-labelledby="tab-login">
+        <form id="loginForm" class="auth-form" novalidate>
+          <label class="f-field">
+            <span class="f-label">אימייל</span>
+            <input id="loginEmail" class="f-input" type="email" inputmode="email" autocomplete="email" required placeholder="name@example.com" />
+            <small class="f-error" id="loginEmailErr"></small>
+          </label>
+
+          <label class="f-field f-field--password">
+            <span class="f-label">סיסמה</span>
+            <input id="loginPassword" class="f-input" type="password" autocomplete="current-password" required placeholder="••••••••" />
+            <button type="button" class="f-eye" aria-label="הצג/הסתר סיסמה" data-eye="loginPassword">👁</button>
+            <small class="f-error" id="loginPasswordErr"></small>
+          </label>
+
+          <div class="f-row between">
+            <label class="f-inline">
+              <input id="rememberMe" type="checkbox" />
+              <span>זכור אותי</span>
+            </label>
+            <a class="f-link" href="#" aria-disabled="true">שכחת סיסמה?</a>
+          </div>
+
+          <button type="submit" class="auth-primary">התחבר/י</button>
+        </form>
+      </section>
+
+      <!-- Register Panel -->
+      <section id="panel-register" class="auth-panel" role="tabpanel" aria-labelledby="tab-register" hidden>
+        <form id="registerForm" class="auth-form" novalidate>
+          <label class="f-field">
+            <span class="f-label">שם פרטי</span>
+            <input id="regName" class="f-input" type="text" autocomplete="given-name" required placeholder="דניאלה" />
+            <small class="f-error" id="regNameErr"></small>
+          </label>
+
+          <label class="f-field">
+            <span class="f-label">אימייל</span>
+            <input id="regEmail" class="f-input" type="email" inputmode="email" autocomplete="email" required placeholder="name@example.com" />
+            <small class="f-error" id="regEmailErr"></small>
+          </label>
+
+          <label class="f-field f-field--password">
+            <span class="f-label">סיסמה</span>
+            <input id="regPassword" class="f-input" type="password" autocomplete="new-password" required placeholder="מינימום 8 תווים ומספר" />
+            <button type="button" class="f-eye" aria-label="הצג/הסתר סיסמה" data-eye="regPassword">👁</button>
+            <small class="f-hint">לפחות 8 תווים, כולל מספר אחד</small>
+            <small class="f-error" id="regPasswordErr"></small>
+          </label>
+
+          <label class="f-field f-field--password">
+            <span class="f-label">אימות סיסמה</span>
+            <input id="regConfirm" class="f-input" type="password" autocomplete="new-password" required placeholder="חזרה על הסיסמה" />
+            <button type="button" class="f-eye" aria-label="הצג/הסתר סיסמה" data-eye="regConfirm">👁</button>
+            <small class="f-error" id="regConfirmErr"></small>
+          </label>
+
+          <label class="f-inline">
+            <input id="regTerms" type="checkbox" required />
+            <span>קראתי ואני מאשר/ת את התנאים</span>
+          </label>
+
+          <button type="submit" class="auth-primary">הרשם/י</button>
+        </form>
+      </section>
+    </section>
+
+    <footer class="auth-foot">
+      <a class="f-link" href="/Calendar/index.html">← חזרה לאפליקציה</a>
+    </footer>
+  </main>
+
+  <script src="/Calendar/dist/auth.js" defer></script>
+</body>
+</html>

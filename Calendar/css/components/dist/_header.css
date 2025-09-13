@@ -113,3 +113,68 @@
   margin-top: 0.75rem;
   /* slightly more space when shifted */
 }
+
+/* Header becomes the positioning context */
+.o-header {
+  position: relative;
+  /* allows absolute child alignment */
+  padding-top: 0.75rem;
+  /* space above the title */
+  padding-inline: 1rem;
+  /* side breathing room */
+}
+
+/* Centered title as-is */
+.c-app-title {
+  margin: 0;
+  text-align: center;
+  font-size: 1.55rem;
+  /* your current size */
+  line-height: 1.2;
+}
+
+/* Elegant, smaller logout button at top-right (RTL aware) */
+.c-logout {
+  position: absolute;
+  top: 0.5rem;
+  /* align vertically with title cap height */
+  inset-inline-end: 1rem;
+  /* RIGHT edge in RTL/LTR */
+  padding: 0.25rem 0.6rem;
+  font: 500 0.9rem/1 "Rubik", system-ui, sans-serif;
+  color: #1f2a44;
+  background: linear-gradient(145deg, #F8F5EF, #EDE7DC);
+  /* subtle “paper” feel */
+  border: 1px solid rgba(0, 0, 0, 0.08);
+  border-radius: 999rem;
+  box-shadow: 0 0.15rem 0.35rem rgba(0, 0, 0, 0.06), inset 0 0 0.25rem rgba(255, 255, 255, 0.6);
+  cursor: pointer;
+  transition: transform 150ms cubic-bezier(0.16, 1, 0.3, 1), box-shadow 150ms cubic-bezier(0.16, 1, 0.3, 1), opacity 150ms;
+}
+
+.c-logout:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 0.35rem 0.6rem rgba(0, 0, 0, 0.1), inset 0 0 0.25rem rgba(255, 255, 255, 0.7);
+}
+
+.c-logout:active {
+  transform: translateY(0);
+}
+
+.c-logout:focus-visible {
+  outline: none;
+  box-shadow: 0 0 0 0.2rem rgba(29, 78, 216, 0.18);
+}
+
+/* Make sure the button never overlaps the centered title on very narrow widths */
+@media (max-width: 360px) {
+  .o-header {
+    padding-top: 1rem;
+  }
+
+  .c-logout {
+    top: 0.6rem;
+    inset-inline-end: 0.75rem;
+    font-size: 0.85rem;
+  }
+}
