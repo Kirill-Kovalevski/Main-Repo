@@ -2,216 +2,152 @@
 
 // Calendar/auth.js
 (function () {
-  'use strict'; // ===== Helpers =====
+  'use strict'; // If already authenticated, go straight to the app
+
+  try {
+    var raw = localStorage.getItem('auth.user');
+
+    if (raw) {
+      window.location.replace('/Calendar/index.html');
+      return;
+    }
+  } catch (e) {}
 
   function $(id) {
     return document.getElementById(id);
   }
 
-  function isEmail(v) {
-    return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(String(v || '').toLowerCase());
+  function validateEmail(v) {
+    return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(String(v || '').trim());
   }
 
-  function hasGoodPassword(v) {
-    return typeof v === 'string' && v.length >= 8 && /\d/.test(v);
+  function validatePassword(v) {
+    v = String(v || '');
+    return v.length >= 8 && /\d/.test(v);
   }
 
-  function setError(el, msg) {
-    if (el) el.textContent = msg || '';
-  }
+  document.addEventListener('DOMContentLoaded', function () {
+    // Tabs
+    var tabLogin = $('tab-login');
+    var tabRegister = $('tab-register');
+    var paneLogin = $('panel-login');
+    var paneRegister = $('panel-register');
 
-  function saveUsers(users) {
-    try {
-      localStorage.setItem('auth.users', JSON.stringify(users));
-    } catch (e) {}
-  }
-
-  function loadUsers() {
-    try {
-      var raw = localStorage.getItem('auth.users');
-      return raw ? JSON.parse(raw) : {};
-    } catch (e) {
-      return {};
-    }
-  }
-
-  function setSession(user, remember) {
-    try {
-      localStorage.setItem('auth.user', JSON.stringify(user));
-
-      if (!remember) {
-        // fallback: session-like behavior
-        sessionStorage.setItem('auth.session', '1');
-      }
-    } catch (e) {}
-  }
-
-  function getSession() {
-    try {
-      var raw = localStorage.getItem('auth.user');
-      return raw ? JSON.parse(raw) : null;
-    } catch (e) {
-      return null;
-    }
-  } // Redirect to app if already logged in
-
-
-  if (getSession()) {
-    window.location.replace('/Calendar/index.html');
-    return;
-  } // ===== Tabs =====
-
-
-  var tabLogin = $('tab-login');
-  var tabRegister = $('tab-register');
-  var panelLogin = $('panel-login');
-  var panelRegister = $('panel-register');
-
-  function switchTo(panel) {
-    var loginActive = panel === 'login';
-
-    if (tabLogin) {
-      tabLogin.classList.toggle('is-active', loginActive);
-      tabLogin.setAttribute('aria-selected', loginActive ? 'true' : 'false');
+    function activate(tab) {
+      var isLogin = tab === 'login';
+      tabLogin.classList.toggle('is-active', isLogin);
+      tabRegister.classList.toggle('is-active', !isLogin);
+      paneLogin.hidden = !isLogin;
+      paneRegister.hidden = isLogin;
+      paneLogin.classList.toggle('is-active', isLogin);
+      paneRegister.classList.toggle('is-active', !isLogin);
     }
 
-    if (tabRegister) {
-      tabRegister.classList.toggle('is-active', !loginActive);
-      tabRegister.setAttribute('aria-selected', !loginActive ? 'true' : 'false');
-    }
+    tabLogin.addEventListener('click', function () {
+      activate('login');
+    });
+    tabRegister.addEventListener('click', function () {
+      activate('register');
+    }); // Show/hide password (both forms)
 
-    if (panelLogin) {
-      panelLogin.hidden = !loginActive;
-      panelLogin.classList.toggle('is-active', loginActive);
-    }
+    document.querySelectorAll('.f-eye[data-eye]').forEach(function (btn) {
+      btn.addEventListener('click', function () {
+        var id = btn.getAttribute('data-eye');
+        var input = $(id);
+        if (!input) return;
+        input.type = input.type === 'password' ? 'text' : 'password';
+      });
+    }); // LOGIN
 
-    if (panelRegister) {
-      panelRegister.hidden = loginActive;
-      panelRegister.classList.toggle('is-active', !loginActive);
-    }
-  }
-
-  if (tabLogin) tabLogin.addEventListener('click', function () {
-    switchTo('login');
-  });
-  if (tabRegister) tabRegister.addEventListener('click', function () {
-    switchTo('register');
-  }); // ===== Show/hide password buttons =====
-
-  document.addEventListener('click', function (e) {
-    var t = e.target;
-    if (!t || !t.matches('.f-eye')) return;
-    var targetId = t.getAttribute('data-eye');
-    var input = targetId ? $(targetId) : null;
-    if (!input) return;
-    input.type = input.type === 'password' ? 'text' : 'password';
-  }); // ===== Login =====
-
-  var loginForm = $('loginForm');
-
-  if (loginForm) {
+    var loginForm = $('loginForm');
     loginForm.addEventListener('submit', function (e) {
       e.preventDefault();
-      var email = ($('loginEmail') && $('loginEmail').value || '').trim();
-      var pass = ($('loginPassword') && $('loginPassword').value || '').trim();
-      var remember = $('rememberMe') ? $('rememberMe').checked : false;
-      setError($('loginEmailErr'), '');
-      setError($('loginPasswordErr'), '');
+      var email = ($('loginEmail').value || '').trim();
+      var pass = $('loginPassword').value || '';
+      var remember = $('rememberMe').checked;
+      $('loginEmailErr').textContent = '';
+      $('loginPasswordErr').textContent = '';
       var ok = true;
 
-      if (!isEmail(email)) {
-        setError($('loginEmailErr'), 'אימייל לא תקין');
+      if (!validateEmail(email)) {
+        $('loginEmailErr').textContent = 'אימייל לא תקין';
         ok = false;
       }
 
       if (!pass) {
-        setError($('loginPasswordErr'), 'נא להזין סיסמה');
+        $('loginPasswordErr').textContent = 'נא להזין סיסמה';
         ok = false;
       }
 
       if (!ok) return;
-      var users = loadUsers();
-      var u = users[email];
-
-      if (!u) {
-        setError($('loginEmailErr'), 'משתמש לא קיים');
-        return;
-      }
-
-      if (u.p !== btoa(pass)) {
-        setError($('loginPasswordErr'), 'סיסמה שגויה');
-        return;
-      }
-
-      setSession({
+      var user = {
         email: email,
-        name: u.n || 'משתמש/ת'
-      }, remember);
+        name: email.split('@')[0],
+        ts: Date.now(),
+        remember: !!remember
+      };
+
+      try {
+        localStorage.setItem('auth.user', JSON.stringify(user));
+        if (remember) sessionStorage.setItem('auth.session', 'keep');
+      } catch (e) {}
+
       window.location.replace('/Calendar/index.html');
-    });
-  } // ===== Register =====
+    }); // REGISTER
 
-
-  var registerForm = $('registerForm');
-
-  if (registerForm) {
+    var registerForm = $('registerForm');
     registerForm.addEventListener('submit', function (e) {
       e.preventDefault();
-      var name = ($('regName') && $('regName').value || '').trim();
-      var email = ($('regEmail') && $('regEmail').value || '').trim();
-      var pass = ($('regPassword') && $('regPassword').value || '').trim();
-      var conf = ($('regConfirm') && $('regConfirm').value || '').trim();
-      var terms = $('regTerms') ? $('regTerms').checked : false;
-      setError($('regNameErr'), '');
-      setError($('regEmailErr'), '');
-      setError($('regPasswordErr'), '');
-      setError($('regConfirmErr'), '');
+      var name = ($('regName').value || '').trim();
+      var email = ($('regEmail').value || '').trim();
+      var pass = $('regPassword').value || '';
+      var conf = $('regConfirm').value || '';
+      var terms = $('regTerms').checked; // clear errors
+
+      $('regNameErr').textContent = '';
+      $('regEmailErr').textContent = '';
+      $('regPasswordErr').textContent = '';
+      $('regConfirmErr').textContent = '';
       var ok = true;
 
       if (!name) {
-        setError($('regNameErr'), 'נא להזין שם');
+        $('regNameErr').textContent = 'נא להזין שם';
         ok = false;
       }
 
-      if (!isEmail(email)) {
-        setError($('regEmailErr'), 'אימייל לא תקין');
+      if (!validateEmail(email)) {
+        $('regEmailErr').textContent = 'אימייל לא תקין';
         ok = false;
       }
 
-      if (!hasGoodPassword(pass)) {
-        setError($('regPasswordErr'), 'לפחות 8 תווים ומספר אחד');
+      if (!validatePassword(pass)) {
+        $('regPasswordErr').textContent = 'סיסמה חייבת להיות באורך 8+ ולכלול ספרה';
         ok = false;
       }
 
-      if (conf !== pass) {
-        setError($('regConfirmErr'), 'הסיסמאות אינן תואמות');
+      if (pass !== conf) {
+        $('regConfirmErr').textContent = 'סיסמאות אינן תואמות';
         ok = false;
       }
 
       if (!terms) {
-        alert('נא לאשר את התנאים');
+        alert('יש לאשר את התנאים');
         ok = false;
       }
 
       if (!ok) return;
-      var users = loadUsers();
-
-      if (users[email]) {
-        setError($('regEmailErr'), 'האימייל כבר רשום');
-        return;
-      }
-
-      users[email] = {
-        n: name,
-        p: btoa(pass)
-      }; // demo only; replace with real hashing in backend
-
-      saveUsers(users);
-      setSession({
+      var user = {
         email: email,
-        name: name
-      }, true);
+        name: name,
+        ts: Date.now(),
+        "new": true
+      };
+
+      try {
+        localStorage.setItem('auth.user', JSON.stringify(user));
+      } catch (e) {}
+
       window.location.replace('/Calendar/index.html');
     });
-  }
+  });
 })();

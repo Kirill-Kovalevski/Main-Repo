@@ -1,159 +1,191 @@
 <!DOCTYPE html>
 <html lang="he" dir="rtl">
 <head>
-  <meta charset="UTF-8" />
+  <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
   <title>LooZ</title>
 
-  <!-- Fonts -->
   <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@500;600&family=Rubik:wght@400;500;700&display=swap" rel="stylesheet" />
-  <!-- Compiled CSS -->
-  <link rel="stylesheet" href="/Calendar/css/dist/main.css" />
+  <link rel="stylesheet" href="css/dist/main.css" />
 </head>
 <body>
 
   <main class="o-page">
     <div class="o-phone">
-      <header class="o-header" id="appHeader">
-  <h1 class="c-app-title">LooZ</h1>
-    <button type="button" class="c-logout" onclick="logout()" aria-label="התנתקות">
-    התנתקות
-  </button>
 
-  <!-- Lemon toggle -->
-  <button id="lemonToggle" class="c-icon-btn c-icon-btn--lemon" aria-label="פתח תפריט">
-    <!-- your lemon SVG unchanged -->
-    <svg viewBox="0 0 24 24" width="24" height="24" aria-hidden="true">
-      <defs>
-        <radialGradient id="gLemon" cx="50%" cy="40%" r="70%">
-          <stop offset="0%"  stop-color="#FFF8C6"/>
-          <stop offset="60%" stop-color="#FFE36E"/>
-          <stop offset="100%" stop-color="#F7C843"/>
-        </radialGradient>
-      </defs>
-      <path d="M19 7c-3-3-8-3-11 0-2 2.3-2 6 0 8 2.2 2.1 5.8 2.4 8 0 2.2-2.1 2.6-5.4 1-7.6" fill="url(#gLemon)" stroke="#C59A21" stroke-width="1"/>
-      <path d="M18 6c.9-.9 1.7-1.8 2.3-2.8" stroke="#6FA14D" stroke-linecap="round"/>
-      <path d="M5.3 18.2c2.1 1 4.8.7 6.7-1" stroke="#C59A21" stroke-linecap="round"/>
-    </svg>
-  </button>
+      <!-- Header -->
+      <header id="appHeader" class="o-header">
+        <!-- logout icon top-left -->
+     <button id="btnLogout" class="c-logout" type="button" aria-label="התנתק">
+  <!-- Example SVG icon for logout -->
+  <svg viewBox="0 0 24 24" fill="none" stroke="#4B5563" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+    <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4" />
+    <polyline points="16 17 21 12 16 7" />
+    <line x1="21" y1="12" x2="9" y2="12" />
+  </svg>
+</button>
 
-  <!-- Nav lives in the "slot" under the lemon -->
-  <nav id="appNav" class="c-nav u-is-collapsed" aria-label="ראשי">
-    <div class="c-nav__panel" id="navPanel">
-      <div class="c-nav__row">
-        <button class="c-icon-btn" aria-label="פרופיל">
-          <svg viewBox="0 0 24 24" width="20" height="20" aria-hidden="true">
-            <circle cx="12" cy="8" r="4" fill="#32324C"/>
-            <path d="M4 20c0-4 4-6 8-6s8 2 8 6" fill="none" stroke="#32324C" stroke-width="1.5" stroke-linecap="round"/>
+
+
+        <!-- Title + lemon centered -->
+        <h1 class="c-app-title">LooZ</h1>
+        <button id="lemonToggle" class="c-icon-btn c-icon-btn--lemon" type="button" aria-label="פתח תפריט">
+          <svg viewBox="0 0 24 24" width="22" height="22" aria-hidden="true">
+            <defs>
+              <radialGradient id="gLemon" cx="50%" cy="40%" r="70%">
+                <stop offset="0%" stop-color="#FFF8C6"/><stop offset="60%" stop-color="#FFE36E"/><stop offset="100%" stop-color="#F7C843"/>
+              </radialGradient>
+            </defs>
+            <path d="M19 7c-3-3-8-3-11 0-2 2.3-2 6 0 8 2.2 2.1 5.8 2.4 8 0 2.2-2.1 2.6-5.4 1-7.6" fill="url(#gLemon)" stroke="#C59A21" stroke-width="1"/>
+            <path d="M18 6c.9-.9 1.7-1.8 2.3-2.8" stroke="#6FA14D" stroke-linecap="round"/>
           </svg>
         </button>
 
-        <label class="c-search" aria-label="חיפוש פעילויות">
-          <input id="navSearch" class="c-search__input" type="search" placeholder="search activities" autocomplete="off" />
-          <span class="c-search__icon" aria-hidden="true">
-            <svg viewBox="0 0 24 24" width="18" height="18">
-              <circle cx="11" cy="11" r="6" fill="none" stroke="#707070" stroke-width="1.4"/>
-              <path d="M16 16l4 4" stroke="#707070" stroke-width="1.4" stroke-linecap="round"/>
+        <!-- Collapsible NAV -->
+        <nav id="appNav" class="c-nav u-is-collapsed" aria-label="ראשי">
+          <div class="c-nav__panel" id="navPanel">
+            <div class="c-nav__row">
+              <!-- Profile (left in RTL grid) -->
+              <button class="c-icon-btn" aria-label="פרופיל">
+                <svg viewBox="0 0 24 24" width="20" height="20" aria-hidden="true">
+                  <circle cx="12" cy="8" r="4" fill="#32324C"/>
+                  <path d="M4 20c0-4 4-6 8-6s8 2 8 6" fill="none" stroke="#32324C" stroke-width="1.5" stroke-linecap="round"/>
+                </svg>
+              </button>
+
+              <!-- Search centered -->
+              <label class="c-search" aria-label="חיפוש פעילויות">
+                <input id="navSearch" class="c-search__input" type="search" placeholder="search activities" autocomplete="off" />
+                <span class="c-search__icon" aria-hidden="true">
+                  <svg viewBox="0 0 24 24" width="18" height="18">
+                    <circle cx="11" cy="11" r="6" fill="none" stroke="#707070" stroke-width="1.4"/>
+                    <path d="M16 16l4 4" stroke="#707070" stroke-width="1.4" stroke-linecap="round"/>
+                  </svg>
+                </span>
+              </label>
+
+              <!-- Settings (right) -->
+              <button class="c-icon-btn" aria-label="הגדרות">
+                <svg viewBox="0 0 24 24" width="20" height="20" aria-hidden="true">
+                  <g fill="none" stroke="#32324C" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round">
+                    <circle cx="12" cy="12" r="3.6"/>
+                    <path d="M12 2.5v2.5M12 19v2.5M2.5 12H5M19 12h2.5"/>
+                    <path d="M5.2 5.2l1.8 1.3M16.9 17.5l1.9 1.4M18.8 5.2l-1.8 1.3M7.1 17.5 5.2 18.9"/>
+                  </g>
+                </svg>
+              </button>
+            </div>
+          </div>
+        </nav>
+
+        <!-- Date block (never collides) -->
+        <div id="dateBlock" class="c-meta-block">
+          <p class="c-title--date"><span class="c-title__day">שבת</span>, <span class="c-title__date">6.09.2025</span></p>
+          <p class="c-subtitle">ברוכה השבה, דניאלה!<br/>מה בלוז היום?</p>
+        </div>
+      </header>
+
+      <!-- Tasks -->
+      <section class="c-list" aria-labelledby="listTitle">
+        <div class="c-list__header">
+          <h2 id="listTitle" class="c-section-title">להיום</h2>
+
+          <!-- Completed toggle -->
+          <button id="completedToggle" class="c-completed-chip" type="button" aria-expanded="false">
+            <svg viewBox="0 0 24 24" width="16" height="16" aria-hidden="true">
+              <circle cx="12" cy="12" r="10" fill="none" stroke="currentColor"/>
+              <path d="M8 12l3 3 5-5" stroke="currentColor" stroke-width="2" fill="none"/>
             </svg>
-          </span>
-        </label>
+            בוצע
+          </button>
+        </div>
 
-        <button class="c-icon-btn" aria-label="הגדרות">
-          <svg viewBox="0 0 24 24" width="20" height="20" aria-hidden="true">
-            <g fill="none" stroke="#32324C" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round">
-              <circle cx="12" cy="12" r="3.6"/>
-              <path d="M12 2.5v2.5M12 19v2.5M2.5 12H5M19 12h2.5"/>
-              <path d="M5.2 5.2l1.8 1.3M16.9 17.5l1.9 1.4M18.8 5.2l-1.8 1.3M7.1 17.5 5.2 18.9"/>
-            </g>
-          </svg>
-        </button>
+        <ul id="taskList" class="c-list__items">
+          <li class="c-item">
+            <label class="c-item__label">
+              <input class="c-item__check" type="checkbox" />
+              <span class="c-item__text">טיול</span>
+            </label>
+            <button class="c-item__remove" type="button" aria-label="הסר">−</button>
+          </li>
+          <li class="c-item">
+            <label class="c-item__label">
+              <input class="c-item__check" type="checkbox" />
+              <span class="c-item__text">שנ״צ</span>
+            </label>
+            <button class="c-item__remove" type="button" aria-label="הסר">−</button>
+          </li>
+          <li class="c-item">
+            <label class="c-item__label">
+              <input class="c-item__check" type="checkbox" />
+              <span class="c-item__text">שם המשימה…</span>
+            </label>
+            <button class="c-item__remove" type="button" aria-label="הסר">−</button>
+          </li>
+          <li class="c-item">
+            <label class="c-item__label">
+              <input class="c-item__check" type="checkbox" />
+              <span class="c-item__text">טיול</span>
+            </label>
+            <button class="c-item__remove" type="button" aria-label="הסר">−</button>
+          </li>
+          <li class="c-item">
+            <label class="c-item__label">
+              <input class="c-item__check" type="checkbox" />
+              <span class="c-item__text">שנ״צ</span>
+            </label>
+            <button class="c-item__remove" type="button" aria-label="הסר">−</button>
+          </li>
+          <li class="c-item">
+            <label class="c-item__label">
+              <input class="c-item__check" type="checkbox" />
+              <span class="c-item__text">שם המשימה…</span>
+            </label>
+            <button class="c-item__remove" type="button" aria-label="הסר">−</button>
+          </li>
+          <li class="c-item">
+            <label class="c-item__label">
+              <input class="c-item__check" type="checkbox" />
+              <span class="c-item__text">טיול</span>
+            </label>
+            <button class="c-item__remove" type="button" aria-label="הסר">−</button>
+          </li>
+          <li class="c-item">
+            <label class="c-item__label">
+              <input class="c-item__check" type="checkbox" />
+              <span class="c-item__text">שנ״צ</span>
+            </label>
+            <button class="c-item__remove" type="button" aria-label="הסר">−</button>
+          </li>
+          <li class="c-item">
+            <label class="c-item__label">
+              <input class="c-item__check" type="checkbox" />
+              <span class="c-item__text">שם המשימה…</span>
+            </label>
+            <button class="c-item__remove" type="button" aria-label="הסר">−</button>
+          </li>
+        </ul>
+
+        <!-- Completed -->
+        <section id="completedSection" class="c-completed u-hidden" aria-live="polite">
+          <ul id="completedList" class="c-completed__list u-hidden"></ul>
+        </section>
+      </section>
+
+      <!-- CTA -->
+      <div class="c-cta-wrap">
+        <button id="addEventBtn" class="c-cta c-cta--bang" type="button">יצירת אירוע חדש</button>
       </div>
-    </div>
-  </nav>
 
- <!-- Date + Subtitle as one unified block -->
-<div id="dateBlock" class="c-meta-block">
-  <p class="c-title--date">
-    <span class="c-title__day">שבת</span>,
-    <span class="c-title__date">6.09.2025</span>
-  </p>
-  <p class="c-subtitle">
-    נדיר שחזרת,  <br/>
-    זה מה שעושים 
-  </p>
-</div>
-
-</header>
-
-<!-- ===== Tasks & Completed ===== -->
-<section class="c-list" aria-labelledby="listTitle">
-  <div class="c-list__header">
-    <h2 id="listTitle" class="c-section-title">להיום</h2>
-    <button id="completedToggle" class="c-completed-chip" type="button" aria-expanded="false">
-      <svg viewBox="0 0 24 24" width="16" height="16" aria-hidden="true">
-        <circle cx="12" cy="12" r="10" fill="none" stroke="currentColor"/>
-        <path d="M8 12l3 3 5-5" stroke="currentColor" stroke-width="2" fill="none"/>
-      </svg>
-      
-    </button>
-  </div>
-
-  <ul id="taskList" class="c-list__items">
-  <li class="c-item">
-  <label class="c-item__label">
-    <input class="c-item__check" type="checkbox" />
-    <span class="c-item__text">קפה </span>
-  </label>
-  <button class="c-item__remove" type="button" aria-label="הסר">−</button>
-</li>
-
-<li class="c-item">
-  <label class="c-item__label">
-    <input class="c-item__check" type="checkbox" />
-    <span class="c-item__text">ים </span>
-  </label>
-  <button class="c-item__remove" type="button" aria-label="הסר">−</button>
-</li>
-
-<li class="c-item">
-  <label class="c-item__label">
-    <input class="c-item__check" type="checkbox" />
-    <span class="c-item__text">טיול </span>
-  </label>
-  <button class="c-item__remove" type="button" aria-label="הסר">−</button>
-</li>
-<li class="c-item">
-  <label class="c-item__label">
-    <input class="c-item__check" type="checkbox" />
-    <span class="c-item__text">שנץ </span>
-  </label>
-  <button class="c-item__remove" type="button" aria-label="הסר">−</button>
-</li>
-<li class="c-item">
-  <label class="c-item__label">
-    <input class="c-item__check" type="checkbox" />
-    <span class="c-item__text">שם המשימה…</span>
-  </label>
-  <button class="c-item__remove" type="button" aria-label="הסר">−</button>
-</li>
-
- 
-
-  </ul>
-
-  <ul id="completedList" class="c-completed__list u-hidden"></ul>
-</section>
-
-
-<!-- Bottom CTA -->
-<div class="c-cta-wrap">
-  <button id="addEventBtn" class="c-cta c-cta--bang" type="button">יצירת אירוע חדש</button>
-</div>
-
+      <!-- Week / Month below CTA -->
+      <div class="c-belowcta">
+        <button id="btnWeek"  class="c-headbtn" type="button">שבוע</button>
+        <button id="btnMonth" class="c-headbtn" type="button">חודש</button>
+      </div>
 
       <!-- Bottom Sheet -->
       <section id="eventSheet" class="c-sheet u-hidden" dir="rtl" aria-hidden="true">
-        <button class="c-sheet__backdrop" type="button" data-close></button>
+        <button class="c-sheet__backdrop" type="button"></button>
         <div class="c-sheet__panel" role="dialog" aria-modal="true" aria-labelledby="sheetTitle">
           <header class="c-sheet__header">
             <h3 id="sheetTitle" class="c-sheet__title">אירוע חדש</h3>
@@ -178,7 +210,7 @@
             <label class="f-field f-field--icon">
               <span class="f-label">שעה</span>
               <input id="evtTime" class="f-input" type="time" required />
-              <span class="f-icon" aria-hidden="true" title="שעון כיס">
+              <span class="f-icon" aria-hidden="true">
                 <svg viewBox="0 0 24 24" width="18" height="18">
                   <circle cx="12" cy="13" r="7" fill="none" stroke="currentColor"/>
                   <path d="M12 13V9M12 13l3 3" stroke="currentColor" stroke-linecap="round"/>
@@ -186,10 +218,6 @@
                 </svg>
               </span>
             </label>
-            <div class="f-row">
-              <button id="addPeopleBtn" class="c-chip" type="button">הוסף משתתפים</button>
-              <span id="peopleHint" class="f-hint">—</span>
-            </div>
             <div class="c-sheet__actions">
               <button class="c-btn c-btn--ghost" type="button" data-close>ביטול</button>
               <button class="c-btn c-btn--primary" type="submit">הוסף</button>
@@ -197,12 +225,13 @@
           </form>
         </div>
       </section>
+
     </div>
   </main>
 
-  <!-- Compiled JS -->
   <script src="/Calendar/dist/app.js" defer></script>
-  <script src="/Calendar/dist/auth-guard.js" defer></script>
+  <script src="dist/auth-guard.js" defer></script>
+ 
 
 </body>
 </html>

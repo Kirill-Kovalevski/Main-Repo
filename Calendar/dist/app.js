@@ -4,11 +4,11 @@
 (function () {
   'use strict';
 
-  // ---------- DOM refs ----------
+  /* ========= DOM refs ========= */
   var lemonToggle = document.getElementById('lemonToggle');
   var appNav = document.getElementById('appNav');
   var taskList = document.getElementById('taskList');
-  var completedWrap = document.getElementById('completedSection');
+  var completedWrap = document.getElementById('completedSection') || null;
   var completedList = document.getElementById('completedList');
   var completedToggle = document.getElementById('completedToggle');
   var addEventBtn = document.getElementById('addEventBtn');
@@ -23,7 +23,10 @@
   var dateInput = document.getElementById('evtDate');
   var timeInput = document.getElementById('evtTime');
 
-  // ---------- helpers ----------
+  // Logout
+  var logoutBtn = document.getElementById('btnLogout');
+
+  /* ========= helpers ========= */
   function hasClass(el, c) {
     return el && el.classList && el.classList.contains(c);
   }
@@ -34,7 +37,7 @@
     if (el && el.classList) el.classList.remove(c);
   }
 
-  // Build an active task row: [checkbox | text | minus]
+  // Build ACTIVE task row: [checkbox | text | minus]
   function buildTaskItem(text) {
     var li = document.createElement('li');
     li.className = 'c-item';
@@ -44,7 +47,7 @@
     return li;
   }
 
-  // Build a completed row with a phantom cell to keep width the same
+  // Build COMPLETED row (keeps same width using phantom in col 1)
   function buildCompletedItem(text) {
     var li = document.createElement('li');
     li.className = 'c-item c-item--done';
@@ -54,68 +57,61 @@
     return li;
   }
 
-  // Tiny confetti burst near an element (fun but light)
+  /* ========= Confetti (bigger & mythic) ========= */
   function confettiAtEl(el) {
     if (!el) return;
     var r = el.getBoundingClientRect();
     var originX = r.left + r.width / 2 + window.scrollX;
     var originY = r.top + r.height / 2 + window.scrollY;
-    var colors = ['#FF6B6B', '#FFD93D', '#6BCB77', '#4D96FF', '#B8C0FF', '#F896D8'];
-    var COUNT = 22;
-    var MAX_DIST = 110;
-    var MIN_DIST = 45;
-    var DURATION = 1000;
+    var colors = ['#3B82F6', '#60A5FA', '#A78BFA', '#F59E0B', '#F472B6', '#34D399', '#F87171'];
+    var COUNT = 52;
+    var MIN_DIST = 60;
+    var MAX_DIST = 160;
+    var DURATION = 1200;
     for (var i = 0; i < COUNT; i++) {
       var p = document.createElement('span');
       p.className = 'c-confetti';
       p.style.position = 'absolute';
       p.style.left = originX + 'px';
       p.style.top = originY + 'px';
-      var s = 5 + Math.random() * 5;
+      var s = 6 + Math.random() * 10; // bigger
       p.style.width = s + 'px';
       p.style.height = s + 'px';
       p.style.borderRadius = '2px';
       p.style.background = colors[i % colors.length];
       p.style.pointerEvents = 'none';
-      p.style.zIndex = 9999;
+      p.style.zIndex = 10000;
+      p.style.opacity = '1';
       document.body.appendChild(p);
       (function (node) {
         var angle = Math.random() * Math.PI * 2;
         var dist = MIN_DIST + Math.random() * (MAX_DIST - MIN_DIST);
         var tx = Math.cos(angle) * dist;
-        var ty = Math.sin(angle) * dist;
+        var ty = Math.sin(angle) * dist * (0.75 + Math.random() * 0.5); // gentle fall
+        var rot = Math.random() * 720 - 360; // mythic spin
         var start = null;
         function step(ts) {
           if (!start) start = ts;
           var t = Math.min(1, (ts - start) / DURATION);
-          var x = tx * t;
-          var y = ty * t;
-          var op = 1 - t;
-          node.style.transform = 'translate(' + x + 'px,' + y + 'px) scale(' + (1 - 0.4 * t) + ')';
-          node.style.opacity = op;
-          if (t < 1) requestAnimationFrame(step);else node.parentNode && node.parentNode.removeChild(node);
+          var ease = t * (2 - t); // ease-out
+          node.style.transform = 'translate(' + tx * ease + 'px,' + ty * ease + 'px) rotate(' + rot * ease + 'deg) scale(' + (1 - 0.2 * ease) + ')';
+          node.style.opacity = String(1 - ease);
+          if (t < 1) requestAnimationFrame(step);else if (node.parentNode) node.parentNode.removeChild(node);
         }
         requestAnimationFrame(step);
       })(p);
     }
   }
 
-  // ---------- NAV: start hidden, toggle on lemon ----------
-  // Ensure collapsed on load (also set in HTML class)
-  if (appNav && !hasClass(appNav, 'u-is-collapsed')) {
-    addClass(appNav, 'u-is-collapsed');
-  }
+  /* ========= NAV: collapse/expand ========= */
+  if (appNav && !hasClass(appNav, 'u-is-collapsed')) addClass(appNav, 'u-is-collapsed');
   if (lemonToggle && appNav) {
     lemonToggle.addEventListener('click', function () {
-      if (hasClass(appNav, 'u-is-collapsed')) {
-        remClass(appNav, 'u-is-collapsed');
-      } else {
-        addClass(appNav, 'u-is-collapsed');
-      }
+      if (hasClass(appNav, 'u-is-collapsed')) remClass(appNav, 'u-is-collapsed');else addClass(appNav, 'u-is-collapsed');
     });
   }
 
-  // ---------- Completed chip toggle ----------
+  /* ========= Completed chip toggle ========= */
   if (completedToggle && completedList) {
     completedToggle.addEventListener('click', function () {
       var hidden = hasClass(completedList, 'u-hidden');
@@ -129,19 +125,18 @@
     });
   }
 
-  // ---------- Bottom sheet: open / close ----------
+  /* ========= Bottom sheet open/close ========= */
   function openSheet() {
     if (!sheet) return;
     remClass(sheet, 'u-hidden');
     addClass(sheet, 'is-open');
-    if (titleInput) try {
-      titleInput.focus();
+    try {
+      titleInput && titleInput.focus();
     } catch (e) {}
   }
   function closeSheet() {
     if (!sheet) return;
     remClass(sheet, 'is-open');
-    // allow closing animation (CSS) to finish
     setTimeout(function () {
       addClass(sheet, 'u-hidden');
     }, 220);
@@ -154,17 +149,14 @@
   }
   if (sheetBackdrop) sheetBackdrop.addEventListener('click', closeSheet);
   if (sheetCloseBtn) sheetCloseBtn.addEventListener('click', closeSheet);
+  if (sheetPanel) sheetPanel.addEventListener('click', function (e) {
+    e.stopPropagation();
+  });
   document.addEventListener('keydown', function (e) {
     if (e.key === 'Escape') closeSheet();
   });
-  if (sheetPanel) {
-    // prevent backdrop click from closing immediately when clicking inside
-    sheetPanel.addEventListener('click', function (e) {
-      e.stopPropagation();
-    });
-  }
 
-  // ---------- Submit new event -> add to task list ----------
+  /* ========= Submit new event -> add task ========= */
   if (sheetForm) {
     sheetForm.addEventListener('submit', function (e) {
       e.preventDefault();
@@ -183,53 +175,70 @@
     });
   }
 
-  // ---------- Task list interactions ----------
+  /* ========= Task list interactions ========= */
   if (taskList) {
     // remove with minus
     taskList.addEventListener('click', function (e) {
       var target = e.target || e.srcElement;
-      if (!target || !target.classList) return;
-      if (target.classList.contains('c-item__remove')) {
+      if (target && target.classList && target.classList.contains('c-item__remove')) {
         var row = target.closest('.c-item');
         if (row && row.parentNode) row.parentNode.removeChild(row);
       }
     });
 
-    // complete with checkbox
+    // complete with checkbox (move to Completed)
     taskList.addEventListener('change', function (e) {
       var chk = e.target || e.srcElement;
       if (!chk || !chk.classList || !chk.classList.contains('c-item__check')) return;
       confettiAtEl(chk);
       var li = chk.closest('.c-item');
-      var txtEl = li ? li.querySelector('.c-item__text') : null;
-      var text = txtEl && txtEl.textContent ? txtEl.textContent.trim() : '';
-      if (li) li.classList.add('is-completing');
+      if (!li) return;
+      var txtEl = li.querySelector('.c-item__text');
+      var text = (txtEl && txtEl.textContent ? txtEl.textContent : '').trim();
+
+      // Fade out text first (CSS hook), then move
+      li.classList.add('is-completing');
       function onAnimEnd() {
-        if (!li) return;
         li.removeEventListener('animationend', onAnimEnd);
         if (completedWrap) remClass(completedWrap, 'u-hidden');
         if (completedList) {
-          var doneRow = buildCompletedItem(text);
-          // optional: disabled/checked-looking “checkbox space” already handled by phantom
+          var doneRow = buildCompletedItem(text); // greenish row
           completedList.appendChild(doneRow);
         }
         if (li.parentNode) li.parentNode.removeChild(li);
       }
-      if (li) li.addEventListener('animationend', onAnimEnd, {
+      li.addEventListener('animationend', onAnimEnd, {
         once: true
       });
     });
   }
 
-  // ---------- Completed list: remove with minus ----------
+  /* ========= Completed list: minus removes ========= */
   if (completedList) {
     completedList.addEventListener('click', function (e) {
       var btn = e.target || e.srcElement;
-      if (!btn || !btn.classList) return;
-      if (btn.classList.contains('c-item__remove')) {
+      if (btn && btn.classList && btn.classList.contains('c-item__remove')) {
         var row = btn.closest('.c-item');
         if (row && row.parentNode) row.parentNode.removeChild(row);
       }
     });
   }
+
+  /* ========= Logout ========= */
+  function logout() {
+    try {
+      localStorage.removeItem('authUser');
+      localStorage.removeItem('token');
+      sessionStorage.clear();
+    } catch (e) {}
+    // Redirect to login
+    var dest = '/Calendar/auth.html';
+    if (location.hostname === 'localhost' || location.hostname === '127.0.0.1') {
+      dest = '/Calendar/auth.html';
+    }
+    window.location.replace(dest);
+  }
+  if (logoutBtn) logoutBtn.addEventListener('click', logout);
+  // optional: support inline onclick="logout()"
+  window.logout = logout;
 })();

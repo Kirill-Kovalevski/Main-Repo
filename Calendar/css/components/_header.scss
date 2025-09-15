@@ -1,147 +1,153 @@
-@use '../settings/tokens' as *;
-@use '../tools/mixins' as *;
+/* No external tokens; standalone */
 
-/* Header layout – phone width, RTL */
-.o-header {
+/* ================= HEADER ================= */
+.o-header{
+  position: relative;
   display: grid;
   justify-items: center;
   align-items: start;
-  gap: $sp-2;                  /* simple 8px rhythm */
   text-align: center;
+  gap: .5rem;
+  padding-inline: 1rem;
+  padding-top: .5rem;
 
-  /* Single source of truth: when nav opens, everything below lemon shifts by --nav-shift */
-  &.is-nav-open #dateBlock {
-    transform: translateY(var(--nav-shift, 2.25rem));
-  }
+  /* JS writes --nav-shift = navPanel height.
+     We reserve only a SMALL spacer so the gap is elegant. */
+  --nav-shift: 0px;
+  padding-bottom: calc(.35rem + var(--nav-shift) * .25);
 }
 
-/* Title (elegant serif) */
-.c-app-title {
-  margin: 0 0 $sp-6 0;         /* slight space above the lemon */
+/* Top strip: logout | centered title | (spacer) */
+.c-topbar{
+  width: 100%;
+  max-width: 22.5rem;
+  margin-inline: auto;
+  display: flex;
+  align-items: center;
+  justify-content: flex-start
+}
+.c-topbar__left{ justify-self: start; }
+.c-topbar__right{ justify-self: end; }
+
+#btnLogout,
+.c-headbtn{
+  padding: .35rem .85rem;
+  font: 500 .9rem/1 "Rubik", system-ui, sans-serif;
+  color: #1f2a44;
+  background: linear-gradient(145deg,#F8F5EF,#EDE7DC);
+  border: 1px solid rgba(0,0,0,.08);
+  border-radius: 999rem;
+  box-shadow: 0 2px 5px rgba(0,0,0,.08);
+  cursor: pointer;
+  transition: transform 150ms ease, box-shadow 150ms ease;
+}
+#btnLogout:hover, .c-headbtn:hover{ transform: translateY(-1px); box-shadow: 0 3px 7px rgba(0,0,0,.10); }
+
+/* Title */
+.c-app-title{
+  margin: 0;
+  text-align: center;
+  font-size: 1.9rem;
   font-weight: 600;
-  letter-spacing: .015em;
-}
-
-/* Lemon button */
-.c-icon-btn--lemon {
-  inline-size: 2rem;
-  block-size: 2rem;
-  display: grid;
-  place-items: center;
-  border: 0;
-  border-radius: .75rem;
-  background:
-    radial-gradient(120% 120% at 40% 30%, rgba(255,255,255,.85), rgba(255,255,255,0)),
-    linear-gradient(160deg, #FFF6CC, #FFE37A);
-  box-shadow:
-    inset 0 0 .25rem rgba(255,255,255,.7),
-    0 .15rem .35rem rgba(0,0,0,.08);
-  transition: box-shadow $motion-150 $ease-out, transform $motion-150 $ease-out;
-
-  &:hover { box-shadow: inset 0 0 .25rem rgba(255,255,255,.8), 0 .35rem .6rem rgba(0,0,0,.12); }
-  &:focus-visible { @include focus-ring; }
-  &:active { transform: translateY(1px); }
-}
-
-/* Date + subtitle block that lives right under the lemon/nav */
-#dateBlock {
-  text-align: center;
-  margin-block-start: .25rem;  /* tiny gap under lemon */
-  transform: translateY(0);
-  transition: transform 220ms cubic-bezier(.16,1,.3,1);
-
-  .c-title--date {
-    margin: $sp-2;      /* tiny gap above subtitle */
-    line-height: 1.15;
-  }
-
-  .c-title__day {               /* “שבת” */
-    display: inline-block;
-    margin-block-start: .15rem; /* micro glue to the date */
-  }
-
-  .c-subtitle {
-    margin: 0;                 /* small, elegant spacing */
-    color: $neutral-600;
-    font-family: 'Rubik', system-ui, sans-serif;
-    line-height: 1.3;
-  }
-}
-#dateBlock {
-  margin-block-start: 0.25rem;
-  height:100px;
-}
-
-#dateBlock .c-title--date {
-  margin: 0 0 0.1rem 0; /* very small gap between date & subtitle */
-}
-
-#dateBlock .c-subtitle {
-  margin: 0;
-  font-size: 0.9rem;
-  line-height: 1.25;
-  color: $neutral-600;
-}
-/* Adds an elegant gap between nav-bar and date */
-#dateBlock {
-  margin-top: 0.5rem;  /* ≈8px – adjust to taste */
-  transition: margin-top 220ms cubic-bezier(.16,1,.3,1);
-}
-
-/* When nav is open and pushing date down, preserve the gap */
-.o-header.is-nav-open #dateBlock {
-  margin-top: 0.75rem; /* slightly more space when shifted */
-}
-
-/* Header becomes the positioning context */
-.o-header {
-  position: relative;              /* allows absolute child alignment */
-  padding-top: 0.75rem;            /* space above the title */
-  padding-inline: 1rem;            /* side breathing room */
-}
-
-/* Centered title as-is */
-.c-app-title {
-  margin: 0;
-  padding:0;
-  text-align: center;
-  font-size: 1.55rem;              /* your current size */
+  letter-spacing: .02em;
   line-height: 1.2;
 }
 
-/* Elegant, smaller logout button at top-right (RTL aware) */
-.c-logout {
-  position: absolute;
-  top: 0.5rem;                     /* align vertically with title cap height */
-  inset-inline-end: 1rem;          /* RIGHT edge in RTL/LTR */
-  padding: .25rem .6rem;
-  font: 500 0.9rem/1 'Rubik', system-ui, sans-serif;
-  color: #1f2a44;
+/* Lemon */
+.c-icon-btn--lemon{
+  inline-size: 2rem; block-size: 2rem; display: grid; place-items: center;
+  border: 0; border-radius: .75rem;
   background:
-    linear-gradient(145deg, #F8F5EF, #EDE7DC); /* subtle “paper” feel */
-  border: 1px solid rgba(0,0,0,.08);
-  border-radius: 999rem;
-  box-shadow:
-    0 .15rem .35rem rgba(0,0,0,.06),
-    inset 0 0 .25rem rgba(255,255,255,.6);
-  cursor: pointer;
-  transition: transform 150ms cubic-bezier(.16,1,.3,1),
-              box-shadow 150ms cubic-bezier(.16,1,.3,1),
-              opacity 150ms;
+    radial-gradient(120% 120% at 40% 30%, rgba(255,255,255,.85), rgba(255,255,255,0)),
+    linear-gradient(160deg, #FFF6CC, #FFE37A);
+  box-shadow: inset 0 0 .25rem rgba(255,255,255,.7), 0 .15rem .35rem rgba(0,0,0,.08);
+  transition: transform 150ms ease, box-shadow 150ms ease;
+}
+.c-icon-btn--lemon:hover{ box-shadow: inset 0 0 .25rem rgba(255,255,255,.8), 0 .35rem .6rem rgba(0,0,0,.12); }
+.c-icon-btn--lemon:active{ transform: translateY(1px); }
+
+/* ============== NAV (search row) ============== */
+.c-nav{ width: 100%; max-width: 22.5rem; margin-inline: auto; }
+.c-nav__panel{
+  overflow: hidden;
+  max-height: 0;
+  opacity: 0;
+  transform: translateY(-.15rem);
+  transition: max-height 260ms cubic-bezier(.16,1,.3,1),
+              opacity    180ms cubic-bezier(.16,1,.3,1),
+              transform  260ms cubic-bezier(.16,1,.3,1);
+  background: rgba(255,255,255,.82);
+  backdrop-filter: blur(8px);
+  border: 1px solid rgba(0,0,0,.06);
+  border-radius: 12px;
+  padding: .75rem;
+  margin-top: .35rem;
+}
+.o-header.is-nav-open .c-nav__panel{ max-height: 4.6rem; opacity: 1; transform: translateY(0); }
+
+.c-nav__row{
+  display: grid;
+  grid-template-columns: auto 1fr auto;
+  align-items: center;
+  gap: .5rem;
 }
 
-.c-logout:hover {
-  transform: translateY(-1px);
-  box-shadow:
-    0 .35rem .6rem rgba(0,0,0,.10),
-    inset 0 0 .25rem rgba(255,255,255,.7);
+/* ============== DATE / SUBTITLE ============== */
+/* Much smaller, exact gap from the nav:
+   0.35rem + 35% of the nav's height. */
+#dateBlock{
+  text-align: center;
+  margin-block-start: calc(.35rem + var(--nav-shift) * .35);
+  margin-block-end: .8rem;
+  transition: margin-block-start 220ms cubic-bezier(.16,1,.3,1);
+}
+#dateBlock .c-title--date{ margin: 0 0 .25rem 0; font-size: 1.05rem; font-weight: 600; }
+#dateBlock .c-subtitle{ margin: 0; font-size: .9rem; color: #6b7280; line-height: 1.3; }
+
+/* ============== CTA + VIEW SWITCH ============== */
+.c-cta-wrap{
+  width: 100%;
+  max-width: 22.5rem;
+  margin-inline: auto;
+  display: grid;
+  justify-items: center;
+  gap: 1rem;             /* keep שבוע/חודש nicely below */
+}
+.c-view-switch{
+  display: flex;
+  justify-content: center;
+  gap: .6rem;
+  margin-top: .15rem;
+}
+.c-view-switch .c-headbtn{ min-width: 4.8rem; }
+
+/* ============== BOTTOM SHEET (FULL, CENTERED) ============== */
+.c-sheet{
+  position: fixed;      /* independent of parents; covers the screen */
+  inset: 0;
+  z-index: 1000;
+  display: none;        /* hidden by default */
+}
+.c-sheet.is-open{ display: grid; } /* when opened we use grid for stacking */
+
+.c-sheet__backdrop{
+  position: absolute;
+  inset: 0;
+  background: rgba(0,0,0,.35);
 }
 
-.c-logout:active { transform: translateY(0); }
-.c-logout:focus-visible { outline: none; box-shadow: 0 0 0 .2rem rgba(29,78,216,.18); }
-
-/* Make sure the button never overlaps the centered title on very narrow widths */
-@media (max-width: 360px) {
-  .o-header { padding-top: 1rem; }
-  .c-logout { top: 0.6rem; inset-inline-end: .75rem; font-size: .85rem; }
+.c-sheet__panel{
+  position: absolute;
+  inset-inline: 0;
+  inset-block-end: 0;
+  max-height: 88vh;
+  background: #fff;
+  border-radius: 16px 16px 0 0;
+  box-shadow: 0 -8px 24px rgba(0,0,0,.18);
+  padding: 1rem;
+  transform: translateY(100%);
+  transition: transform 240ms cubic-bezier(.16,1,.3,1);
 }
+.c-sheet.is-open .c-sheet__panel{ transform: translateY(0); }
+
+.u-hidden{ display: none !important; }

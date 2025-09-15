@@ -10,13 +10,124 @@
 
   <!-- Your compiled CSS -->
   <link rel="stylesheet" href="/Calendar/css/dist/main.css" />
+  <style>
+    /* Light, elegant wrapper that uses your existing design language */
+    .auth-page {
+      min-height: 100svh;
+      display: grid;
+      grid-template-rows: auto 1fr auto;
+      justify-items: center;
+      align-items: start;
+      padding: 1.25rem clamp(0.75rem, 3vw, 1.25rem);
+      background: radial-gradient(120% 120% at 50% 0%, #ffffff 0%, #f4f7fb 70%);
+    }
+    .auth-header { text-align: center; margin-block: .5rem 1rem; }
+    .auth-brand {
+      font-family: "Cormorant Garamond", serif;
+      font-weight: 600;
+      font-size: clamp(1.8rem, 3.8vw + 1rem, 2.2rem);
+      letter-spacing: .02em;
+      margin: 0;
+    }
+    .auth-lemon {
+      inline-size: 2rem; block-size: 2rem;
+      margin: .35rem auto 0;
+      display: grid; place-items: center;
+      border-radius: .75rem;
+      background:
+        radial-gradient(circle at 40% 35%, #fff, rgba(255,255,255,.25)),
+        linear-gradient(180deg, #FFF7D1, #FFE48A);
+      box-shadow: 0 .25rem .6rem rgba(0,0,0,.08), inset 0 0 .35rem rgba(255,255,255,.7);
+    }
+
+    /* Card */
+    .auth-card {
+      width: 100%;
+      max-width: 24rem;
+      background: rgba(255,255,255,.9);
+      border: 1px solid rgba(0,0,0,.06);
+      border-radius: 1rem;
+      box-shadow: 0 .75rem 2rem rgba(0,0,0,.07);
+      padding: 1rem clamp(1rem, 3vw, 1.25rem);
+    }
+
+    .auth-tabs {
+      display: grid;
+      grid-auto-flow: column;
+      gap: .5rem;
+      margin-bottom: .75rem;
+    }
+    .auth-tab {
+      border: 1px solid rgba(0,0,0,.08);
+      border-radius: 999rem;
+      padding: .45rem .9rem;
+      background: linear-gradient(145deg,#F8F5EF,#EDE7DC);
+      box-shadow: inset 0 0 .25rem rgba(255,255,255,.5), 0 .15rem .35rem rgba(0,0,0,.08);
+      font: 500 .95rem/1 'Rubik', system-ui, sans-serif;
+      cursor: pointer;
+    }
+    .auth-tab.is-active {
+      outline: 2px solid rgba(29,78,216,.12);
+      background: linear-gradient(145deg,#fff,#f4f2ea);
+    }
+
+    .auth-panel { display: none; }
+    .auth-panel.is-active { display: block; }
+
+    /* Reuse your form atoms */
+    .auth-form { display: grid; gap: .75rem; }
+    .f-field { display: grid; gap: .35rem; }
+    .f-label { font: 500 .9rem/1 'Rubik', system-ui, sans-serif; color: #2b2b44; }
+    .f-input {
+      inline-size: 100%;
+      block-size: 2.5rem;
+      padding: 0 .75rem;
+      border-radius: .75rem;
+      border: 1px solid rgba(0,0,0,.1);
+      background: linear-gradient(180deg,#fff,#f7f7fa);
+      font: 400 .95rem/1 'Rubik', system-ui, sans-serif;
+    }
+    .f-field--password { position: relative; }
+    .f-eye {
+      position: absolute;
+      inset-inline-start: .4rem;
+      inset-block-start: 50%;
+      transform: translateY(-50%);
+      border: 0;
+      background: transparent;
+      cursor: pointer;
+      font-size: 1.05rem;
+      opacity: .65;
+    }
+    .f-inline { display: inline-flex; align-items: center; gap: .5rem; }
+    .f-row.between { display: flex; justify-content: space-between; align-items: center; }
+    .f-error { color: #b91c1c; font-size: .8rem; min-height: 1em; }
+    .f-link { color: #2563eb; text-decoration: none; }
+
+    .auth-primary {
+      margin-top: .25rem;
+      block-size: 2.6rem;
+      border-radius: 999rem;
+      border: 0;
+      cursor: pointer;
+      color: #fff;
+      font: 600 1rem/1 'Rubik', system-ui, sans-serif;
+      background: linear-gradient(135deg,#1e68ff,#06b6d4);
+      box-shadow: 0 .6rem 1.25rem rgba(6,182,212,.28);
+    }
+
+    .auth-foot {
+      margin-block: 1.25rem 0;
+      text-align: center;
+    }
+  </style>
 </head>
 <body>
   <main class="auth-page">
     <header class="auth-header">
       <h1 class="auth-brand">LooZ</h1>
       <div class="auth-lemon" aria-hidden="true">
-        <svg viewBox="0 0 24 24" width="24" height="24">
+        <svg viewBox="0 0 24 24" width="20" height="20">
           <defs>
             <radialGradient id="authLemon" cx="50%" cy="40%" r="70%">
               <stop offset="0%" stop-color="#FFF8C6"/>
@@ -42,14 +153,14 @@
           <label class="f-field">
             <span class="f-label">אימייל</span>
             <input id="loginEmail" class="f-input" type="email" inputmode="email" autocomplete="email" required placeholder="name@example.com" />
-            <small class="f-error" id="loginEmailErr"></small>
+            <small id="loginEmailErr" class="f-error"></small>
           </label>
 
           <label class="f-field f-field--password">
             <span class="f-label">סיסמה</span>
             <input id="loginPassword" class="f-input" type="password" autocomplete="current-password" required placeholder="••••••••" />
             <button type="button" class="f-eye" aria-label="הצג/הסתר סיסמה" data-eye="loginPassword">👁</button>
-            <small class="f-error" id="loginPasswordErr"></small>
+            <small id="loginPasswordErr" class="f-error"></small>
           </label>
 
           <div class="f-row between">
@@ -70,13 +181,13 @@
           <label class="f-field">
             <span class="f-label">שם פרטי</span>
             <input id="regName" class="f-input" type="text" autocomplete="given-name" required placeholder="דניאלה" />
-            <small class="f-error" id="regNameErr"></small>
+            <small id="regNameErr" class="f-error"></small>
           </label>
 
           <label class="f-field">
             <span class="f-label">אימייל</span>
             <input id="regEmail" class="f-input" type="email" inputmode="email" autocomplete="email" required placeholder="name@example.com" />
-            <small class="f-error" id="regEmailErr"></small>
+            <small id="regEmailErr" class="f-error"></small>
           </label>
 
           <label class="f-field f-field--password">
@@ -84,14 +195,14 @@
             <input id="regPassword" class="f-input" type="password" autocomplete="new-password" required placeholder="מינימום 8 תווים ומספר" />
             <button type="button" class="f-eye" aria-label="הצג/הסתר סיסמה" data-eye="regPassword">👁</button>
             <small class="f-hint">לפחות 8 תווים, כולל מספר אחד</small>
-            <small class="f-error" id="regPasswordErr"></small>
+            <small id="regPasswordErr" class="f-error"></small>
           </label>
 
           <label class="f-field f-field--password">
             <span class="f-label">אימות סיסמה</span>
             <input id="regConfirm" class="f-input" type="password" autocomplete="new-password" required placeholder="חזרה על הסיסמה" />
             <button type="button" class="f-eye" aria-label="הצג/הסתר סיסמה" data-eye="regConfirm">👁</button>
-            <small class="f-error" id="regConfirmErr"></small>
+            <small id="regConfirmErr" class="f-error"></small>
           </label>
 
           <label class="f-inline">
@@ -109,6 +220,7 @@
     </footer>
   </main>
 
+  <!-- Only auth.js here; do NOT include the guard -->
   <script src="/Calendar/dist/auth.js" defer></script>
 </body>
 </html>
