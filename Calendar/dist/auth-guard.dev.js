@@ -2,10 +2,9 @@
 
 // Calendar/auth-guard.js
 (function () {
-  'use strict'; // Do not run the guard on the auth page itself
+  'use strict'; // don't guard the login/register page itself
 
-  var isAuthPage = /\/Calendar\/auth\.html$/i.test(window.location.pathname);
-  if (isAuthPage) return;
+  if (/\/Calendar\/auth\.html$/i.test(location.pathname)) return;
 
   function getUser() {
     try {
@@ -14,13 +13,13 @@
     } catch (e) {
       return null;
     }
-  } // If no user -> redirect to login/register
+  } // no user -> go to auth
 
 
   if (!getUser()) {
-    window.location.replace('/Calendar/auth.html');
+    location.replace('/Calendar/auth.html');
     return;
-  } // Expose a safe global logout used by the app's header button
+  } // expose a logout() the header can call
 
 
   window.logout = function () {
@@ -28,9 +27,9 @@
       localStorage.removeItem('auth.user');
       localStorage.removeItem('auth.token');
       sessionStorage.removeItem('auth.session');
-    } catch (e) {} // replace() prevents the back button from re-entering a protected page
+    } catch (e) {} // IMPORTANT: add a flag so auth.html knows not to bounce back
 
 
-    window.location.replace('/Calendar/auth.html');
+    location.replace('/Calendar/auth.html?loggedout=1');
   };
 })();

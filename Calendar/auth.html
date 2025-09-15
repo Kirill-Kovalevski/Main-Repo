@@ -5,121 +5,45 @@
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
   <title>LooZ — התחברות / הרשמה</title>
 
-  <!-- Fonts to match the app -->
   <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@500;600&family=Rubik:wght@400;500;700&display=swap" rel="stylesheet">
-
-  <!-- Your compiled CSS -->
   <link rel="stylesheet" href="/Calendar/css/dist/main.css" />
+
+  <!-- Clear any stale auth if we arrived via ?loggedout=1 BEFORE auth.js runs -->
+  <script>
+    (function(){
+      var q = new URLSearchParams(location.search);
+      if (q.get('loggedout') === '1') {
+        try {
+          localStorage.removeItem('auth.user');
+          localStorage.removeItem('auth.token');
+          sessionStorage.removeItem('auth.session');
+        } catch(e){}
+      }
+    })();
+  </script>
+
   <style>
-    /* Light, elegant wrapper that uses your existing design language */
-    .auth-page {
-      min-height: 100svh;
-      display: grid;
-      grid-template-rows: auto 1fr auto;
-      justify-items: center;
-      align-items: start;
-      padding: 1.25rem clamp(0.75rem, 3vw, 1.25rem);
-      background: radial-gradient(120% 120% at 50% 0%, #ffffff 0%, #f4f7fb 70%);
-    }
-    .auth-header { text-align: center; margin-block: .5rem 1rem; }
-    .auth-brand {
-      font-family: "Cormorant Garamond", serif;
-      font-weight: 600;
-      font-size: clamp(1.8rem, 3.8vw + 1rem, 2.2rem);
-      letter-spacing: .02em;
-      margin: 0;
-    }
-    .auth-lemon {
-      inline-size: 2rem; block-size: 2rem;
-      margin: .35rem auto 0;
-      display: grid; place-items: center;
-      border-radius: .75rem;
-      background:
-        radial-gradient(circle at 40% 35%, #fff, rgba(255,255,255,.25)),
-        linear-gradient(180deg, #FFF7D1, #FFE48A);
-      box-shadow: 0 .25rem .6rem rgba(0,0,0,.08), inset 0 0 .35rem rgba(255,255,255,.7);
-    }
-
-    /* Card */
-    .auth-card {
-      width: 100%;
-      max-width: 24rem;
-      background: rgba(255,255,255,.9);
-      border: 1px solid rgba(0,0,0,.06);
-      border-radius: 1rem;
-      box-shadow: 0 .75rem 2rem rgba(0,0,0,.07);
-      padding: 1rem clamp(1rem, 3vw, 1.25rem);
-    }
-
-    .auth-tabs {
-      display: grid;
-      grid-auto-flow: column;
-      gap: .5rem;
-      margin-bottom: .75rem;
-    }
-    .auth-tab {
-      border: 1px solid rgba(0,0,0,.08);
-      border-radius: 999rem;
-      padding: .45rem .9rem;
-      background: linear-gradient(145deg,#F8F5EF,#EDE7DC);
-      box-shadow: inset 0 0 .25rem rgba(255,255,255,.5), 0 .15rem .35rem rgba(0,0,0,.08);
-      font: 500 .95rem/1 'Rubik', system-ui, sans-serif;
-      cursor: pointer;
-    }
-    .auth-tab.is-active {
-      outline: 2px solid rgba(29,78,216,.12);
-      background: linear-gradient(145deg,#fff,#f4f2ea);
-    }
-
-    .auth-panel { display: none; }
-    .auth-panel.is-active { display: block; }
-
-    /* Reuse your form atoms */
-    .auth-form { display: grid; gap: .75rem; }
-    .f-field { display: grid; gap: .35rem; }
-    .f-label { font: 500 .9rem/1 'Rubik', system-ui, sans-serif; color: #2b2b44; }
-    .f-input {
-      inline-size: 100%;
-      block-size: 2.5rem;
-      padding: 0 .75rem;
-      border-radius: .75rem;
-      border: 1px solid rgba(0,0,0,.1);
-      background: linear-gradient(180deg,#fff,#f7f7fa);
-      font: 400 .95rem/1 'Rubik', system-ui, sans-serif;
-    }
-    .f-field--password { position: relative; }
-    .f-eye {
-      position: absolute;
-      inset-inline-start: .4rem;
-      inset-block-start: 50%;
-      transform: translateY(-50%);
-      border: 0;
-      background: transparent;
-      cursor: pointer;
-      font-size: 1.05rem;
-      opacity: .65;
-    }
-    .f-inline { display: inline-flex; align-items: center; gap: .5rem; }
-    .f-row.between { display: flex; justify-content: space-between; align-items: center; }
-    .f-error { color: #b91c1c; font-size: .8rem; min-height: 1em; }
-    .f-link { color: #2563eb; text-decoration: none; }
-
-    .auth-primary {
-      margin-top: .25rem;
-      block-size: 2.6rem;
-      border-radius: 999rem;
-      border: 0;
-      cursor: pointer;
-      color: #fff;
-      font: 600 1rem/1 'Rubik', system-ui, sans-serif;
-      background: linear-gradient(135deg,#1e68ff,#06b6d4);
-      box-shadow: 0 .6rem 1.25rem rgba(6,182,212,.28);
-    }
-
-    .auth-foot {
-      margin-block: 1.25rem 0;
-      text-align: center;
-    }
+    .auth-page{min-height:100svh;display:grid;grid-template-rows:auto 1fr auto;justify-items:center;align-items:start;padding:1.25rem clamp(.75rem,3vw,1.25rem);background:radial-gradient(120% 120% at 50% 0%,#fff 0%,#f4f7fb 70%)}
+    .auth-header{text-align:center;margin:.5rem 0 1rem}
+    .auth-brand{font-family:"Cormorant Garamond",serif;font-weight:600;font-size:clamp(1.8rem,3.8vw + 1rem,2.2rem);letter-spacing:.02em;margin:0}
+    .auth-lemon{inline-size:2rem;block-size:2rem;margin:.35rem auto 0;display:grid;place-items:center;border-radius:.75rem;background:radial-gradient(circle at 40% 35%,#fff,rgba(255,255,255,.25)),linear-gradient(180deg,#FFF7D1,#FFE48A);box-shadow:0 .25rem .6rem rgba(0,0,0,.08),inset 0 0 .35rem rgba(255,255,255,.7)}
+    .auth-card{width:100%;max-width:24rem;background:rgba(255,255,255,.9);border:1px solid rgba(0,0,0,.06);border-radius:1rem;box-shadow:0 .75rem 2rem rgba(0,0,0,.07);padding:1rem clamp(1rem,3vw,1.25rem)}
+    .auth-tabs{display:grid;grid-auto-flow:column;gap:.5rem;margin-bottom:.75rem}
+    .auth-tab{border:1px solid rgba(0,0,0,.08);border-radius:999rem;padding:.45rem .9rem;background:linear-gradient(145deg,#F8F5EF,#EDE7DC);box-shadow:inset 0 0 .25rem rgba(255,255,255,.5),0 .15rem .35rem rgba(0,0,0,.08);font:500 .95rem 'Rubik',system-ui,sans-serif;cursor:pointer}
+    .auth-tab.is-active{outline:2px solid rgba(29,78,216,.12);background:linear-gradient(145deg,#fff,#f4f2ea)}
+    .auth-panel{display:none}.auth-panel.is-active{display:block}
+    .auth-form{display:grid;gap:.75rem}
+    .f-field{display:grid;gap:.35rem}
+    .f-label{font:500 .9rem 'Rubik',system-ui,sans-serif;color:#2b2b44}
+    .f-input{inline-size:100%;block-size:2.5rem;padding:0 .75rem;border-radius:.75rem;border:1px solid rgba(0,0,0,.1);background:linear-gradient(180deg,#fff,#f7f7fa);font:400 .95rem 'Rubik',system-ui,sans-serif}
+    .f-field--password{position:relative}
+    .f-eye{position:absolute;inset-inline-start:.4rem;inset-block-start:50%;transform:translateY(-50%);border:0;background:transparent;cursor:pointer;font-size:1.05rem;opacity:.65}
+    .f-inline{display:inline-flex;align-items:center;gap:.5rem}
+    .f-row.between{display:flex;justify-content:space-between;align-items:center}
+    .f-error{color:#b91c1c;font-size:.8rem;min-height:1em}
+    .f-link{color:#2563eb;text-decoration:none}
+    .auth-primary{margin-top:.25rem;block-size:2.6rem;border-radius:999rem;border:0;cursor:pointer;color:#fff;font:600 1rem 'Rubik',system-ui,sans-serif;background:linear-gradient(135deg,#1e68ff,#06b6d4);box-shadow:0 .6rem 1.25rem rgba(6,182,212,.28)}
+    .auth-foot{margin-block:1.25rem 0;text-align:center}
   </style>
 </head>
 <body>
@@ -136,7 +60,7 @@
             </radialGradient>
           </defs>
           <path d="M19 7c-3-3-8-3-11 0-2 2.3-2 6 0 8 2.2 2.1 5.8 2.4 8 0 2.2-2.1 2.6-5.4 1-7.6" fill="url(#authLemon)" stroke="#C59A21" stroke-width="1"/>
-          <path d="M18 6c.9-.9 1.7-1.8 2.3-2.8" stroke="#6FA14D" stroke-linecap="round" />
+          <path d="M18 6c.9-.9 1.7-1.8 2.3-2.8" stroke="#6FA14D" stroke-linecap="round"/>
         </svg>
       </div>
     </header>
@@ -147,7 +71,7 @@
         <button id="tab-register" class="auth-tab" role="tab" aria-controls="panel-register" aria-selected="false">הרשמה</button>
       </div>
 
-      <!-- Login Panel -->
+      <!-- Login -->
       <section id="panel-login" class="auth-panel is-active" role="tabpanel" aria-labelledby="tab-login">
         <form id="loginForm" class="auth-form" novalidate>
           <label class="f-field">
@@ -155,27 +79,21 @@
             <input id="loginEmail" class="f-input" type="email" inputmode="email" autocomplete="email" required placeholder="name@example.com" />
             <small id="loginEmailErr" class="f-error"></small>
           </label>
-
           <label class="f-field f-field--password">
             <span class="f-label">סיסמה</span>
             <input id="loginPassword" class="f-input" type="password" autocomplete="current-password" required placeholder="••••••••" />
             <button type="button" class="f-eye" aria-label="הצג/הסתר סיסמה" data-eye="loginPassword">👁</button>
             <small id="loginPasswordErr" class="f-error"></small>
           </label>
-
           <div class="f-row between">
-            <label class="f-inline">
-              <input id="rememberMe" type="checkbox" />
-              <span>זכור אותי</span>
-            </label>
+            <label class="f-inline"><input id="rememberMe" type="checkbox" /><span>זכור אותי</span></label>
             <a class="f-link" href="#" aria-disabled="true">שכחת סיסמה?</a>
           </div>
-
           <button type="submit" class="auth-primary">התחבר/י</button>
         </form>
       </section>
 
-      <!-- Register Panel -->
+      <!-- Register -->
       <section id="panel-register" class="auth-panel" role="tabpanel" aria-labelledby="tab-register" hidden>
         <form id="registerForm" class="auth-form" novalidate>
           <label class="f-field">
@@ -183,13 +101,11 @@
             <input id="regName" class="f-input" type="text" autocomplete="given-name" required placeholder="דניאלה" />
             <small id="regNameErr" class="f-error"></small>
           </label>
-
           <label class="f-field">
             <span class="f-label">אימייל</span>
             <input id="regEmail" class="f-input" type="email" inputmode="email" autocomplete="email" required placeholder="name@example.com" />
             <small id="regEmailErr" class="f-error"></small>
           </label>
-
           <label class="f-field f-field--password">
             <span class="f-label">סיסמה</span>
             <input id="regPassword" class="f-input" type="password" autocomplete="new-password" required placeholder="מינימום 8 תווים ומספר" />
@@ -197,19 +113,13 @@
             <small class="f-hint">לפחות 8 תווים, כולל מספר אחד</small>
             <small id="regPasswordErr" class="f-error"></small>
           </label>
-
           <label class="f-field f-field--password">
             <span class="f-label">אימות סיסמה</span>
             <input id="regConfirm" class="f-input" type="password" autocomplete="new-password" required placeholder="חזרה על הסיסמה" />
             <button type="button" class="f-eye" aria-label="הצג/הסתר סיסמה" data-eye="regConfirm">👁</button>
             <small id="regConfirmErr" class="f-error"></small>
           </label>
-
-          <label class="f-inline">
-            <input id="regTerms" type="checkbox" required />
-            <span>קראתי ואני מאשר/ת את התנאים</span>
-          </label>
-
+          <label class="f-inline"><input id="regTerms" type="checkbox" required /><span>קראתי ואני מאשר/ת את התנאים</span></label>
           <button type="submit" class="auth-primary">הרשם/י</button>
         </form>
       </section>
@@ -220,7 +130,7 @@
     </footer>
   </main>
 
-  <!-- Only auth.js here; do NOT include the guard -->
+  <!-- Only auth.js; DO NOT include the guard on this page -->
   <script src="/Calendar/dist/auth.js" defer></script>
 </body>
 </html>

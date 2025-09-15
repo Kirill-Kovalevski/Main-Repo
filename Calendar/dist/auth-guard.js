@@ -4,9 +4,8 @@
 (function () {
   'use strict';
 
-  // Do not run the guard on the auth page itself
-  var isAuthPage = /\/Calendar\/auth\.html$/i.test(window.location.pathname);
-  if (isAuthPage) return;
+  // don't guard the login/register page itself
+  if (/\/Calendar\/auth\.html$/i.test(location.pathname)) return;
   function getUser() {
     try {
       var raw = localStorage.getItem('auth.user');
@@ -16,20 +15,20 @@
     }
   }
 
-  // If no user -> redirect to login/register
+  // no user -> go to auth
   if (!getUser()) {
-    window.location.replace('/Calendar/auth.html');
+    location.replace('/Calendar/auth.html');
     return;
   }
 
-  // Expose a safe global logout used by the app's header button
+  // expose a logout() the header can call
   window.logout = function () {
     try {
       localStorage.removeItem('auth.user');
       localStorage.removeItem('auth.token');
       sessionStorage.removeItem('auth.session');
     } catch (e) {}
-    // replace() prevents the back button from re-entering a protected page
-    window.location.replace('/Calendar/auth.html');
+    // IMPORTANT: add a flag so auth.html knows not to bounce back
+    location.replace('/Calendar/auth.html?loggedout=1');
   };
 })();
