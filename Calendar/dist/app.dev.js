@@ -272,3 +272,66 @@
 
   window.logout = logout;
 })();
+
+(function () {
+  var btn = document.getElementById('lemonToggle');
+  var nav = document.getElementById('appNav');
+  if (!btn || !nav) return;
+  btn.addEventListener('click', function () {
+    nav.classList.toggle('u-is-collapsed'); // closed <-> open
+  });
+})();
+/* ========= NAV: collapse/expand (robust) ========= */
+
+
+(function initNav() {
+  var btn = document.getElementById('lemonToggle');
+  var nav = document.getElementById('appNav');
+  var panel = nav ? nav.querySelector('.c-nav__panel') : null;
+  if (!btn || !nav || !panel) return; // Start collapsed
+
+  nav.classList.add('u-is-collapsed');
+  nav.style.maxHeight = '0';
+
+  function openNav() {
+    // set maxHeight to the content height so it can animate open
+    nav.classList.remove('u-is-collapsed');
+    nav.style.visibility = 'visible';
+    nav.style.opacity = '1';
+    nav.style.maxHeight = panel.scrollHeight + 'px'; // after transition, remove max-height so content can grow/shrink naturally
+
+    nav.addEventListener('transitionend', function onEnd(e) {
+      if (e.propertyName === 'max-height') {
+        nav.style.maxHeight = 'none';
+        nav.removeEventListener('transitionend', onEnd);
+      }
+    });
+    btn.setAttribute('aria-expanded', 'true');
+  }
+
+  function closeNav() {
+    // lock current height, then animate to 0
+    var current = nav.scrollHeight;
+    nav.style.maxHeight = current + 'px'; // lock
+    // force reflow so the browser recognizes the locked height
+    // eslint-disable-next-line no-unused-expressions
+
+    nav.offsetHeight;
+    nav.style.maxHeight = '0';
+    btn.setAttribute('aria-expanded', 'false');
+    nav.addEventListener('transitionend', function onEnd(e) {
+      if (e.propertyName === 'max-height') {
+        nav.classList.add('u-is-collapsed');
+        nav.removeEventListener('transitionend', onEnd);
+      }
+    });
+  }
+
+  function isOpen() {
+    return !nav.classList.contains('u-is-collapsed');
+  }
+
+  btn.addEventListener('click', function () {
+    if (isOpen()) closeNav();else openNav();
+  });
+})();
