@@ -335,4 +335,252 @@ html, body { height: 100%; }
 #appNav.c-nav:not(.u-is-collapsed) ~ #dateBlock {
   margin-top: .25rem;         /* optional – remove if you want zero */
 }
+/* --- Planner shell --- */
+.c-planner { margin: 0.75rem 0 1rem; }
 
+/* Hide the old "today list" when planner is on */
+body.planner-on .c-list { display: none; }
+
+/* --- Week view --- */
+.p-week {
+  display: grid;
+  gap: .5rem;
+}
+.p-day {
+  background: #fff;
+  border-radius: 14px;
+  box-shadow: 0 1px 2px rgba(16,24,40,.04), 0 1px 1px rgba(16,24,40,.02);
+  padding: .6rem .7rem;
+}
+.p-day__head {
+  display: flex; align-items: baseline; gap: .5rem; margin-bottom: .4rem;
+}
+.p-day__name { font-weight: 600; color: #0f172a; }
+.p-day__date { color: #64748b; font-size: .9rem; }
+
+/* task row with hour in the middle */
+.p-task {
+  display: grid;
+  grid-template-columns: 1fr 72px 1.2fr; /* text | time | controls */
+  align-items: center;
+  padding: .5rem .55rem;
+  border: 1px solid #e5e7eb;
+  border-radius: 12px;
+  margin-bottom: .4rem;
+  background: #fcfcfd;
+}
+.p-task__text { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.p-task__time { text-align: center; font-weight: 500; color: #334155; }
+.p-task__actions { display: flex; justify-content: flex-end; gap: .4rem; }
+.p-task__btn {
+  border: 1px solid #e5e7eb; background: #fff; border-radius: 10px;
+  padding: .25rem .45rem; font-size: .85rem;
+}
+
+/* --- Month view --- */
+.p-month {
+  display: grid; grid-template-columns: repeat(7, 1fr); gap: .35rem;
+}
+.p-cell {
+  background: #fff; border: 1px solid #edf2f7; border-radius: 12px; min-height: 66px;
+  padding: .4rem; position: relative;
+}
+.p-cell__date { font-size: .85rem; color: #475569; }
+.p-cell__tasks {
+  margin-top: .25rem; display: grid; gap: .25rem;
+}
+.p-chip {
+  font-size: .78rem; line-height: 1.2;
+  background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 8px; padding: .18rem .35rem;
+  white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+}
+.p-cell--today { outline: 2px solid #60a5fa; outline-offset: 1px; }
+
+/* small helper for the active button */
+.c-headbtn.is-active { background: #111827; color: #fff; }
+/* --- Planner shell --- */
+.c-planner { margin: .75rem 0 4.5rem; } /* leave room for bottom buttons */
+
+/* Hide the old "today list" when planner is on */
+body.planner-on .c-list { display: none; }
+
+/* ===== DAILY VIEW ===== */
+.p-dayview { display: grid; gap: .6rem; }
+.p-dayview__head {
+  display:flex; justify-content: space-between; align-items: baseline;
+  padding-inline:.2rem;
+}
+.p-dayview__title { font-weight:700; color:#0f172a; }
+.p-dayview__date  { color:#475569; font-size:.95rem; }
+.p-daytask {
+  display:grid;
+  grid-template-columns: 1fr 92px 1fr; /* text | time | actions */
+  align-items:center;
+  padding:.55rem .65rem;
+  border:1px solid #e5e7eb; border-radius:12px; background:#fcfcfd;
+}
+.p-daytask__text { white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+.p-daytask__time { text-align:center; font-weight:600; color:#334155; }
+.p-daytask__actions { display:flex; justify-content:flex-end; gap:.35rem; }
+.p-daytask__btn { border:1px solid #e5e7eb; background:#fff; border-radius:10px; padding:.25rem .5rem; font-size:.85rem; }
+.p-empty { color:#94a3b8; padding:.4rem; }
+
+/* ===== WEEK VIEW ===== */
+.p-week { display:grid; gap:.55rem; }
+.p-day {
+  background:#fff; border-radius:14px;
+  box-shadow:0 1px 2px rgba(16,24,40,.04), 0 1px 1px rgba(16,24,40,.02);
+  padding:.6rem .7rem;
+}
+.p-day__head { display:flex; align-items:baseline; gap:.5rem; margin-bottom:.4rem; }
+.p-day__name { font-weight:600; color:#0f172a; }
+.p-day__date { color:#64748b; font-size:.9rem; cursor:pointer; }
+
+/* task row reused in week view */
+.p-task { display:grid; grid-template-columns: 1fr 72px 1.2fr; align-items:center;
+  padding:.5rem .55rem; border:1px solid #e5e7eb; border-radius:12px; margin-bottom:.4rem; background:#fcfcfd; }
+.p-task__text { white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+.p-task__time { text-align:center; font-weight:500; color:#334155; }
+.p-task__actions { display:flex; justify-content:flex-end; gap:.4rem; }
+.p-task__btn { border:1px solid #e5e7eb; background:#fff; border-radius:10px; padding:.25rem .45rem; font-size:.85rem; }
+
+/* ===== MONTH VIEW ===== */
+.p-month { display:grid; grid-template-columns: repeat(7, 1fr); gap:.35rem; }
+.p-cell { background:#fff; border:1px solid #edf2f7; border-radius:12px; min-height:66px; padding:.4rem; position:relative; }
+.p-cell__date { font-size:.85rem; color:#475569; cursor:pointer; }
+.p-cell__tasks { margin-top:.25rem; display:grid; gap:.25rem; }
+.p-chip { font-size:.78rem; line-height:1.2; background:#f8fafc; border:1px solid #e2e8f0; border-radius:8px; padding:.18rem .35rem; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+.p-cell--today { outline:2px solid #60a5fa; outline-offset:1px; }
+
+/* ===== Bottom toolbar (Week/Month buttons) ===== */
+.c-view-toggle{
+  position:sticky; bottom: max(10px, env(safe-area-inset-bottom));
+  display:flex; gap:.6rem; justify-content:center;
+  padding:.6rem .4rem .8rem;
+  background:linear-gradient(180deg, rgba(255,255,255,0) 0%, #fff 40%);
+  z-index:5;
+}
+.c-headbtn{ padding:.6rem 1.2rem; border-radius:999px; border:1px solid #e5e7eb; background:#f6f5f2; }
+.c-headbtn.is-active{ background:#111827; color:#fff; }
+
+/* keep CTA clear of bottom buttons */
+.c-cta-wrap { margin-bottom: .25rem; }
+
+/* --- Header date highlight (your yellow marker look) --- */
+.c-title--date {
+  display:inline-block; padding: .15rem .35rem; border-radius: .35rem;
+  background: linear-gradient(180deg,#fff6ae 0%, #ffe77a 100%);
+  font-weight:700;
+}
+
+/* --- Keep planner margin (from previous step) --- */
+.c-planner { margin: .75rem 0 4.5rem; }
+body.planner-on .c-list { display: none; }
+
+/* ===== DAILY VIEW (mythic parchment) ===== */
+.p-dayview { display:grid; gap:.6rem; }
+.p-dayview__head { display:flex; justify-content:space-between; align-items:baseline; padding-inline:.2rem; }
+.p-dayview__title { font-family: "Cormorant Garamond", serif; font-weight:700; letter-spacing:.02em; color:#111827; }
+.p-dayview__date  { color:#374151; font-weight:600; }
+
+.p-daytask {
+  display:grid;
+  grid-template-columns: 1fr 96px 1fr; /* title | time | actions */
+  align-items:center;
+  padding:.7rem .8rem;
+  background:
+    radial-gradient(120% 100% at 0% 0%, #fffef4 0%, #fffaf0 40%, #fff8ea 100%);
+  border:1px solid #e7d8a1;
+  border-radius: 16px;
+  box-shadow:
+    0 1px 0 rgba(121, 85, 0, .06),
+    0 8px 18px rgba(121, 85, 0, .06);
+  position:relative;
+}
+.p-daytask::before{
+  content:"";
+  position:absolute; inset:0;
+  border-radius:16px;
+  pointer-events:none;
+  background: linear-gradient(180deg, rgba(199,153,41,.18), rgba(199,153,41,0));
+  mix-blend-mode:multiply;
+}
+.p-daytask__text{
+  font-family:"Cormorant Garamond", serif;
+  font-size:1.05rem;
+  white-space:nowrap; overflow:hidden; text-overflow:ellipsis;
+  color:#1f2937;
+}
+.p-daytask__time{
+  text-align:center; font-weight:700; letter-spacing:.02em;
+  padding:.25rem .6rem; border-radius:999px;
+  border:1px solid #d6c27b; background:#fff8d6; color:#4b5563;
+}
+.p-daytask__actions{ display:flex; justify-content:flex-end; gap:.35rem; }
+.p-daytask__btn{
+  border:1px solid #e5e7eb; background:#fff; border-radius:12px;
+  padding:.28rem .6rem; font-size:.85rem;
+}
+
+/* Empty day text */
+.p-empty { color:#94a3b8; padding:.4rem; }
+
+/* ===== WEEK VIEW (reuses task row style) ===== */
+.p-week { display:grid; gap:.55rem; }
+.p-day{
+  background:#fff; border-radius:14px;
+  box-shadow:0 1px 2px rgba(16,24,40,.04), 0 1px 1px rgba(16,24,40,.02);
+  padding:.6rem .7rem;
+}
+.p-day__head{ display:flex; align-items:baseline; gap:.5rem; margin-bottom:.4rem; }
+.p-day__name{ font-weight:600; color:#0f172a; }
+.p-day__date{ color:#64748b; font-size:.9rem; cursor:pointer; }
+
+/* Week task rows (same vibe, slightly tighter) */
+.p-task{ display:grid; grid-template-columns: 1fr 84px 1.2fr; align-items:center;
+  padding:.55rem .6rem; border:1px solid #e7d8a1; border-radius:14px; margin-bottom:.4rem;
+  background:radial-gradient(120% 100% at 0% 0%, #fffef4 0%, #fffaf0 40%, #fff8ea 100%);
+}
+.p-task__text{ white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+.p-task__time{ text-align:center; font-weight:600; border:1px solid #d6c27b; border-radius:999px; background:#fff8d6; padding:.2rem .5rem; }
+.p-task__actions{ display:flex; justify-content:flex-end; gap:.4rem; }
+.p-task__btn{ border:1px solid #e5e7eb; background:#fff; border-radius:10px; padding:.25rem .45rem; font-size:.85rem; }
+
+/* ===== MONTH VIEW: grid + selected cell with BLUE window and count ===== */
+.p-month{ display:grid; grid-template-columns:repeat(7,1fr); gap:.35rem; }
+.p-cell{
+  background:#fff; border:1px solid #edf2f7; border-radius:16px; min-height:70px;
+  padding:.45rem; position:relative;
+}
+.p-cell__date{
+  font-size:.92rem; color:#334155; cursor:pointer;
+  display:inline-flex; align-items:center; gap:.35rem;
+}
+.p-cell__tasks{ margin-top:.3rem; display:grid; gap:.25rem; }
+.p-chip{ font-size:.78rem; line-height:1.2; background:#f8fafc; border:1px solid #e2e8f0; border-radius:8px; padding:.18rem .35rem; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+.p-cell--today{ outline:2px solid #60a5fa; outline-offset:1px; }
+
+/* BLUE selection window */
+.p-cell--selected{
+  box-shadow: inset 0 0 0 2px #3b82f6;
+  border-color:#bfdbfe;
+}
+.p-cell--selected .p-count{
+  position:absolute; right:8px; bottom:8px;
+  min-width:28px; height:28px; padding:0 .4rem;
+  display:inline-flex; align-items:center; justify-content:center;
+  font-weight:700; font-size:.85rem;
+  border-radius:999px; background:#3b82f6; color:#fff;
+  box-shadow: 0 4px 10px rgba(59,130,246,.3);
+}
+
+/* ===== Bottom toolbar (unchanged) ===== */
+.c-view-toggle{
+  position:sticky; bottom: max(10px, env(safe-area-inset-bottom));
+  display:flex; gap:.6rem; justify-content:center;
+  padding:.6rem .4rem .8rem;
+  background:linear-gradient(180deg, rgba(255,255,255,0) 0%, #fff 40%);
+  z-index:5;
+}
+.c-headbtn{ padding:.6rem 1.2rem; border-radius:999px; border:1px solid #e5e7eb; background:#f6f5f2; }
+.c-headbtn.is-active{ background:#111827; color:#fff; }

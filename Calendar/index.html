@@ -78,11 +78,15 @@
           </div>
         </nav>
 
-        <!-- Date block (never collides) -->
-        <div id="dateBlock" class="c-meta-block">
-          <p class="c-title--date"><span class="c-title__day">שבת</span>, <span class="c-title__date">6.09.2025</span></p>
-          <p class="c-subtitle">ברוכה השבה, דניאלה!<br/>מה בלוז היום?</p>
-        </div>
+    <!-- Date block (auto-updated by JS) -->
+<div id="dateBlock" class="c-meta-block">
+  <p class="c-title--date">
+    <span id="titleDay"  class="c-title__day">—</span>,
+    <span id="titleDate" class="c-title__date">—</span>
+  </p>
+  <p class="c-subtitle">ברוכה השבה, דניאלה!<br/>מה בלוז היום?</p>
+</div>
+
       </header>
 
       <!-- Tasks -->
@@ -111,14 +115,14 @@
           <li class="c-item">
             <label class="c-item__label">
               <input class="c-item__check" type="checkbox" />
-              <span class="c-item__text">שנ״צ</span>
+              <span class="c-item__text">גיטרה</span>
             </label>
             <button class="c-item__remove" type="button" aria-label="הסר">−</button>
           </li>
           <li class="c-item">
             <label class="c-item__label">
               <input class="c-item__check" type="checkbox" />
-              <span class="c-item__text">שם המשימה…</span>
+              <span class="c-item__text">קאפקייק </span>
             </label>
             <button class="c-item__remove" type="button" aria-label="הסר">−</button>
           </li>
@@ -132,7 +136,7 @@
           <li class="c-item">
             <label class="c-item__label">
               <input class="c-item__check" type="checkbox" />
-              <span class="c-item__text">שנ״צ</span>
+              <span class="c-item__text">מקדונלדס</span>
             </label>
             <button class="c-item__remove" type="button" aria-label="הסר">−</button>
           </li>
@@ -176,12 +180,16 @@
       <div class="c-cta-wrap">
         <button id="addEventBtn" class="c-cta c-cta--bang" type="button">יצירת אירוע חדש</button>
       </div>
+      <!-- Planner (Daily/Week/Month renders here) -->
+<section id="planner" class="c-planner" aria-live="polite"></section>
 
-      <!-- Week / Month below CTA -->
-      <div class="c-belowcta">
-        <button id="btnWeek"  class="c-headbtn" type="button">שבוע</button>
-        <button id="btnMonth" class="c-headbtn" type="button">חודש</button>
-      </div>
+
+ <!-- Bottom view toggle (sticks to bottom) -->
+<div class="c-view-toggle" role="group" aria-label="החלפת תצוגה">
+  <button id="btnWeek"  class="c-headbtn" type="button">שבוע</button>
+  <button id="btnMonth" class="c-headbtn" type="button">חודש</button>
+</div>
+
 
       <!-- Bottom Sheet -->
       <section id="eventSheet" class="c-sheet u-hidden" dir="rtl" aria-hidden="true">
