@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <title>LooZ • Social</title>
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@500;600&family=Rubik:wght@400;500;700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="css/dist/social.css" />
+</head>
+<body>
+
+<main class="s-page">
+  <header class="s-header">
+    <button class="s-btn" id="sBack" aria-label="חזרה">←</button>
+    <h1 class="s-title"><span>LooZ</span> Social</h1>
+    <span class="s-spacer"></span>
+  </header>
+
+  <section class="s-hero">
+    <h2 class="s-hero__title">חברוּת, השראה, קהילה</h2>
+    <p class="s-hero__subtitle">שתפו הישגים, בקשו עזרה, וקבלו רעיונות מהחברים — בנראות נקייה, חמה ומודרנית.</p>
+    <div class="s-hero__actions">
+      <button class="s-cta">פרסום פוסט חדש</button>
+      <button class="s-ghost" id="sDiscover">גלו אנשים</button>
+    </div>
+  </section>
+
+  <section class="s-feed" id="sFeed" aria-live="polite">
+    <!-- JS injects cards -->
+  </section>
+
+  <nav class="s-tabbar" role="tablist">
+    <button class="s-tab is-active" data-tab="feed">פיד</button>
+    <button class="s-tab" data-tab="groups">קבוצות</button>
+    <button class="s-tab" data-tab="inbox">הודעות</button>
+    <button class="s-tab" data-tab="me">אני</button>
+  </nav>
+</main>
+
+<script src="/Calendar/social.js" defer></script>
+</body>
+</html>

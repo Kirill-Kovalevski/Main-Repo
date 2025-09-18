@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <title>LooZ • Profile</title>
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@500;600&family=Rubik:wght@400;500;700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="/Calendar/css/dist/profile.css" />
+</head>
+<body>
+
+<main class="p">
+  <header class="p__header">
+    <button class="p__btn" id="pBack" aria-label="חזרה">←</button>
+    <h1 class="p__title"><span>LooZ</span> Profile</h1>
+    <span class="p__spacer"></span>
+  </header>
+
+  <section class="card card--hero">
+    <div class="avatar" id="pAvatar" aria-label="Avatar"></div>
+    <div class="hero__meta">
+      <h2 class="hero__name" id="pName">—</h2>
+      <p class="hero__tag">חיים טובים, לוח יפה</p>
+    </div>
+    <button class="p__edit" id="pEdit">עריכה</button>
+  </section>
+
+  <section class="grid">
+    <article class="card">
+      <h3>פרטים אישיים</h3>
+      <label class="field">
+        <span>שם מלא</span>
+        <input type="text" id="fFullName" placeholder="השם שלך" />
+      </label>
+      <label class="field">
+        <span>דוא״ל</span>
+        <input type="email" id="fEmail" placeholder="name@email.com" />
+      </label>
+      <label class="field">
+        <span>טלפון</span>
+        <input type="tel" id="fPhone" placeholder="05x-xxxxxxx" />
+      </label>
+    </article>
+
+    <article class="card">
+      <h3>מראה ואווירה</h3>
+      <div class="chips" id="themeChips">
+        <button class="chip is-active" data-theme="light">קליל</button>
+        <button class="chip" data-theme="dawn">שחר</button>
+        <button class="chip" data-theme="noir">לילה</button>
+        <button class="chip" data-theme="olive">זית</button>
+      </div>
+      <label class="switch">
+        <input type="checkbox" id="fHighContrast" />
+        <span>ניגודיות גבוהה</span>
+      </label>
+    </article>
+
+    <article class="card">
+      <h3>התראות</h3>
+      <label class="switch"><input type="checkbox" id="fPush" checked /><span>קבל התראות</span></label>
+      <label class="switch"><input type="checkbox" id="fEmailN" /><span>התראות במייל</span></label>
+      <label class="switch"><input type="checkbox" id="fDailyDigest" /><span>סיכום יומי בבוקר</span></label>
+      <div class="chips">
+        <span class="chip" data-rem="5">תזכורת 5 ד׳</span>
+        <span class="chip is-active" data-rem="15">15 ד׳</span>
+        <span class="chip" data-rem="30">30 ד׳</span>
+        <span class="chip" data-rem="60">60 ד׳</span>
+      </div>
+    </article>
+
+    <article class="card">
+      <h3>חיבורים</h3>
+      <div class="links">
+        <button class="link">Google</button>
+        <button class="link">Apple</button>
+        <button class="link">Facebook</button>
+      </div>
+    </article>
+
+    <article class="card">
+      <h3>הישגים</h3>
+      <ul class="badges">
+        <li>🔥 רצף 7 ימים</li>
+        <li>🕊️ “קצב נעים”</li>
+        <li>🍋 “אמן הלימון”</li>
+      </ul>
+    </article>
+  </section>
+
+  <footer class="p__footer">
+    <button class="btn btn--ghost" id="pLogout">התנתקות</button>
+    <button class="btn btn--primary" id="pSave">שמירה</button>
+  </footer>
+</main>
+
+<script src="/Calendar/profile.js" defer></script>
+</body>
+</html>

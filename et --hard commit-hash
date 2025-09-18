@@ -1,0 +1,83 @@
+[33mcommit d444376f6ff72ad714a6563405e30b0a3d1854d2[m[33m ([m[1;36mHEAD[m[33m -> [m[1;32mmain[m[33m, [m[1;31morigin/main[m[33m)[m
+Author: Kirill Kovalevski <kirill.kovalevski@mail.huji.ac.il>
+Date:   Tue Sep 16 18:27:28 2025 +0300
+
+    month and week view fixes
+
+[33mcommit e93b9a6cd46e3503a768532715f2308ae6a4eee6[m
+Author: Kirill Kovalevski <kirill.kovalevski@mail.huji.ac.il>
+Date:   Tue Sep 16 08:31:25 2025 +0300
+
+    week and month
+
+[33mcommit 9245434c0936c3fe4b86fe469b4d484740289138[m
+Author: Kirill Kovalevski <kirill.kovalevski@mail.huji.ac.il>
+Date:   Tue Sep 16 07:46:13 2025 +0300
+
+    fixed gap between lemon and text
+
+[33mcommit e698719c43fd8a98a711726139d19fb608a09239[m
+Author: Kirill Kovalevski <kirill.kovalevski@mail.huji.ac.il>
+Date:   Mon Sep 15 16:51:08 2025 +0300
+
+    so far so good
+
+[33mcommit ca09d3878801cab203cb426570c64cb13e524b5f[m
+Author: Kirill Kovalevski <kirill.kovalevski@mail.huji.ac.il>
+Date:   Mon Sep 15 16:38:37 2025 +0300
+
+    working on log-out button, still flickers between screens
+
+[33mcommit d4144e845b216d221a656f1c3f50b4f1e4367035[m
+Author: Kirill Kovalevski <kirill.kovalevski@mail.huji.ac.il>
+Date:   Sat Sep 13 05:47:46 2025 +0300
+
+    checking
+
+[33mcommit dc90433a0931744f7f0ca92da552fbeb5f0612af[m
+Author: Kirill Kovalevski <kirill.kovalevski@mail.huji.ac.il>
+Date:   Sat Sep 13 05:34:30 2025 +0300
+
+    added log-in
+
+[33mcommit 0d5287ccd70cbe6b551023ba351566ada6a05a00[m
+Author: Kirill Kovalevski <kirill.kovalevski@mail.huji.ac.il>
+Date:   Fri Sep 12 04:39:38 2025 +0300
+
+    just checking
+
+[33mcommit bcdb3560ee86490e6d27276a91750a395e97989d[m
+Author: Kirill Kovalevski <kirill.kovalevski@mail.huji.ac.il>
+Date:   Fri Sep 12 04:25:08 2025 +0300
+
+    everything on the page seems to work
+
+[33mcommit 5b475408526daee55be18751e62ce6ee9b72d073[m
+Author: Kirill Kovalevski <kirill.kovalevski@mail.huji.ac.il>
+Date:   Fri Sep 12 03:30:37 2025 +0300
+
+    nav-bar works, only alignemnt of tick boxes left
+
+[33mcommit b8b2c5a1b44fe22a9a7f62984464750b70a3103f[m
+Author: Kirill Kovalevski <kirill.kovalevski@mail.huji.ac.il>
+Date:   Thu Sep 11 17:27:03 2025 +0300
+
+    layout needs fixing, and the new event button only flickers
+
+[33mcommit 7918fe05ec64e24d1e65316d843b11e7d2df6e16[m
+Author: Kirill Kovalevski <kirill.kovalevski@mail.huji.ac.il>
+Date:   Thu Sep 11 17:10:20 2025 +0300
+
+    making sure tasks aligned
+
+[33mcommit e12808e45aee4af828609406053955e5dec1722e[m
+Author: Kirill Kovalevski <kirill.kovalevski@mail.huji.ac.il>
+Date:   Tue Sep 9 08:58:46 2025 +0300
+
+    just cheking
+
+[33mcommit 39bd6d85c0eca917f45dfddd820ed803c65bc097[m
+Author: Kirill Kovalevski <kirill.kovalevski@mail.huji.ac.il>
+Date:   Mon Sep 8 12:59:17 2025 +0300
+
+    first commit

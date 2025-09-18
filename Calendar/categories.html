@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <title>LooZ • קטגוריות</title>
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@500;600&family=Rubik:wght@400;500;700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="css/dist/categories.css" />
+</head>
+<body>
+
+<main class="c">
+  <header class="c__header">
+    <button class="c__btn" id="cBack" aria-label="חזרה">←</button>
+    <h1 class="c__title"><span>LooZ</span> קטגוריות</h1>
+    <span class="c__spacer"></span>
+  </header>
+
+  <section class="c__grid">
+
+    <article class="card">
+      <h2 class="card__title">עונות</h2>
+      <div class="chips" data-key="season">
+        <button class="chip">סתיו</button>
+        <button class="chip">קיץ</button>
+        <button class="chip">אביב</button>
+        <button class="chip">חורף</button>
+      </div>
+    </article>
+
+    <article class="card">
+      <h2 class="card__title">זמן ביום</h2>
+      <div class="chips" data-key="timeofday">
+        <button class="chip" data-time="21:00">לילה</button>
+        <button class="chip" data-time="16:00">אחר הצהריים</button>
+        <button class="chip" data-time="12:00">צהריים</button>
+        <button class="chip" data-time="08:00">בוקר</button>
+      </div>
+    </article>
+
+    <article class="card">
+      <h2 class="card__title">מדינה / מקום</h2>
+      <div class="chips" data-key="country">
+        <button class="chip">יפן</button>
+        <button class="chip">איטליה</button>
+        <button class="chip">ארה״ב</button>
+        <button class="chip">ישראל</button>
+      </div>
+    </article>
+
+    <article class="card">
+      <h2 class="card__title">אנשים</h2>
+      <div class="chips" data-key="people">
+        <button class="chip">קבוצה</button>
+        <button class="chip">משפחה</button>
+        <button class="chip">שניים</button>
+        <button class="chip">סולו</button>
+      </div>
+    </article>
+
+    <article class="card">
+      <h2 class="card__title">מצב רוח</h2>
+      <div class="chips" data-key="mood">
+        <button class="chip">חברתי</button>
+        <button class="chip">פעיל</button>
+        <button class="chip">יצירתי</button>
+        <button class="chip">רגוע</button>
+      </div>
+    </article>
+
+    <article class="card">
+      <h2 class="card__title">בפנים / בחוץ</h2>
+      <div class="chips" data-key="place">
+        <button class="chip">בחוץ</button>
+        <button class="chip">בפנים</button>
+      </div>
+    </article>
+
+    <article class="card card--templates">
+      <h2 class="card__title">תבניות מהירות</h2>
+      <div class="tpls">
+        <button class="tpl" data-title="שעת למידה" data-time="20:00">📚 שעת למידה</button>
+        <button class="tpl" data-title="ריצה בבוקר" data-time="06:30">🏃 ריצה בבוקר</button>
+        <button class="tpl" data-title="ארוחת ערב משפחתית" data-time="19:30">🍽️ ארוחת ערב</button>
+        <button class="tpl" data-title="קפה עם חבר/ה" data-time="10:30">☕ קפה</button>
+      </div>
+    </article>
+
+  </section>
+
+  <footer class="c__footer">
+    <button class="btn" id="cApply">צור מאירוע שנבחר</button>
+  </footer>
+</main>
+
+<script src="/Calendar/categories.js" defer></script>
+</body>
+</html>
