@@ -4,30 +4,54 @@
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
   <title>LooZ • Profile</title>
-  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@500;600&family=Rubik:wght@400;500;700&display=swap" rel="stylesheet" />
-  <link rel="stylesheet" href="/Calendar/css/dist/profile.css" />
+<!-- Theme FIRST (prevents flash), then page CSS -->
+<script src="/Calendar/js/theme.js"></script>
+
+<!-- Base styles -->
+<link rel="stylesheet" href="/Calendar/css/dist/main.css" />
+<link rel="stylesheet" href="/Calendar/css/dist/profile.css" />
+
+<!-- Dark-mode + lemon overrides (must be AFTER main.css) -->
+<link rel="stylesheet" href="/Calendar/css/dist/dark-overrides.css" />
+
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@500;600&family=Rubik:wght@400;500;700&display=swap" rel="stylesheet" />
+
 </head>
 <body>
 
 <main class="p">
+  <!-- Header -->
   <header class="p__header">
     <button class="p__btn" id="pBack" aria-label="חזרה">←</button>
     <h1 class="p__title"><span>LooZ</span> Profile</h1>
     <span class="p__spacer"></span>
   </header>
 
+  <!-- Hero -->
   <section class="card card--hero">
-    <div class="avatar" id="pAvatar" aria-label="Avatar"></div>
+    <div class="hero__left">
+      <button class="avatar" id="pAvatarBtn" aria-label="בחר תמונה">
+        <div id="pAvatar" class="avatar__img" role="img" aria-label="Avatar"></div>
+      </button>
+      <input id="pAvatarFile" class="u-hidden" type="file" accept="image/*" />
+    </div>
     <div class="hero__meta">
       <h2 class="hero__name" id="pName">—</h2>
-      <p class="hero__tag">חיים טובים, לוח יפה</p>
+      <p class="hero__tag" id="pStatus">חיים טובים, לוח יפה</p>
+      <label class="switch hero__dm">
+        <input type="checkbox" id="pDark" />
+        <span>מצב כהה</span>
+      </label>
     </div>
-    <button class="p__edit" id="pEdit">עריכה</button>
+    <div class="hero__actions">
+      <button class="p__edit" id="pEdit">עריכה</button>
+    </div>
   </section>
 
+  <!-- Personal details -->
   <section class="grid">
     <article class="card">
-      <h3>פרטים אישיים</h3>
+      <h3 class="card__title">פרטים אישיים</h3>
       <label class="field">
         <span>שם מלא</span>
         <input type="text" id="fFullName" placeholder="השם שלך" />
@@ -42,52 +66,59 @@
       </label>
     </article>
 
+    <!-- Alerts -->
     <article class="card">
-      <h3>מראה ואווירה</h3>
-      <div class="chips" id="themeChips">
-        <button class="chip is-active" data-theme="light">קליל</button>
-        <button class="chip" data-theme="dawn">שחר</button>
-        <button class="chip" data-theme="noir">לילה</button>
-        <button class="chip" data-theme="olive">זית</button>
-      </div>
+      <h3 class="card__title">התראות</h3>
       <label class="switch">
-        <input type="checkbox" id="fHighContrast" />
-        <span>ניגודיות גבוהה</span>
+        <input type="checkbox" id="fPush" />
+        <span>קבל התראות</span>
       </label>
     </article>
 
-    <article class="card">
-      <h3>התראות</h3>
-      <label class="switch"><input type="checkbox" id="fPush" checked /><span>קבל התראות</span></label>
-      <label class="switch"><input type="checkbox" id="fEmailN" /><span>התראות במייל</span></label>
-      <label class="switch"><input type="checkbox" id="fDailyDigest" /><span>סיכום יומי בבוקר</span></label>
-      <div class="chips">
-        <span class="chip" data-rem="5">תזכורת 5 ד׳</span>
-        <span class="chip is-active" data-rem="15">15 ד׳</span>
-        <span class="chip" data-rem="30">30 ד׳</span>
-        <span class="chip" data-rem="60">60 ד׳</span>
-      </div>
-    </article>
+    <!-- Completed & open tasks -->
+    <article class="card" id="tasksCard">
+      <h3 class="card__title">משימות שהושלמו</h3>
 
-    <article class="card">
-      <h3>חיבורים</h3>
-      <div class="links">
-        <button class="link">Google</button>
-        <button class="link">Apple</button>
-        <button class="link">Facebook</button>
+      <div class="stats">
+        <div class="stat"><div class="stat__num" id="stOpen">0</div><div class="stat__lbl">פתוחות</div></div>
+        <div class="stat"><div class="stat__num" id="stDone">0</div><div class="stat__lbl">הושלמו</div></div>
+        <div class="stat"><div class="stat__num" id="stTotal">0</div><div class="stat__lbl">סך־הכל</div></div>
       </div>
-    </article>
 
-    <article class="card">
-      <h3>הישגים</h3>
-      <ul class="badges">
-        <li>🔥 רצף 7 ימים</li>
-        <li>🕊️ “קצב נעים”</li>
-        <li>🍋 “אמן הלימון”</li>
+      <h4 class="subhead">פתוחות</h4>
+      <ul id="openList" class="tlist"></ul>
+
+      <h4 class="subhead">הושלמו</h4>
+      <ul id="doneList" class="tlist tlist--muted">
+        <li class="tlist__empty" id="doneEmpty">אין היסטוריית השלמות עדיין.</li>
       </ul>
+    </article>
+
+    <!-- Social center -->
+    <article class="card">
+      <h3 class="card__title">מרכז חברתי</h3>
+
+      <div class="social__icons" id="socialIcons">
+        <button class="sicon" data-net="facebook"  aria-label="Facebook"><svg viewBox="0 0 24 24"><path d="M13 10h3V7h-3V5.5A1.5 1.5 0 0 1 14.5 4H16V1h-2.5A4.5 4.5 0 0 0 9 5.5V7H6v3h3v10h4V10Z" fill="currentColor"/></svg></button>
+        <button class="sicon" data-net="instagram" aria-label="Instagram"><svg viewBox="0 0 24 24"><path d="M7 2h10a5 5 0 0 1 5 5v10a5 5 0 0 1-5 5H7a5 5 0 0 1-5-5V7a5 5 0 0 1 5-5Zm5 5a5 5 0 1 0 0 10 5 5 0 0 0 0-10Zm6.5-.75a1.25 1.25 0 1 0 0 2.5 1.25 1.25 0 0 0 0-2.5Z" fill="currentColor"/></svg></button>
+        <button class="sicon" data-net="tiktok"     aria-label="TikTok"><svg viewBox="0 0 24 24"><path d="M15 3c1 2 2 3 4 3v3c-1 0-3-.5-4-1v6a6 6 0 1 1-6-6v3a3 3 0 1 0 3 3V3h3Z" fill="currentColor"/></svg></button>
+        <button class="sicon" data-net="twitter"    aria-label="X"><svg viewBox="0 0 24 24"><path d="M3 3h4.6l4.2 6.2L16.4 3H21l-8.1 9.4L21 21h-4.6l-4.6-6.8L7.6 21H3l8.4-8.6L3 3Z" fill="currentColor"/></svg></button>
+      </div>
+
+      <div class="inputrow">
+        <button class="btn btn--ghost" id="btnLink">הוסף</button>
+        <input id="socialHandle" class="inputrow__input" type="text" placeholder="קישור או handle@" />
+        <select id="socialSelect" class="inputrow__select" aria-label="רשת">
+          <option value="facebook">Facebook</option>
+          <option value="instagram">Instagram</option>
+          <option value="tiktok">TikTok</option>
+          <option value="twitter">X / Twitter</option>
+        </select>
+      </div>
     </article>
   </section>
 
+  <!-- Footer actions -->
   <footer class="p__footer">
     <button class="btn btn--ghost" id="pLogout">התנתקות</button>
     <button class="btn btn--primary" id="pSave">שמירה</button>

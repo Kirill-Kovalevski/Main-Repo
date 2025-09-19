@@ -23,3 +23,17 @@ body{margin:0;font-family:'Rubik',system-ui,sans-serif;background:linear-gradien
 .btn--danger{background:#ffe5e5;border-color:#fecaca;color:#991b1b}
 
 .s__footer{display:flex;justify-content:flex-end}
+/* Make sub-pages pick the global dark tokens */
+body.is-dark{
+  --bg: #0b1220;
+  --fg: #e8f0ff;
+  --card: #15233b;
+  --border:#2a3a5a;
+  --muted:#aabbcf;
+}
+body.is-dark { background: var(--bg); color: var(--fg); }
+body.is-dark .card { background: var(--card); border-color: var(--border); }
+body.is-dark .card__title { color: #f6fbff; }
+body.is-dark .chip, body.is-dark .btn, body.is-dark input, body.is-dark select {
+  background:#101a2c; color: var(--fg); border:1px solid var(--border);
+}

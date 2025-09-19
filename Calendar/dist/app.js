@@ -1,194 +1,152 @@
 "use strict";
 
-function _regenerator() { /*! regenerator-runtime -- Copyright (c) 2014-present, Facebook, Inc. -- license (MIT): https://github.com/babel/babel/blob/main/packages/babel-helpers/LICENSE */ var e, t, r = "function" == typeof Symbol ? Symbol : {}, n = r.iterator || "@@iterator", o = r.toStringTag || "@@toStringTag"; function i(r, n, o, i) { var c = n && n.prototype instanceof Generator ? n : Generator, u = Object.create(c.prototype); return _regeneratorDefine2(u, "_invoke", function (r, n, o) { var i, c, u, f = 0, p = o || [], y = !1, G = { p: 0, n: 0, v: e, a: d, f: d.bind(e, 4), d: function d(t, r) { return i = t, c = 0, u = e, G.n = r, a; } }; function d(r, n) { for (c = r, u = n, t = 0; !y && f && !o && t < p.length; t++) { var o, i = p[t], d = G.p, l = i[2]; r > 3 ? (o = l === n) && (u = i[(c = i[4]) ? 5 : (c = 3, 3)], i[4] = i[5] = e) : i[0] <= d && ((o = r < 2 && d < i[1]) ? (c = 0, G.v = n, G.n = i[1]) : d < l && (o = r < 3 || i[0] > n || n > l) && (i[4] = r, i[5] = n, G.n = l, c = 0)); } if (o || r > 1) return a; throw y = !0, n; } return function (o, p, l) { if (f > 1) throw TypeError("Generator is already running"); for (y && 1 === p && d(p, l), c = p, u = l; (t = c < 2 ? e : u) || !y;) { i || (c ? c < 3 ? (c > 1 && (G.n = -1), d(c, u)) : G.n = u : G.v = u); try { if (f = 2, i) { if (c || (o = "next"), t = i[o]) { if (!(t = t.call(i, u))) throw TypeError("iterator result is not an object"); if (!t.done) return t; u = t.value, c < 2 && (c = 0); } else 1 === c && (t = i["return"]) && t.call(i), c < 2 && (u = TypeError("The iterator does not provide a '" + o + "' method"), c = 1); i = e; } else if ((t = (y = G.n < 0) ? u : r.call(n, G)) !== a) break; } catch (t) { i = e, c = 1, u = t; } finally { f = 1; } } return { value: t, done: y }; }; }(r, o, i), !0), u; } var a = {}; function Generator() {} function GeneratorFunction() {} function GeneratorFunctionPrototype() {} t = Object.getPrototypeOf; var c = [][n] ? t(t([][n]())) : (_regeneratorDefine2(t = {}, n, function () { return this; }), t), u = GeneratorFunctionPrototype.prototype = Generator.prototype = Object.create(c); function f(e) { return Object.setPrototypeOf ? Object.setPrototypeOf(e, GeneratorFunctionPrototype) : (e.__proto__ = GeneratorFunctionPrototype, _regeneratorDefine2(e, o, "GeneratorFunction")), e.prototype = Object.create(u), e; } return GeneratorFunction.prototype = GeneratorFunctionPrototype, _regeneratorDefine2(u, "constructor", GeneratorFunctionPrototype), _regeneratorDefine2(GeneratorFunctionPrototype, "constructor", GeneratorFunction), GeneratorFunction.displayName = "GeneratorFunction", _regeneratorDefine2(GeneratorFunctionPrototype, o, "GeneratorFunction"), _regeneratorDefine2(u), _regeneratorDefine2(u, o, "Generator"), _regeneratorDefine2(u, n, function () { return this; }), _regeneratorDefine2(u, "toString", function () { return "[object Generator]"; }), (_regenerator = function _regenerator() { return { w: i, m: f }; })(); }
-function _regeneratorDefine2(e, r, n, t) { var i = Object.defineProperty; try { i({}, "", {}); } catch (e) { i = 0; } _regeneratorDefine2 = function _regeneratorDefine(e, r, n, t) { function o(r, n) { _regeneratorDefine2(e, r, function (e) { return this._invoke(r, n, e); }); } r ? i ? i(e, r, { value: n, enumerable: !t, configurable: !t, writable: !t }) : e[r] = n : (o("next", 0), o("throw", 1), o("return", 2)); }, _regeneratorDefine2(e, r, n, t); }
-function asyncGeneratorStep(n, t, e, r, o, a, c) { try { var i = n[a](c), u = i.value; } catch (n) { return void e(n); } i.done ? t(u) : Promise.resolve(u).then(r, o); }
-function _asyncToGenerator(n) { return function () { var t = this, e = arguments; return new Promise(function (r, o) { var a = n.apply(t, e); function _next(n) { asyncGeneratorStep(a, r, o, _next, _throw, "next", n); } function _throw(n) { asyncGeneratorStep(a, r, o, _next, _throw, "throw", n); } _next(void 0); }); }; }
 function _typeof(o) { "@babel/helpers - typeof"; return _typeof = "function" == typeof Symbol && "symbol" == typeof Symbol.iterator ? function (o) { return typeof o; } : function (o) { return o && "function" == typeof Symbol && o.constructor === Symbol && o !== Symbol.prototype ? "symbol" : typeof o; }, _typeof(o); }
+/* LooZ — Planner App (home) */
 (function () {
   'use strict';
 
-  /* ===== DOM refs ===== */
+  /* ===================== NAV across pages ===================== */
+  function go(href) {
+    window.location.href = href;
+  }
+  var btnProfile = document.getElementById('btnProfile');
+  var btnMenu = document.getElementById('btnMenu'); // 3-dots -> settings
+  var btnCategories = document.getElementById('btnCategories'); // in lemon nav
+  var btnSocial = document.getElementById('btnSocial'); // in lemon nav
+  if (btnProfile) btnProfile.addEventListener('click', function () {
+    return go('/Calendar/profile.html');
+  });
+  if (btnMenu) btnMenu.addEventListener('click', function () {
+    return go('/Calendar/settings.html');
+  });
+  if (btnCategories) btnCategories.addEventListener('click', function () {
+    return go('/Calendar/categories.html');
+  });
+  if (btnSocial) btnSocial.addEventListener('click', function () {
+    return go('/Calendar/social.html');
+  });
+
+  /* ===================== DOM ===================== */
   var lemonToggle = document.getElementById('lemonToggle');
   var appNav = document.getElementById('appNav');
-  var navPanel = document.getElementById('navPanel');
-  var navSearch = document.getElementById('navSearch');
-  var searchClear = document.getElementById('searchClear');
-  var searchGo = document.getElementById('searchGo');
-  var sugWrap = document.getElementById('sugWrap');
-  var sugList = document.getElementById('sugList');
-  var srOverlay = document.getElementById('srOverlay');
-  var srClose = document.getElementById('srClose');
-  var srX = document.getElementById('srX');
-  var srList = document.getElementById('srList');
-  var btnSocial = document.getElementById('btnSocial');
-  var btnProfile = document.getElementById('btnProfile');
-  var btnMenu = document.getElementById('btnMenu');
-  var btnCategories = document.getElementById('btnCategories');
-  var addEventBtn = document.getElementById('addEventBtn');
-  var sheet = document.getElementById('eventSheet');
-  var sheetBackdrop = sheet ? sheet.querySelector('[data-close]') : null;
-  var sheetCloseBtn = sheet ? sheet.querySelector('.c-icon-btn--ghost[data-close]') : null;
-  var sheetPanel = sheet ? sheet.querySelector('.c-sheet__panel') : null;
-  var sheetForm = document.getElementById('sheetForm');
-  var titleInput = document.getElementById('evtTitle');
-  var dateInput = document.getElementById('evtDate');
-  var timeInput = document.getElementById('evtTime');
-  var plannerRoot = document.getElementById('planner');
-  var btnDay = document.getElementById('btnDay');
-  var btnWeek = document.getElementById('btnWeek');
-  var btnMonth = document.getElementById('btnMonth');
+  var navPanel = appNav ? appNav.querySelector('.c-nav__panel') : null;
   var titleDay = document.getElementById('titleDay');
   var titleDate = document.getElementById('titleDate');
   var titleBadge = document.getElementById('titleBadge');
   var uiName = document.getElementById('uiName');
-  var contactSheet = document.getElementById('contactSheet');
-  var contactWho = document.getElementById('contactWho');
-  var contactMsg = document.getElementById('contactMsg');
-  var contactProfile = document.getElementById('contactProfile');
-  var contactCopy = document.getElementById('contactCopy');
+  var subtitleEl = document.querySelector('.c-subtitle');
+  var plannerRoot = document.getElementById('planner');
+  var btnDay = document.getElementById('btnDay');
+  var btnWeek = document.getElementById('btnWeek');
+  var btnMonth = document.getElementById('btnMonth');
+  var sheet = document.getElementById('eventSheet');
+  var sheetPanel = sheet ? sheet.querySelector('.c-sheet__panel') : null;
+  var sheetClose = sheet ? sheet.querySelector('[data-close]') : null;
+  var sheetForm = document.getElementById('sheetForm');
+  var titleInput = document.getElementById('evtTitle');
+  var dateInput = document.getElementById('evtDate');
+  var timeInput = document.getElementById('evtTime');
 
-  /* ===== Helpers ===== */
+  /* ===================== Helpers ===================== */
   function pad2(n) {
     return String(n).padStart(2, '0');
   }
   function escapeHtml(s) {
-    if (s == null) return '';
-    var m = {
-      '&': '&amp;',
-      '<': '&lt;',
-      '>': '&gt;',
-      '"': '&quot;',
-      "'": '&#39;'
-    };
-    return String(s).replace(/[&<>"']/g, function (c) {
-      return m[c];
+    return (s || '').replace(/[&<>"']/g, function (m) {
+      return {
+        '&': '&amp;',
+        '<': '&lt;',
+        '>': '&gt;',
+        '"': '&quot;',
+        "'": '&#39;'
+      }[m];
     });
   }
   function sameDay(a, b) {
     return a.getFullYear() === b.getFullYear() && a.getMonth() === b.getMonth() && a.getDate() === b.getDate();
   }
-  function formatDateHeb(d) {
-    return pad2(d.getDate()) + '.' + pad2(d.getMonth() + 1) + '.' + d.getFullYear();
-  }
-  function dateKeyLocal(d) {
+  function dateKey(d) {
     return d.getFullYear() + '-' + pad2(d.getMonth() + 1) + '-' + pad2(d.getDate());
   }
-  function parseYMD(s) {
-    var p = s.split('-');
-    return new Date(+p[0], +p[1] - 1, +p[2]);
+  function fromKey(ymd) {
+    var p = (ymd || '').split('-');
+    return new Date(+p[0], (+p[1] || 1) - 1, +p[2] || 1);
   }
-  function startOfWeek(d) {
-    var t = new Date(d.getFullYear(), d.getMonth(), d.getDate());
-    var dow = t.getDay();
-    t.setDate(t.getDate() - dow);
-    return t;
+  function startOfWeek(d, weekStart) {
+    var x = new Date(d.getFullYear(), d.getMonth(), d.getDate());
+    var diff = (x.getDay() - weekStart + 7) % 7;
+    x.setDate(x.getDate() - diff);
+    return x;
   }
-  function todayYMD() {
-    var t = new Date();
-    return dateKeyLocal(t);
+  function startOfMonth(d) {
+    return new Date(d.getFullYear(), d.getMonth(), 1);
   }
-  function debounce(fn, ms) {
-    var id = 0;
-    return function () {
-      var _this = this;
-      var args = arguments;
-      clearTimeout(id);
-      id = setTimeout(function () {
-        return fn.apply(_this, args);
-      }, ms);
-    };
+  function addMonths(d, n) {
+    return new Date(d.getFullYear(), d.getMonth() + n, 1);
   }
   var HEB_DAYS = ['ראשון', 'שני', 'שלישי', 'רביעי', 'חמישי', 'שישי', 'שבת'];
   var HEB_MONTHS = ['ינואר', 'פברואר', 'מרץ', 'אפריל', 'מאי', 'יוני', 'יולי', 'אוגוסט', 'ספטמבר', 'אוקטובר', 'נובמבר', 'דצמבר'];
-  function updateHeaderDate(d) {
-    var idx = d.getDay();
-    if (titleDay) titleDay.textContent = HEB_DAYS[idx];
-    if (titleDate) titleDate.textContent = formatDateHeb(d);
-    if (titleBadge) titleBadge.classList.add('is-highlight');
+  function formatTitle(d) {
+    if (titleDay) titleDay.textContent = HEB_DAYS[d.getDay()];
+    if (titleDate) titleDate.textContent = pad2(d.getDate()) + '.' + pad2(d.getMonth() + 1) + '.' + d.getFullYear();
+  }
+  function weekLabel(d, weekStart) {
+    var s = startOfWeek(d, weekStart);
+    var e = new Date(s);
+    e.setDate(s.getDate() + 6);
+    var sM = HEB_MONTHS[s.getMonth()],
+      eM = HEB_MONTHS[e.getMonth()];
+    if (s.getMonth() === e.getMonth()) {
+      return s.getDate() + '–' + e.getDate() + ' ' + sM + ' ' + e.getFullYear();
+    }
+    return s.getDate() + ' ' + sM + ' – ' + e.getDate() + ' ' + eM + ' ' + e.getFullYear();
   }
 
-  /* ===== Name ===== */
-  (function setHelloName() {
+  /* ===================== Greeting / profile name ===================== */
+  function getAuth() {
     try {
-      var name = null;
-      var au = localStorage.getItem('authUser');
-      if (au) {
-        var parsed = JSON.parse(au);
-        if (parsed && _typeof(parsed) === 'object') {
-          if (parsed.name) name = parsed.name;else if (parsed.displayName) name = parsed.displayName;else if (parsed.firstName) name = parsed.firstName;
-        }
-      }
-      if (!name) {
-        var alt = localStorage.getItem('authName');
-        if (alt) name = alt;
-      }
-      if (uiName) uiName.textContent = name && String(name).trim() || 'דניאלה';
+      var raw = localStorage.getItem('authUser');
+      if (!raw) return null;
+      var o = JSON.parse(raw);
+      return o && _typeof(o) === 'object' ? o : null;
     } catch (e) {
-      if (uiName) uiName.textContent = 'דניאלה';
+      return null;
     }
-  })();
+  }
+  function getProfile() {
+    try {
+      return JSON.parse(localStorage.getItem('profile') || '{}');
+    } catch (e) {
+      return {};
+    }
+  }
+  function getDisplayName() {
+    var prof = getProfile();
+    if (prof && prof.name) return prof.name;
+    var au = getAuth();
+    if (au && (au.name || au.displayName || au.firstName)) return au.name || au.displayName || au.firstName;
+    var alt = localStorage.getItem('authName');
+    if (alt) return alt;
+    return 'חברה';
+  }
+  function setGreeting() {
+    var name = getDisplayName();
+    var au = getAuth();
+    var SPECIAL_EMAIL = 'special.person@example.com'; // set your VIP here
+    if (subtitleEl) {
+      if (au && au.email === SPECIAL_EMAIL) {
+        subtitleEl.innerHTML = '✨ שמחים לראותך שוב, <strong>' + escapeHtml(name) + '</strong>. לוח מושלם מחכה לך.';
+      } else {
+        subtitleEl.innerHTML = 'ברוך/ה השב/ה, <span id="uiName">' + escapeHtml(name) + '</span>!<br>מה בלוז היום?';
+      }
+    }
+    if (uiName) uiName.textContent = name;
+  }
+  setGreeting();
 
-  /* ===== NAV open/close (in-flow; expands for suggestions) ===== */
-  (function initNav() {
-    if (!lemonToggle || !appNav || !navPanel) return;
-    function openNav() {
-      appNav.classList.remove('u-is-collapsed');
-      appNav.setAttribute('aria-hidden', 'false');
-      lemonToggle.setAttribute('aria-expanded', 'true');
-      navPanel.style.maxHeight = navPanel.scrollHeight + 'px';
-      navPanel.addEventListener('transitionend', function onEnd(e) {
-        if (e.propertyName === 'max-height') {
-          navPanel.style.maxHeight = '';
-          navPanel.removeEventListener('transitionend', onEnd);
-        }
-      });
-      navPanel.style.overflow = 'visible';
-    }
-    function closeNav() {
-      var h = navPanel.scrollHeight;
-      navPanel.style.maxHeight = h + 'px';
-      void navPanel.offsetHeight;
-      appNav.classList.add('u-is-collapsed');
-      appNav.setAttribute('aria-hidden', 'true');
-      lemonToggle.setAttribute('aria-expanded', 'false');
-      navPanel.style.maxHeight = '0';
-      navPanel.style.overflow = 'hidden';
-      hideSuggestions();
-    }
-    function isOpen() {
-      return !appNav.classList.contains('u-is-collapsed');
-    }
-    lemonToggle.addEventListener('click', function () {
-      isOpen() ? closeNav() : openNav();
-    });
-    if (navSearch) navSearch.addEventListener('focus', function () {
-      if (!isOpen()) openNav();
-      renderSuggestions(navSearch.value);
-    });
-  })();
-
-  /* ===== Routes ===== */
-  if (btnSocial) btnSocial.addEventListener('click', function () {
-    window.location.href = 'social.html';
-  });
-  if (btnProfile) btnProfile.addEventListener('click', function () {
-    window.location.href = 'profile.html';
-  });
-  if (btnMenu) btnMenu.addEventListener('click', function () {
-    window.location.href = 'settings.html';
-  });
-  if (btnCategories) btnCategories.addEventListener('click', function () {
-    window.location.href = 'categories.html';
-  });
-
-  /* ===== Planner storage ===== */
+  /* ===================== State ===================== */
   var STORAGE_KEY = 'plannerTasks';
-  var state = {
-    view: 'day',
-    current: new Date(),
-    tasks: loadTasks()
-  };
+  var PREFS_KEY = 'plannerPrefs';
   function loadTasks() {
     try {
       var raw = localStorage.getItem(STORAGE_KEY);
@@ -199,404 +157,90 @@ function _typeof(o) { "@babel/helpers - typeof"; return _typeof = "function" == 
     }
   }
   function saveTasks() {
-    localStorage.setItem(STORAGE_KEY, JSON.stringify(state.tasks));
-  }
-
-  /* ===== Social posts ===== */
-  var POSTS_KEY = 'socialPosts';
-  function seedPostsIfEmpty() {
     try {
-      var raw = localStorage.getItem(POSTS_KEY);
-      if (raw) return;
-      var seed = [{
-        id: 'p1',
-        title: 'הליכת בוקר בטיילת',
-        desc: '30 דקות עם קפה ומוזיקה רגועה',
-        tags: ['בוקר', 'הליכה', 'חוץ'],
-        time: '08:00',
-        user: {
-          id: 'u_dani',
-          name: 'דני',
-          handle: '@dani'
-        }
-      }, {
-        id: 'p2',
-        title: 'ריצה קלה בפארק',
-        desc: '5 ק״מ קצב נעים',
-        tags: ['ספורט', 'בריאות', 'חוץ'],
-        time: '07:00',
-        user: {
-          id: 'u_lia',
-          name: 'ליה',
-          handle: '@lia'
-        }
-      }, {
-        id: 'p3',
-        title: 'שעת למידה בספרייה',
-        desc: 'התמקדות בשקט מוחלט',
-        tags: ['למידה', 'פוקוס', 'פנים'],
-        time: '20:00',
-        user: {
-          id: 'u_noa',
-          name: 'נועה',
-          handle: '@noa'
-        }
-      }, {
-        id: 'p4',
-        title: 'קפה עם חבר/ה',
-        desc: 'Catch-up נעים לשעה',
-        tags: ['חברתי', 'פנאי', 'קפה'],
-        time: '10:30',
-        user: {
-          id: 'u_ron',
-          name: 'רון',
-          handle: '@ron'
-        }
-      }, {
-        id: 'p5',
-        title: 'שקיעה וחול ים',
-        desc: 'נשימות עמוקות, בלי טלפון',
-        tags: ['מיינדפולנס', 'ים', 'שקיעה'],
-        time: '18:30',
-        user: {
-          id: 'u_gal',
-          name: 'גל',
-          handle: '@gal'
-        }
-      }, {
-        id: 'p6',
-        title: 'שעת יצירה עם ילדים',
-        desc: 'פלסטלינה וצבעי גואש',
-        tags: ['משפחה', 'יצירה', 'בית'],
-        time: '17:00',
-        user: {
-          id: 'u_maya',
-          name: 'מאיה',
-          handle: '@maya'
-        }
-      }, {
-        id: 'p7',
-        title: 'מדיטציה קצרה',
-        desc: '10 דקות לפני השינה',
-        tags: ['שקט', 'בריאות', 'לילה'],
-        time: '22:00',
-        user: {
-          id: 'u_shai',
-          name: 'שי',
-          handle: '@shai'
-        }
-      }, {
-        id: 'p8',
-        title: 'שחמט בשדרה',
-        desc: 'דו-קרב ידידותי בשבת',
-        tags: ['משחק', 'חוץ', 'חברתי'],
-        time: '12:00',
-        user: {
-          id: 'u_avi',
-          name: 'אבי',
-          handle: '@avi'
-        }
-      }];
-      localStorage.setItem(POSTS_KEY, JSON.stringify(seed));
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(state.tasks));
     } catch (e) {}
   }
-  function loadPosts() {
-    seedPostsIfEmpty();
+  function loadPrefs() {
     try {
-      var raw = localStorage.getItem(POSTS_KEY);
-      var arr = raw ? JSON.parse(raw) : [];
-      return Array.isArray(arr) ? arr : [];
+      return JSON.parse(localStorage.getItem(PREFS_KEY)) || {};
     } catch (e) {
-      return [];
+      return {};
     }
   }
-  function normalize(s) {
-    return (s || '').toString().toLowerCase();
+  function persistPrefs() {
+    try {
+      localStorage.setItem(PREFS_KEY, JSON.stringify(prefs));
+    } catch (e) {}
   }
-  function scorePost(post, q) {
-    var t = normalize(post.title);
-    var d = normalize(post.desc);
-    var tags = (post.tags || []).map(normalize).join(' ');
-    var terms = normalize(q).split(/\s+/).filter(Boolean);
-    if (!terms.length) return 0;
-    var score = 0;
-    for (var i = 0; i < terms.length; i++) {
-      var term = terms[i];
-      if (t.includes(term)) score += 5;
-      if (tags.includes(term)) score += 3;
-      if (d.includes(term)) score += 1;
-      if (t.startsWith(term)) score += 2;
-    }
-    return score;
-  }
-  function searchPosts(q) {
-    var posts = loadPosts();
-    if (!q.trim()) return [];
-    return posts.map(function (p) {
-      return {
-        p: p,
-        s: scorePost(p, q)
-      };
-    }).filter(function (x) {
-      return x.s > 0;
-    }).sort(function (a, b) {
-      return b.s - a.s;
-    }).map(function (x) {
-      return x.p;
-    });
+  var prefs = loadPrefs();
+  var weekStart = prefs.weekStart === 'mon' ? 1 : 0;
+  var today = new Date();
+  var state = {
+    view: prefs.defaultView || 'day',
+    current: today,
+    tasks: loadTasks()
+  };
+  function markToday() {
+    if (titleBadge) titleBadge.setAttribute('data-today', '1');
   }
 
-  /* ===== Suggestions engine ===== */
-  function showSuggestions() {
-    if (!sugWrap) return;
-    sugWrap.classList.remove('u-hidden');
-    sugWrap.classList.add('is-open');
-    // ensure panel grows while suggestions open
-    if (navPanel && !appNav.classList.contains('u-is-collapsed')) {
-      // let it auto-grow
-      navPanel.style.maxHeight = '';
-      navPanel.style.overflow = 'visible';
-    }
-  }
-  function hideSuggestions() {
-    if (!sugWrap) return;
-    sugWrap.classList.add('u-hidden');
-    sugWrap.classList.remove('is-open');
-  }
-  function renderSuggestions(q) {
-    if (!sugList) return;
-    var posts = loadPosts();
-    var list = [];
-    if (!q.trim()) {
-      list = posts.slice(0, 6); // trending
-    } else {
-      list = searchPosts(q).slice(0, 6); // filtered
-    }
-    var html = [];
-    if (!list.length) {
-      html.push('<div class="sug-item"><div class="sug-title">לא נמצאו הצעות…</div></div>');
-    } else {
-      for (var i = 0; i < list.length; i++) {
-        var p = list[i];
-        html.push("<div class=\"sug-item\" role=\"option\">\n            <div>\n              <h5 class=\"sug-title\">".concat(escapeHtml(p.title), "</h5>\n              <div class=\"sug-row\">\n                ").concat((p.tags || []).map(function (t) {
-          return "<span class=\"sug-tag\">".concat(escapeHtml(t), "</span>");
-        }).join(''), "\n                ").concat(p.time ? "<span class=\"sug-tag\">\u23F0 ".concat(p.time, "</span>") : '', "\n                ").concat(p.user && p.user.handle ? "<span class=\"sug-tag\">\u05DE\u05D0\u05EA ".concat(escapeHtml(p.user.handle), "</span>") : '', "\n              </div>\n            </div>\n            <div class=\"sug-actions\">\n              <button class=\"sug-btn\" data-contact=\"").concat(p.id, "\">\u05E6\u05D5\u05E8 \u05E7\u05E9\u05E8</button>\n              <button class=\"sug-btn sug-btn--primary\" data-use=\"").concat(p.id, "\">\u05D4\u05D5\u05E1\u05E3</button>\n            </div>\n          </div>"));
-      }
-    }
-    var allCount = q.trim() ? searchPosts(q).length : posts.length;
-    var more = "<div class=\"sug-more\"><button class=\"sug-more__btn\" data-go-all=\"1\">\u05D4\u05E6\u05D2 \u05D4\u05DB\u05DC (".concat(allCount, ")</button></div>");
-    sugList.innerHTML = html.join('') + more;
-    showSuggestions();
-  }
-
-  // IME-friendly typing
-  var isComposing = false;
-  if (navSearch) {
-    navSearch.addEventListener('compositionstart', function () {
-      isComposing = true;
-    });
-    navSearch.addEventListener('compositionend', function () {
-      isComposing = false;
-      renderSuggestions(navSearch.value);
-    });
-    var debounced = debounce(function () {
-      if (!isComposing) renderSuggestions(navSearch.value);
-    }, 120);
-    navSearch.addEventListener('input', debounced);
-    navSearch.addEventListener('focus', function () {
-      return renderSuggestions(navSearch.value);
-    });
-    navSearch.addEventListener('keydown', function (e) {
-      if (e.key === 'Escape') {
-        hideSuggestions();
-      }
-      if (e.key === 'Enter') {
-        openFullResults(navSearch.value);
-        hideSuggestions();
-      }
-    });
-  }
-  if (searchGo) {
-    searchGo.addEventListener('click', function () {
-      var q = navSearch ? navSearch.value : '';
-      openFullResults(q);
-      hideSuggestions();
-    });
-  }
-  if (searchClear) {
-    searchClear.addEventListener('click', function () {
-      if (navSearch) navSearch.value = '';
-      renderSuggestions('');
-      navSearch && navSearch.focus();
-    });
-  }
-  if (sugList) {
-    sugList.addEventListener('click', function (e) {
-      var useBtn = e.target.closest('[data-use]');
-      var ctBtn = e.target.closest('[data-contact]');
-      var allBtn = e.target.closest('[data-go-all]');
-      if (useBtn) {
-        usePost(useBtn.getAttribute('data-use'));
-      }
-      if (ctBtn) {
-        contactFor(ctBtn.getAttribute('data-contact'));
-      }
-      if (allBtn) {
-        openFullResults(navSearch ? navSearch.value : '');
-        hideSuggestions();
-      }
-    });
-  }
-  document.addEventListener('click', function (e) {
-    if (!sugWrap || sugWrap.classList.contains('u-hidden')) return;
-    var inside = e.target.closest('.c-search');
-    if (!inside) hideSuggestions();
-  });
-
-  /* ===== Full results overlay ===== */
-  function openResults() {
-    srOverlay.classList.remove('u-hidden');
-    srOverlay.setAttribute('aria-hidden', 'false');
-  }
-  function closeResults() {
-    srOverlay.classList.add('u-hidden');
-    srOverlay.setAttribute('aria-hidden', 'true');
-    srList.innerHTML = '';
-  }
-  function renderResults(q) {
-    var list = searchPosts(q);
-    var html = [];
-    if (!list.length) {
-      html.push('<div class="sr-card"><div class="sr-sub">לא נמצאו פעילויות מתאימות…</div></div>');
-    } else {
-      for (var i = 0; i < list.length; i++) {
-        var p = list[i];
-        html.push("<article class=\"sr-card\" data-id=\"".concat(p.id, "\">\n            <h4 class=\"sr-title\">").concat(escapeHtml(p.title), "</h4>\n            <p class=\"sr-sub\">").concat(escapeHtml(p.desc || ''), "</p>\n            <div class=\"sr-meta\">\n              ").concat((p.tags || []).map(function (t) {
-          return "<span class=\"sr-tag\">".concat(escapeHtml(t), "</span>");
-        }).join(''), "\n              ").concat(p.time ? "<span class=\"sr-tag\">\u23F0 ".concat(p.time, "</span>") : '', "\n              ").concat(p.user && p.user.handle ? "<span class=\"sr-tag\">\u05DE\u05D0\u05EA ".concat(escapeHtml(p.user.handle), "</span>") : '', "\n            </div>\n            <div class=\"sr-actions\">\n              <button class=\"sr-btn\" data-contact=\"").concat(p.id, "\">\u05E6\u05D5\u05E8 \u05E7\u05E9\u05E8</button>\n              <button class=\"sr-btn sr-btn--primary\" data-use=\"").concat(p.id, "\">\u05D4\u05D5\u05E1\u05E3</button>\n            </div>\n          </article>"));
-      }
-    }
-    srList.innerHTML = html.join('');
-  }
-  function openFullResults(q) {
-    renderResults(q || '');
-    openResults();
-  }
-  if (srClose) srClose.addEventListener('click', closeResults);
-  if (srX) srX.addEventListener('click', closeResults);
-  if (srList) {
-    srList.addEventListener('click', function (e) {
-      var useBtn = e.target.closest('[data-use]');
-      var ctBtn = e.target.closest('[data-contact]');
-      if (useBtn) {
-        usePost(useBtn.getAttribute('data-use'));
-      }
-      if (ctBtn) {
-        contactFor(ctBtn.getAttribute('data-contact'));
-      }
-    });
-  }
-
-  /* ===== Use / Contact ===== */
-  function usePost(id) {
-    var p = loadPosts().find(function (x) {
-      return x.id === id;
-    });
-    if (!p) return;
-    if (titleInput) titleInput.value = p.title || '';
-    if (dateInput) dateInput.value = todayYMD();
-    if (timeInput) timeInput.value = p.time || '12:00';
-    closeResults();
-    hideSuggestions();
-    openSheet();
-  }
-  var contactPayload = null;
-  function contactFor(id) {
-    var p = loadPosts().find(function (x) {
-      return x.id === id;
-    });
-    if (!p || !p.user) return;
-    contactPayload = p.user;
-    if (contactWho) contactWho.textContent = p.user.name + ' ' + (p.user.handle || '');
-    openContactSheet();
-  }
-  function openContactSheet() {
-    contactSheet.classList.remove('u-hidden');
-    contactSheet.classList.add('is-open');
-  }
-  function closeContactSheet() {
-    contactSheet.classList.remove('is-open');
-    setTimeout(function () {
-      return contactSheet.classList.add('u-hidden');
-    }, 220);
-  }
-  if (contactSheet) {
-    contactSheet.addEventListener('click', function (e) {
-      if (e.target.closest('[data-close]')) closeContactSheet();
-    });
-  }
-  if (contactMsg) {
-    contactMsg.addEventListener('click', function () {
-      if (contactPayload) window.location.href = 'social.html?to=' + encodeURIComponent(contactPayload.handle || '');
-    });
-  }
-  if (contactProfile) {
-    contactProfile.addEventListener('click', function () {
-      if (contactPayload) window.location.href = 'profile.html?u=' + encodeURIComponent(contactPayload.id || 'user');
-    });
-  }
-  if (contactCopy) {
-    contactCopy.addEventListener('click', /*#__PURE__*/_asyncToGenerator(/*#__PURE__*/_regenerator().m(function _callee() {
-      var _t;
-      return _regenerator().w(function (_context) {
-        while (1) switch (_context.p = _context.n) {
-          case 0:
-            _context.p = 0;
-            _context.n = 1;
-            return navigator.clipboard.writeText(contactPayload && contactPayload.handle || '');
-          case 1:
-            contactCopy.textContent = 'הועתק ✓';
-            setTimeout(function () {
-              return contactCopy.textContent = 'העתק משתמש';
-            }, 900);
-            _context.n = 3;
-            break;
-          case 2:
-            _context.p = 2;
-            _t = _context.v;
-          case 3:
-            return _context.a(2);
+  /* ===================== Lemon nav ===================== */
+  (function initNav() {
+    if (!lemonToggle || !appNav || !navPanel) return;
+    appNav.classList.add('u-is-collapsed');
+    lemonToggle.setAttribute('aria-expanded', 'false');
+    appNav.setAttribute('aria-hidden', 'true');
+    function open() {
+      appNav.classList.remove('u-is-collapsed');
+      appNav.setAttribute('aria-hidden', 'false');
+      lemonToggle.setAttribute('aria-expanded', 'true');
+      navPanel.style.maxHeight = navPanel.scrollHeight + 'px';
+      navPanel.addEventListener('transitionend', function onEnd(e) {
+        if (e.propertyName === 'max-height') {
+          navPanel.style.maxHeight = '';
+          navPanel.removeEventListener('transitionend', onEnd);
         }
-      }, _callee, null, [[0, 2]]);
-    })));
-  }
-
-  /* ===== Planner (abridged; unchanged rendering) ===== */
-  function render() {
-    if (!plannerRoot) return;
-    updateHeaderDate(state.current);
-    if (state.view === 'day') renderDay();else if (state.view === 'week') renderWeek();else if (state.view === 'month') renderMonth();else renderYear();
-    if (btnDay && btnWeek && btnMonth) {
-      btnDay.classList.toggle('is-active', state.view === 'day');
-      btnWeek.classList.toggle('is-active', state.view === 'week');
-      btnMonth.classList.toggle('is-active', state.view === 'month' || state.view === 'year');
+      });
     }
+    function close() {
+      var h = navPanel.scrollHeight;
+      navPanel.style.maxHeight = h + 'px';
+      void navPanel.offsetHeight;
+      navPanel.style.maxHeight = '0px';
+      lemonToggle.setAttribute('aria-expanded', 'false');
+      appNav.setAttribute('aria-hidden', 'true');
+      appNav.classList.add('u-is-collapsed');
+    }
+    lemonToggle.addEventListener('click', function () {
+      var collapsed = appNav.classList.contains('u-is-collapsed') || appNav.getAttribute('aria-hidden') === 'true';
+      collapsed ? open() : close();
+    });
+  })();
+
+  /* ===================== Planner rendering ===================== */
+  function render() {
+    formatTitle(state.current);
+    markToday();
+    if (!plannerRoot) return;
+    if (btnDay) btnDay.classList.toggle('is-active', state.view === 'day');
+    if (btnWeek) btnWeek.classList.toggle('is-active', state.view === 'week');
+    if (btnMonth) btnMonth.classList.toggle('is-active', state.view === 'month');
+    if (state.view === 'day') renderDay();else if (state.view === 'week') renderWeek();else renderMonth();
   }
   function renderDay() {
-    var root = plannerRoot;
-    root.innerHTML = '';
+    plannerRoot.innerHTML = '';
     var wrap = document.createElement('div');
     wrap.className = 'p-dayview';
-    var h = document.createElement('div');
-    h.className = 'p-dayview__head';
-    var idx = state.current.getDay();
-    h.innerHTML = '<div class="p-dayview__title">' + HEB_DAYS[idx] + '</div><div class="p-dayview__date">' + formatDateHeb(state.current) + '</div>';
-    wrap.appendChild(h);
-    var ymd = dateKeyLocal(state.current);
+    var head = document.createElement('div');
+    head.className = 'p-dayview__head';
+    head.innerHTML = '<div class="p-dayview__title">' + HEB_DAYS[state.current.getDay()] + '</div>' + '<div class="p-dayview__date">' + pad2(state.current.getDate()) + '.' + pad2(state.current.getMonth() + 1) + '.' + state.current.getFullYear() + '</div>';
+    wrap.appendChild(head);
+    var ymd = dateKey(state.current);
     var items = state.tasks.filter(function (t) {
       return t.date === ymd;
     }).sort(function (a, b) {
-      return a.time.localeCompare(b.time);
+      return (a.time || '').localeCompare(b.time || '');
     });
     if (!items.length) {
       var empty = document.createElement('div');
@@ -604,249 +248,178 @@ function _typeof(o) { "@babel/helpers - typeof"; return _typeof = "function" == 
       empty.textContent = 'אין אירועים ליום זה.';
       wrap.appendChild(empty);
     } else {
-      for (var i = 0; i < items.length; i++) {
-        var t = items[i];
+      items.forEach(function (t) {
         var row = document.createElement('div');
         row.className = 'p-daytask';
-        row.setAttribute('data-task-id', t.id);
-        row.innerHTML = '<div class="p-daytask__text">' + escapeHtml(t.title) + '</div><div class="p-daytask__time">' + t.time + '</div>' + '<div class="p-daytask__actions"><button class="p-daytask__btn" data-done="' + t.id + '">בוצע</button><button class="p-daytask__btn" data-del="' + t.id + '">מחק</button></div>';
+        row.innerHTML = '<div class="p-daytask__text">' + escapeHtml(t.title) + '</div>' + '<div class="p-daytask__time">' + (t.time || '') + '</div>' + '<div class="p-daytask__actions">' + '<button class="p-daytask__btn" data-done="' + t.id + '">בוצע</button>' + '<button class="p-daytask__btn" data-del="' + t.id + '">מחק</button>' + '</div>';
         wrap.appendChild(row);
-      }
+      });
     }
-    root.appendChild(wrap);
+    plannerRoot.appendChild(wrap);
   }
   function renderWeek() {
-    var root = plannerRoot;
-    root.innerHTML = '';
+    plannerRoot.innerHTML = '';
+
+    // Week bar (prev / title / next)
+    var bar = document.createElement('div');
+    bar.className = 'p-weekbar';
+    bar.innerHTML = '<button class="p-weekbar__btn" data-weeknav="prev" aria-label="שבוע קודם">‹</button>' + '<div class="p-weekbar__title">' + weekLabel(state.current, weekStart) + '</div>' + '<div class="p-weekbar__right">' + '<button class="p-weekbar__btn" data-weeknav="today">היום</button>' + '<button class="p-weekbar__btn" data-weeknav="next" aria-label="שבוע הבא">›</button>' + '</div>';
+    plannerRoot.appendChild(bar);
+    bar.addEventListener('click', function (e) {
+      var a = e.target.closest('[data-weeknav]');
+      if (!a) return;
+      var kind = a.getAttribute('data-weeknav');
+      if (kind === 'prev') {
+        state.current.setDate(state.current.getDate() - 7);
+      } else if (kind === 'next') {
+        state.current.setDate(state.current.getDate() + 7);
+      } else {
+        state.current = new Date();
+      }
+      render();
+      persistPrefs();
+    });
+
+    // Week grid
     var wrap = document.createElement('div');
     wrap.className = 'p-week';
-    var start = startOfWeek(state.current);
-    var todayKey = dateKeyLocal(new Date());
-    var _loop = function _loop() {
+    var start = startOfWeek(state.current, weekStart);
+    for (var i = 0; i < 7; i++) {
       var day = new Date(start);
       day.setDate(start.getDate() + i);
-      var ymd = dateKeyLocal(day);
+      var ymd = dateKey(day);
       var box = document.createElement('div');
-      box.className = 'p-day' + (ymd === todayKey ? ' p-day--today' : '');
-      box.setAttribute('data-goto', ymd);
+      box.className = 'p-day' + (sameDay(day, new Date()) ? ' p-day--today' : '');
+      box.dataset["goto"] = ymd;
       var head = document.createElement('div');
       head.className = 'p-day__head';
-      var count = state.tasks.filter(function (t) {
-        return t.date === ymd;
-      }).length;
-      head.innerHTML = '<span class="p-day__name">' + HEB_DAYS[i] + '</span><span class="p-day__date">' + pad2(day.getDate()) + '.' + pad2(day.getMonth() + 1) + '</span><span class="p-day__count">' + count + '</span>';
+      head.innerHTML = '<span class="p-day__name">' + HEB_DAYS[day.getDay()] + '</span>' + '<span class="p-day__date">' + pad2(day.getDate()) + '.' + pad2(day.getMonth() + 1) + '</span>';
       box.appendChild(head);
       var dayTasks = state.tasks.filter(function (t) {
         return t.date === ymd;
       }).sort(function (a, b) {
-        return a.time.localeCompare(b.time);
+        return (a.time || '').localeCompare(b.time || '');
       });
-      for (var k = 0; k < dayTasks.length; k++) {
-        var t = dayTasks[k];
+      dayTasks.forEach(function (t) {
         var row = document.createElement('div');
         row.className = 'p-task';
-        row.setAttribute('data-task-id', t.id);
-        row.innerHTML = '<div class="p-task__text">' + escapeHtml(t.title) + '</div><div class="p-task__time">' + t.time + '</div>' + '<div class="p-task__actions"><button class="p-task__btn" data-done="' + t.id + '">בוצע</button><button class="p-task__btn" data-del="' + t.id + '">מחק</button></div>';
+        row.innerHTML = '<div class="p-task__text">' + escapeHtml(t.title) + '</div>' + '<div class="p-task__time">' + (t.time || '') + '</div>' + '<div class="p-task__actions">' + '<button class="p-task__btn" data-done="' + t.id + '">בוצע</button>' + '<button class="p-task__btn" data-del="' + t.id + '">מחק</button>' + '</div>';
         box.appendChild(row);
-      }
+      });
       wrap.appendChild(box);
-    };
-    for (var i = 0; i < 7; i++) {
-      _loop();
     }
-    root.appendChild(wrap);
+    plannerRoot.appendChild(wrap);
   }
   function renderMonth() {
-    var root = plannerRoot;
-    root.innerHTML = '';
-    var wrap = document.createElement('div');
-    wrap.className = 'p-monthwrap';
+    plannerRoot.innerHTML = '';
+
+    // Month bar (prev / title / next)
     var bar = document.createElement('div');
     bar.className = 'p-monthbar';
-    var left = document.createElement('div');
-    left.className = 'p-monthbar__left';
-    var title = document.createElement('div');
-    title.className = 'p-monthbar__title';
-    var right = document.createElement('div');
-    right.className = 'p-monthbar__right';
-    title.textContent = HEB_MONTHS[state.current.getMonth()] + ' ' + state.current.getFullYear();
-    var yearSelect = document.createElement('select');
-    yearSelect.className = 'p-yearselect';
-    var yearNow = state.current.getFullYear();
-    for (var y = yearNow - 5; y <= yearNow + 5; y++) {
-      var opt = document.createElement('option');
-      opt.value = String(y);
-      opt.textContent = String(y);
-      if (y === yearNow) opt.selected = true;
-      yearSelect.appendChild(opt);
-    }
-    right.appendChild(yearSelect);
-    var chips = document.createElement('div');
-    chips.className = 'p-monthbar__chips';
-    for (var m = 0; m < 12; m++) {
-      var chip = document.createElement('button');
-      chip.type = 'button';
-      chip.className = 'p-chip' + (m === state.current.getMonth() ? ' is-selected' : '');
-      chip.textContent = HEB_MONTHS[m];
-      chip.dataset.month = String(m);
-      chips.appendChild(chip);
-    }
-    left.appendChild(chips);
-    bar.appendChild(left);
-    bar.appendChild(title);
-    bar.appendChild(right);
-    wrap.appendChild(bar);
+    bar.innerHTML = '<div class="p-monthbar__left">' + '<button class="p-monthbar__btn" data-monthnav="prev" aria-label="חודש קודם">‹</button>' + '</div>' + '<div class="p-monthbar__title">' + HEB_MONTHS[state.current.getMonth()] + ' ' + state.current.getFullYear() + '</div>' + '<div class="p-monthbar__right">' + '<button class="p-monthbar__btn" data-monthnav="today">היום</button>' + '<button class="p-monthbar__btn" data-monthnav="next" aria-label="חודש הבא">›</button>' + '</div>';
+    plannerRoot.appendChild(bar);
+    bar.addEventListener('click', function (e) {
+      var a = e.target.closest('[data-monthnav]');
+      if (!a) return;
+      var kind = a.getAttribute('data-monthnav');
+      if (kind === 'prev') {
+        state.current = addMonths(startOfMonth(state.current), -1);
+      } else if (kind === 'next') {
+        state.current = addMonths(startOfMonth(state.current), 1);
+      } else {
+        state.current = new Date();
+      }
+      render();
+      persistPrefs();
+    });
     var grid = document.createElement('div');
     grid.className = 'p-month';
     var anchor = new Date(state.current.getFullYear(), state.current.getMonth(), 1);
-    var firstDow = anchor.getDay();
+    var firstDow = (anchor.getDay() - weekStart + 7) % 7;
     var start = new Date(anchor);
     start.setDate(anchor.getDate() - firstDow);
-    var curKey = dateKeyLocal(state.current);
-    var todayKey = dateKeyLocal(new Date());
-    var thisMonth = state.current.getMonth();
+    var curKey = dateKey(state.current);
     for (var i = 0; i < 42; i++) {
       var day = new Date(start);
       day.setDate(start.getDate() + i);
-      var ymd = dateKeyLocal(day);
+      var ymd = dateKey(day);
       var cell = document.createElement('div');
       var cls = 'p-cell';
-      if (day.getMonth() !== thisMonth) cls += ' p-cell--pad';
-      if (ymd === todayKey) cls += ' p-cell--today';
+      if (sameDay(day, new Date())) cls += ' p-cell--today';
       if (ymd === curKey) cls += ' p-cell--selected';
+      if (day.getMonth() !== state.current.getMonth()) cls += ' p-cell--pad';
       cell.className = cls;
-      cell.setAttribute('data-goto', ymd);
+      cell.dataset["goto"] = ymd;
       var num = document.createElement('div');
       num.className = 'p-cell__num';
       num.textContent = day.getDate();
       cell.appendChild(num);
       grid.appendChild(cell);
     }
-    wrap.appendChild(grid);
-    plannerRoot.appendChild(wrap);
-    chips.addEventListener('click', function (e) {
-      var btn = e.target && e.target.closest('.p-chip');
-      if (!btn) return;
-      var m = parseInt(btn.dataset.month, 10);
-      var d = new Date(state.current);
-      d.setMonth(m);
-      d.setDate(1);
-      state.current = d;
-      state.view = 'month';
-      render();
-    });
-    yearSelect.addEventListener('change', function () {
-      var y = parseInt(yearSelect.value, 10);
-      var d = new Date(state.current);
-      d.setFullYear(y);
-      d.setDate(1);
-      state.current = d;
-      state.view = 'month';
-      render();
-    });
-    addVerticalSwipe(grid, function (dir) {
-      var d = new Date(state.current);
-      if (dir === 'down') d.setMonth(d.getMonth() + 1);else d.setMonth(d.getMonth() - 1);
-      d.setDate(1);
-      state.current = d;
-      render();
-    });
-  }
-  function renderYear() {
-    var root = plannerRoot;
-    root.innerHTML = '';
-    var wrap = document.createElement('div');
-    wrap.className = 'p-monthwrap';
-    var bar = document.createElement('div');
-    bar.className = 'p-monthbar';
-    var title = document.createElement('div');
-    title.className = 'p-monthbar__title';
-    title.textContent = state.current.getFullYear();
-    bar.appendChild(document.createElement('div'));
-    bar.appendChild(title);
-    bar.appendChild(document.createElement('div'));
-    wrap.appendChild(bar);
-    var yearGrid = document.createElement('div');
-    yearGrid.className = 'p-year';
-    for (var m = 0; m < 12; m++) {
-      var box = document.createElement('div');
-      box.className = 'p-year__month';
-      box.innerHTML = '<h4 class="p-year__title">' + HEB_MONTHS[m] + '</h4>';
-      var g = document.createElement('div');
-      g.className = 'p-year__grid';
-      var first = new Date(state.current.getFullYear(), m, 1);
-      var dow = first.getDay();
-      var start = new Date(first);
-      start.setDate(first.getDate() - dow);
-      for (var i = 0; i < 42; i++) {
-        var d = new Date(start);
-        d.setDate(start.getDate() + i);
-        var cell = document.createElement('div');
-        cell.className = 'p-year__cell';
-        if (d.getMonth() !== m) cell.classList.add('p-year__cell--pad');
-        cell.textContent = d.getDate();
-        cell.setAttribute('data-goto', dateKeyLocal(d));
-        g.appendChild(cell);
-      }
-      box.appendChild(g);
-      yearGrid.appendChild(box);
-    }
-    wrap.appendChild(yearGrid);
-    root.appendChild(wrap);
+    plannerRoot.appendChild(grid);
   }
 
-  /* ===== Interactions ===== */
-  if (plannerRoot) {
-    plannerRoot.addEventListener('click', function (e) {
-      var gotoEl = e.target && e.target.closest ? e.target.closest('[data-goto]') : null;
-      if (gotoEl && gotoEl.getAttribute) {
-        var ymd = gotoEl.getAttribute('data-goto');
-        if (ymd) {
-          state.current = parseYMD(ymd);
-          state.view = 'day';
-          render();
-          return;
-        }
-      }
-      var t = e.target;
-      if (t.dataset && t.dataset.done) {
-        confettiAtEl(t);
-        state.tasks = state.tasks.filter(function (x) {
-          return x.id !== t.dataset.done;
-        });
-        saveTasks();
-        render();
-      }
-      if (t.dataset && t.dataset.del) {
-        state.tasks = state.tasks.filter(function (x) {
-          return x.id !== t.dataset.del;
-        });
-        saveTasks();
-        render();
-      }
-    });
-  }
+  /* ===================== Interactions ===================== */
+  // view tabs
   if (btnDay) btnDay.addEventListener('click', function () {
     state.view = 'day';
     render();
+    prefs.defaultView = 'day';
+    persistPrefs();
   });
   if (btnWeek) btnWeek.addEventListener('click', function () {
     state.view = 'week';
     render();
+    prefs.defaultView = 'week';
+    persistPrefs();
   });
   if (btnMonth) btnMonth.addEventListener('click', function () {
     state.view = 'month';
     render();
+    prefs.defaultView = 'month';
+    persistPrefs();
   });
 
-  /* ===== Sheet open/close + quick picks ===== */
+  // go to a specific day (week+month cards)
+  if (plannerRoot) {
+    plannerRoot.addEventListener('click', function (e) {
+      var host = e.target && e.target.closest('[data-goto]');
+      var go = host && host.dataset["goto"];
+      if (go) {
+        state.current = fromKey(go);
+        state.view = 'day';
+        render();
+        return;
+      }
+      var doneId = e.target && e.target.getAttribute('data-done');
+      var delId = e.target && e.target.getAttribute('data-del');
+      if (doneId) {
+        state.tasks = state.tasks.filter(function (t) {
+          return t.id !== doneId;
+        });
+        saveTasks();
+        render();
+      } else if (delId) {
+        state.tasks = state.tasks.filter(function (t) {
+          return t.id !== delId;
+        });
+        saveTasks();
+        render();
+      }
+    });
+  }
+
+  /* ===================== Bottom Sheet (Create event) ===================== */
   function openSheet() {
     if (!sheet) return;
+    var now = new Date();
+    if (dateInput && !dateInput.value) dateInput.value = dateKey(now);
+    if (timeInput && !timeInput.value) timeInput.value = pad2(now.getHours()) + ':' + pad2(now.getMinutes());
     sheet.classList.remove('u-hidden');
     sheet.classList.add('is-open');
     try {
       titleInput && titleInput.focus();
-    } catch (e) {}
+    } catch (_) {}
   }
   function closeSheet() {
     if (!sheet) return;
@@ -855,47 +428,64 @@ function _typeof(o) { "@babel/helpers - typeof"; return _typeof = "function" == 
       return sheet.classList.add('u-hidden');
     }, 220);
   }
-  if (addEventBtn) addEventBtn.addEventListener('click', function (e) {
-    e.preventDefault();
-    openSheet();
+  document.addEventListener('click', function (e) {
+    if (e.target && e.target.closest('#addEventBtn')) {
+      e.preventDefault();
+      openSheet();
+    }
   });
-  if (sheetBackdrop) sheetBackdrop.addEventListener('click', closeSheet);
-  if (sheetCloseBtn) sheetCloseBtn.addEventListener('click', closeSheet);
-  if (sheetPanel) sheetPanel.addEventListener('click', function (e) {
-    return e.stopPropagation();
-  });
-  (function initQuickPicks() {
-    var qp = document.querySelector('.qp');
-    if (!qp) return;
-    qp.addEventListener('click', function (e) {
-      var chip = e.target && e.target.closest('.qp__chip');
-      if (!chip) return;
-      if (chip.dataset.date) {
-        var today = new Date();
-        var target = new Date(today);
-        if (chip.dataset.date === 'tomorrow') target.setDate(today.getDate() + 1);else if (chip.dataset.date === 'nextweek') target.setDate(today.getDate() + 7);else if (chip.dataset.date.startsWith('+')) target.setDate(today.getDate() + parseInt(chip.dataset.date.replace('+', ''), 10));
-        var v = target.getFullYear() + '-' + pad2(target.getMonth() + 1) + '-' + pad2(target.getDate());
-        if (dateInput) dateInput.value = v;
-      }
-      if (chip.dataset.time) {
-        if (chip.dataset.time.indexOf('now+') === 0) {
-          var addMin = parseInt(chip.dataset.time.split('+')[1], 10) || 0;
-          var now = new Date();
-          now.setMinutes(now.getMinutes() + addMin);
-          var _v = pad2(now.getHours()) + ':' + pad2(now.getMinutes());
-          if (timeInput) timeInput.value = _v;
-        } else {
-          if (timeInput) timeInput.value = chip.dataset.time;
+  if (sheetPanel) {
+    sheetPanel.addEventListener('click', function (e) {
+      var qd = e.target && e.target.closest('.qp__chip[data-date]');
+      if (qd) {
+        e.preventDefault();
+        var kind = qd.getAttribute('data-date');
+        var base = new Date();
+        if (kind === 'today') {} else if (kind === 'tomorrow') {
+          base.setDate(base.getDate() + 1);
+        } else if (kind === 'nextweek') {
+          base.setDate(base.getDate() + 7);
+        } else if (/^\+\d+$/.test(kind)) {
+          base.setDate(base.getDate() + parseInt(kind.slice(1), 10));
         }
+        if (dateInput) dateInput.value = dateKey(base);
+        return;
+      }
+      var qt = e.target && e.target.closest('.qp__chip[data-time]');
+      if (qt) {
+        e.preventDefault();
+        var kindT = qt.getAttribute('data-time');
+        var now = new Date();
+        if (/^now\+\d+$/.test(kindT)) {
+          var m = parseInt(kindT.split('+')[1], 10) || 0;
+          now.setMinutes(now.getMinutes() + m);
+          if (timeInput) timeInput.value = pad2(now.getHours()) + ':' + pad2(now.getMinutes());
+        } else if (/^\d{2}:\d{2}$/.test(kindT) && timeInput) {
+          timeInput.value = kindT;
+        }
+        return;
+      }
+      var closeBtn = e.target && e.target.closest('[data-close]');
+      if (closeBtn) {
+        e.preventDefault();
+        closeSheet();
       }
     });
-  })();
+  }
+  if (sheet) {
+    sheet.addEventListener('click', function (e) {
+      if (e.target && e.target.matches('.c-sheet__backdrop')) closeSheet();
+    });
+  }
+  document.addEventListener('keydown', function (e) {
+    if (e.key === 'Escape') closeSheet();
+  });
   if (sheetForm) {
     sheetForm.addEventListener('submit', function (e) {
       e.preventDefault();
-      var t = titleInput && titleInput.value ? titleInput.value.trim() : '';
-      var d = dateInput && dateInput.value ? dateInput.value.trim() : '';
-      var h = timeInput && timeInput.value ? timeInput.value.trim() : '';
+      var t = (titleInput && titleInput.value || '').trim();
+      var d = (dateInput && dateInput.value || '').trim();
+      var h = (timeInput && timeInput.value || '').trim();
       if (!t || !d || !h) return;
       var id = 't_' + Date.now() + '_' + Math.random().toString(36).slice(2, 7);
       state.tasks.push({
@@ -905,133 +495,95 @@ function _typeof(o) { "@babel/helpers - typeof"; return _typeof = "function" == 
         time: h
       });
       saveTasks();
-      sheetForm.reset();
-      closeSheet();
-      state.current = parseYMD(d);
+      state.current = fromKey(d);
       state.view = 'day';
       render();
-      var targetEl = document.querySelector('[data-task-id="' + id + '"]');
-      flyFromTo(addEventBtn, targetEl, t);
+      sheetForm.reset();
+      closeSheet();
     });
   }
 
-  /* ===== Confetti + fly chip ===== */
-  function confettiAtEl(el) {
-    if (!el) return;
-    var r = el.getBoundingClientRect();
-    var originX = r.left + r.width / 2 + window.scrollX;
-    var originY = r.top + r.height / 2 + window.scrollY;
-    var colors = ['#3B82F6', '#60A5FA', '#A78BFA', '#F59E0B', '#F472B6', '#34D399', '#F87171'];
-    var COUNT = 44,
-      MIN_DIST = 60,
-      MAX_DIST = 160,
-      DURATION = 1200;
-    for (var i = 0; i < COUNT; i++) {
-      var p = document.createElement('span');
-      p.className = 'c-confetti';
-      Object.assign(p.style, {
-        position: 'absolute',
-        left: originX + 'px',
-        top: originY + 'px',
-        width: 6 + Math.random() * 10 + 'px',
-        height: 6 + Math.random() * 10 + 'px',
-        borderRadius: '2px',
-        background: colors[i % colors.length],
-        pointerEvents: 'none',
-        zIndex: 10000,
-        opacity: '1'
-      });
-      document.body.appendChild(p);
-      (function (node) {
-        var angle = Math.random() * Math.PI * 2;
-        var dist = MIN_DIST + Math.random() * (MAX_DIST - MIN_DIST);
-        var tx = Math.cos(angle) * dist,
-          ty = Math.sin(angle) * dist * (0.75 + Math.random() * 0.5);
-        var rot = Math.random() * 720 - 360;
-        var start = null;
-        function step(ts) {
-          if (!start) start = ts;
-          var t = Math.min(1, (ts - start) / DURATION),
-            ease = t * (2 - t);
-          node.style.transform = 'translate(' + tx * ease + 'px,' + ty * ease + 'px) rotate(' + rot * ease + 'deg) scale(' + (1 - 0.2 * ease) + ')';
-          node.style.opacity = String(1 - ease);
-          if (t < 1) requestAnimationFrame(step);else node.remove();
-        }
-        requestAnimationFrame(step);
-      })(p);
-    }
-  }
-  function flyFromTo(fromEl, toEl, label) {
-    if (!fromEl || !toEl) return;
-    var fr = fromEl.getBoundingClientRect();
-    var tr = toEl.getBoundingClientRect();
-    var chip = document.createElement('div');
-    chip.className = 'fly-chip';
-    chip.textContent = label.length > 18 ? label.slice(0, 16) + '…' : label;
-    document.body.appendChild(chip);
-    var sx = fr.left + fr.width / 2,
-      sy = fr.top + fr.height / 2;
-    var ex = tr.left + tr.width / 2,
-      ey = tr.top + tr.height / 2;
-    chip.style.left = sx + 'px';
-    chip.style.top = sy + 'px';
-    var DURATION = 700;
-    var start = null;
-    function step(ts) {
-      if (!start) start = ts;
-      var t = Math.min(1, (ts - start) / DURATION),
-        e = t * (2 - t);
-      var cx = sx + (ex - sx) * e;
-      var cy = sy - (1 - 2 * Math.abs(.5 - e)) * 90 + (ey - sy) * e;
-      chip.style.left = cx + 'px';
-      chip.style.top = cy + 'px';
-      chip.style.opacity = String(1 - t * 0.2);
-      if (t < 1) requestAnimationFrame(step);else chip.remove();
-    }
-    requestAnimationFrame(step);
-  }
-
-  /* ===== Swipe util ===== */
-  function addVerticalSwipe(node, cb) {
-    if (!node || !cb) return;
-    var startY = 0,
-      startX = 0,
-      t0 = 0;
-    node.addEventListener('touchstart', function (e) {
-      var t = e.changedTouches[0];
-      startY = t.clientY;
-      startX = t.clientX;
-      t0 = Date.now();
-    }, {
-      passive: true
-    });
-    node.addEventListener('touchend', function (e) {
-      var t = e.changedTouches[0];
-      var dy = t.clientY - startY;
-      var dx = Math.abs(t.clientX - startX);
-      var dt = Date.now() - t0;
-      if (Math.abs(dy) > 40 && dx < 60 && dt < 800) {
-        cb(dy > 0 ? 'down' : 'up');
-      }
-    });
-  }
-
-  /* ===== Prefill from categories / social ===== */
-  (function prefillDraft() {
+  /* ===================== Robust Log-out (works for #btnExit or [data-logout]) ===================== */
+  function clearAuthAll() {
     try {
-      var raw = localStorage.getItem('draftEvent');
-      if (!raw) return;
-      var d = JSON.parse(raw);
-      localStorage.removeItem('draftEvent');
-      if (titleInput && d.title) titleInput.value = d.title;
-      if (dateInput && d.date) dateInput.value = d.date;
-      if (timeInput && d.time) timeInput.value = d.time;
-      openSheet();
+      var KEYS = ['authUser', 'authName', 'token', 'auth.token', 'auth.user', 'looz:justLoggedIn', 'looz:loggedOut'];
+      KEYS.forEach(function (k) {
+        try {
+          localStorage.removeItem(k);
+        } catch (e) {}
+        try {
+          sessionStorage.removeItem(k);
+        } catch (e) {}
+      });
     } catch (e) {}
-  })();
+  }
+  function handleLogout() {
+    // prevent any stray handlers from re-writing auth during this tick
+    window.__loozLoggingOut = true;
+    clearAuthAll();
+    // hard replace so Back won’t bounce you into the app again
+    try {
+      // add a small tombstone so auth.html can also clean extras if it wants
+      localStorage.setItem('looz:loggedOut', '1');
+    } catch (e) {}
+    window.location.replace('/Calendar/auth.html?loggedout=1');
+  }
+  // attach both direct and delegated handlers (covers late DOM or markup changes)
+  var exitBtn = document.getElementById('btnExit');
+  if (exitBtn) exitBtn.addEventListener('click', function (ev) {
+    ev.preventDefault();
+    handleLogout();
+  });
+  document.addEventListener('click', function (e) {
+    var trg = e.target && e.target.closest('[data-logout]');
+    if (trg) {
+      e.preventDefault();
+      handleLogout();
+    }
+  });
 
-  /* ===== Initial render ===== */
-  state.current = new Date();
-  state.view = 'day';
+  /* ===================== Elegant post-login intro (glowy lemon) ===================== */
+  function welcomeIntro() {
+    var root = document.createElement('div');
+    root.className = 'looz-welcome';
+    root.innerHTML = '<div class="looz-welcome__scrim"></div>';
+    var wrap = document.createElement('div');
+    wrap.className = 'lw-wrap';
+    var halo = document.createElement('div');
+    halo.className = 'lw-halo';
+    var lemon = document.createElement('div');
+    lemon.className = 'lw-lemon';
+    lemon.innerHTML = "\n      <svg viewBox=\"0 0 64 64\" width=\"96\" height=\"96\" aria-hidden=\"true\">\n        <defs>\n          <radialGradient id=\"wLemonCore\" cx=\"48%\" cy=\"40%\" r=\"60%\">\n            <stop offset=\"0%\"  stop-color=\"#FFF8C6\"/>\n            <stop offset=\"62%\" stop-color=\"#FFE36E\"/>\n            <stop offset=\"100%\" stop-color=\"#F7C843\"/>\n          </radialGradient>\n          <linearGradient id=\"wLeaf\" x1=\"0%\" y1=\"0%\" x2=\"100%\" y2=\"100%\">\n            <stop offset=\"0%\" stop-color=\"#8BC34A\"/>\n            <stop offset=\"100%\" stop-color=\"#4E8B2A\"/>\n          </linearGradient>\n        </defs>\n        <path d=\"M48 20c-9-9-23-9-32 0-6 6-6 16 0 22 6.4 6 16.9 6.9 23.4 0 6.4-6.1 7.6-15.6 1.6-22\"\n              fill=\"url(#wLemonCore)\" stroke=\"#C59A21\" stroke-width=\"1.2\"/>\n        <path d=\"M45 18c2.9-2.9 5.5-5.8 7.4-8.7\" stroke=\"url(#wLeaf)\" stroke-width=\"2.2\" stroke-linecap=\"round\"/>\n      </svg>\n    ";
+    var shine = document.createElement('div');
+    shine.className = 'lw-shine';
+    var rays = document.createElement('div');
+    rays.className = 'lw-rays';
+    for (var i = 0; i < 12; i++) {
+      var r = document.createElement('span');
+      r.className = 'lw-ray';
+      r.style.setProperty('--a', i * 30 + 'deg');
+      r.style.animationDelay = 80 + i * 20 + 'ms';
+      rays.appendChild(r);
+    }
+    wrap.appendChild(halo);
+    wrap.appendChild(lemon);
+    wrap.appendChild(shine);
+    wrap.appendChild(rays);
+    root.appendChild(wrap);
+    document.body.appendChild(root);
+    setTimeout(function () {
+      root.remove();
+    }, 1500);
+  }
+  try {
+    if (localStorage.getItem('looz:justLoggedIn') === '1') {
+      localStorage.removeItem('looz:justLoggedIn');
+      setTimeout(welcomeIntro, 40);
+    }
+  } catch (_) {}
+
+  /* ===================== Initial render ===================== */
+  formatTitle(today);
+  state.current = today;
   render();
 })();

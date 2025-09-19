@@ -1,687 +1,531 @@
-(function () {
+/* LooZ — Planner App (home) */
+(function(){
   'use strict';
 
-  /* ===== DOM refs ===== */
-  const lemonToggle   = document.getElementById('lemonToggle');
-  const appNav        = document.getElementById('appNav');
-  const navPanel      = document.getElementById('navPanel');
+  /* ===================== NAV across pages ===================== */
+  function go(href){ window.location.href = href; }
+  var btnProfile    = document.getElementById('btnProfile');
+  var btnMenu       = document.getElementById('btnMenu');       // 3-dots -> settings
+  var btnCategories = document.getElementById('btnCategories'); // in lemon nav
+  var btnSocial     = document.getElementById('btnSocial');     // in lemon nav
+  if (btnProfile)    btnProfile.addEventListener('click', () => go('/Calendar/profile.html'));
+  if (btnMenu)       btnMenu.addEventListener('click',    () => go('/Calendar/settings.html'));
+  if (btnCategories) btnCategories.addEventListener('click', () => go('/Calendar/categories.html'));
+  if (btnSocial)     btnSocial.addEventListener('click',    () => go('/Calendar/social.html'));
 
-  const navSearch     = document.getElementById('navSearch');
-  const searchClear   = document.getElementById('searchClear');
-  const searchGo      = document.getElementById('searchGo');
+  /* ===================== DOM ===================== */
+  var lemonToggle   = document.getElementById('lemonToggle');
+  var appNav        = document.getElementById('appNav');
+  var navPanel      = appNav ? appNav.querySelector('.c-nav__panel') : null;
 
-  const sugWrap       = document.getElementById('sugWrap');
-  const sugList       = document.getElementById('sugList');
+  var titleDay      = document.getElementById('titleDay');
+  var titleDate     = document.getElementById('titleDate');
+  var titleBadge    = document.getElementById('titleBadge');
+  var uiName        = document.getElementById('uiName');
+  var subtitleEl    = document.querySelector('.c-subtitle');
 
-  const srOverlay     = document.getElementById('srOverlay');
-  const srClose       = document.getElementById('srClose');
-  const srX           = document.getElementById('srX');
-  const srList        = document.getElementById('srList');
+  var plannerRoot   = document.getElementById('planner');
+  var btnDay        = document.getElementById('btnDay');
+  var btnWeek       = document.getElementById('btnWeek');
+  var btnMonth      = document.getElementById('btnMonth');
 
-  const btnSocial     = document.getElementById('btnSocial');
-  const btnProfile    = document.getElementById('btnProfile');
-  const btnMenu       = document.getElementById('btnMenu');
-  const btnCategories = document.getElementById('btnCategories');
+  var sheet         = document.getElementById('eventSheet');
+  var sheetPanel    = sheet ? sheet.querySelector('.c-sheet__panel') : null;
+  var sheetClose    = sheet ? sheet.querySelector('[data-close]') : null;
+  var sheetForm     = document.getElementById('sheetForm');
+  var titleInput    = document.getElementById('evtTitle');
+  var dateInput     = document.getElementById('evtDate');
+  var timeInput     = document.getElementById('evtTime');
 
-  const addEventBtn   = document.getElementById('addEventBtn');
-  const sheet         = document.getElementById('eventSheet');
-  const sheetBackdrop = sheet ? sheet.querySelector('[data-close]') : null;
-  const sheetCloseBtn = sheet ? sheet.querySelector('.c-icon-btn--ghost[data-close]') : null;
-  const sheetPanel    = sheet ? sheet.querySelector('.c-sheet__panel') : null;
-
-  const sheetForm  = document.getElementById('sheetForm');
-  const titleInput = document.getElementById('evtTitle');
-  const dateInput  = document.getElementById('evtDate');
-  const timeInput  = document.getElementById('evtTime');
-
-  const plannerRoot = document.getElementById('planner');
-  const btnDay   = document.getElementById('btnDay');
-  const btnWeek  = document.getElementById('btnWeek');
-  const btnMonth = document.getElementById('btnMonth');
-
-  const titleDay   = document.getElementById('titleDay');
-  const titleDate  = document.getElementById('titleDate');
-  const titleBadge = document.getElementById('titleBadge');
-  const uiName     = document.getElementById('uiName');
-
-  const contactSheet   = document.getElementById('contactSheet');
-  const contactWho     = document.getElementById('contactWho');
-  const contactMsg     = document.getElementById('contactMsg');
-  const contactProfile = document.getElementById('contactProfile');
-  const contactCopy    = document.getElementById('contactCopy');
-
-  /* ===== Helpers ===== */
+  /* ===================== Helpers ===================== */
   function pad2(n){ return String(n).padStart(2,'0'); }
-  function escapeHtml(s){ if (s==null) return ''; const m={'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}; return String(s).replace(/[&<>"']/g, c=>m[c]); }
+  function escapeHtml(s){
+    return (s||'').replace(/[&<>"']/g, function(m){
+      return ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m]);
+    });
+  }
   function sameDay(a,b){ return a.getFullYear()===b.getFullYear() && a.getMonth()===b.getMonth() && a.getDate()===b.getDate(); }
-  function formatDateHeb(d){ return pad2(d.getDate())+'.'+pad2(d.getMonth()+1)+'.'+d.getFullYear(); }
-  function dateKeyLocal(d){ return d.getFullYear()+'-'+pad2(d.getMonth()+1)+'-'+pad2(d.getDate()); }
-  function parseYMD(s){ const p=s.split('-'); return new Date(+p[0],+p[1]-1,+p[2]); }
-  function startOfWeek(d){ const t=new Date(d.getFullYear(),d.getMonth(),d.getDate()); const dow=t.getDay(); t.setDate(t.getDate()-dow); return t; }
-  function todayYMD(){ const t=new Date(); return dateKeyLocal(t); }
-  function debounce(fn, ms){ let id=0; return function(){ const args=arguments; clearTimeout(id); id=setTimeout(()=>fn.apply(this,args),ms); }; }
+  function dateKey(d){ return d.getFullYear()+'-'+pad2(d.getMonth()+1)+'-'+pad2(d.getDate()); }
+  function fromKey(ymd){ var p=(ymd||'').split('-'); return new Date(+p[0],(+p[1]||1)-1,+p[2]||1); }
+  function startOfWeek(d, weekStart){ var x=new Date(d.getFullYear(),d.getMonth(),d.getDate()); var diff=(x.getDay()-weekStart+7)%7; x.setDate(x.getDate()-diff); return x; }
+  function startOfMonth(d){ return new Date(d.getFullYear(), d.getMonth(), 1); }
+  function addMonths(d, n){ return new Date(d.getFullYear(), d.getMonth()+n, 1); }
 
-  const HEB_DAYS   = ['ראשון','שני','שלישי','רביעי','חמישי','שישי','שבת'];
-  const HEB_MONTHS = ['ינואר','פברואר','מרץ','אפריל','מאי','יוני','יולי','אוגוסט','ספטמבר','אוקטובר','נובמבר','דצמבר'];
+  var HEB_DAYS   = ['ראשון','שני','שלישי','רביעי','חמישי','שישי','שבת'];
+  var HEB_MONTHS = ['ינואר','פברואר','מרץ','אפריל','מאי','יוני','יולי','אוגוסט','ספטמבר','אוקטובר','נובמבר','דצמבר'];
 
-  function updateHeaderDate(d){
-    const idx = d.getDay();
-    if (titleDay)  titleDay.textContent  = HEB_DAYS[idx];
-    if (titleDate) titleDate.textContent = formatDateHeb(d);
-    if (titleBadge) titleBadge.classList.add('is-highlight');
+  function formatTitle(d){
+    if (titleDay)  titleDay.textContent = HEB_DAYS[d.getDay()];
+    if (titleDate) titleDate.textContent = pad2(d.getDate())+'.'+pad2(d.getMonth()+1)+'.'+d.getFullYear();
+  }
+  function weekLabel(d, weekStart){
+    var s = startOfWeek(d, weekStart);
+    var e = new Date(s); e.setDate(s.getDate()+6);
+    var sM = HEB_MONTHS[s.getMonth()], eM = HEB_MONTHS[e.getMonth()];
+    if (s.getMonth() === e.getMonth()){
+      return s.getDate()+'–'+e.getDate()+' '+sM+' '+e.getFullYear();
+    }
+    return s.getDate()+' '+sM+' – '+e.getDate()+' '+eM+' '+e.getFullYear();
   }
 
-  /* ===== Name ===== */
-  (function setHelloName(){
-    try {
-      let name = null;
-      const au = localStorage.getItem('authUser');
-      if (au) {
-        const parsed = JSON.parse(au);
-        if (parsed && typeof parsed === 'object') {
-          if (parsed.name) name = parsed.name;
-          else if (parsed.displayName) name = parsed.displayName;
-          else if (parsed.firstName) name = parsed.firstName;
-        }
+  /* ===================== Greeting / profile name ===================== */
+  function getAuth(){
+    try{
+      const raw = localStorage.getItem('authUser');
+      if (!raw) return null;
+      const o = JSON.parse(raw);
+      return (o && typeof o === 'object') ? o : null;
+    }catch(e){ return null; }
+  }
+  function getProfile(){
+    try{ return JSON.parse(localStorage.getItem('profile') || '{}'); }
+    catch(e){ return {}; }
+  }
+  function getDisplayName(){
+    const prof = getProfile();
+    if (prof && prof.name) return prof.name;
+    const au = getAuth();
+    if (au && (au.name || au.displayName || au.firstName)) return au.name || au.displayName || au.firstName;
+    const alt = localStorage.getItem('authName');
+    if (alt) return alt;
+    return 'חברה';
+  }
+  function setGreeting(){
+    const name = getDisplayName();
+    const au = getAuth();
+    const SPECIAL_EMAIL = 'special.person@example.com'; // set your VIP here
+    if (subtitleEl){
+      if (au && au.email === SPECIAL_EMAIL){
+        subtitleEl.innerHTML = '✨ שמחים לראותך שוב, <strong>'+escapeHtml(name)+'</strong>. לוח מושלם מחכה לך.';
+      } else {
+        subtitleEl.innerHTML = 'ברוך/ה השב/ה, <span id="uiName">'+escapeHtml(name)+'</span>!<br>מה בלוז היום?';
       }
-      if (!name) {
-        const alt = localStorage.getItem('authName');
-        if (alt) name = alt;
-      }
-      if (uiName) uiName.textContent = (name && String(name).trim()) || 'דניאלה';
-    } catch(e) { if (uiName) uiName.textContent = 'דניאלה'; }
-  })();
+    }
+    if (uiName) uiName.textContent = name;
+  }
+  setGreeting();
 
-  /* ===== NAV open/close (in-flow; expands for suggestions) ===== */
-  (function initNav() {
+  /* ===================== State ===================== */
+  var STORAGE_KEY = 'plannerTasks';
+  var PREFS_KEY   = 'plannerPrefs';
+  function loadTasks(){ try{ var raw=localStorage.getItem(STORAGE_KEY); var arr=raw?JSON.parse(raw):[]; return Array.isArray(arr)?arr:[]; } catch(e){ return []; } }
+  function saveTasks(){ try{ localStorage.setItem(STORAGE_KEY, JSON.stringify(state.tasks)); }catch(e){} }
+  function loadPrefs(){ try{ return JSON.parse(localStorage.getItem(PREFS_KEY)) || {}; }catch(e){ return {}; } }
+  function persistPrefs(){ try{ localStorage.setItem(PREFS_KEY, JSON.stringify(prefs)); }catch(e){} }
+
+  var prefs = loadPrefs();
+  var weekStart = prefs.weekStart==='mon' ? 1 : 0;
+
+  var today = new Date();
+  var state = { view:(prefs.defaultView||'day'), current:today, tasks:loadTasks() };
+
+  function markToday(){ if (titleBadge) titleBadge.setAttribute('data-today','1'); }
+
+  /* ===================== Lemon nav ===================== */
+  (function initNav(){
     if (!lemonToggle || !appNav || !navPanel) return;
-    function openNav() {
+    appNav.classList.add('u-is-collapsed');
+    lemonToggle.setAttribute('aria-expanded','false');
+    appNav.setAttribute('aria-hidden','true');
+
+    function open(){
       appNav.classList.remove('u-is-collapsed');
-      appNav.setAttribute('aria-hidden', 'false');
-      lemonToggle.setAttribute('aria-expanded', 'true');
+      appNav.setAttribute('aria-hidden','false');
+      lemonToggle.setAttribute('aria-expanded','true');
       navPanel.style.maxHeight = navPanel.scrollHeight + 'px';
       navPanel.addEventListener('transitionend', function onEnd(e){
         if (e.propertyName==='max-height'){ navPanel.style.maxHeight=''; navPanel.removeEventListener('transitionend', onEnd); }
       });
-      navPanel.style.overflow = 'visible';
     }
-    function closeNav() {
-      const h = navPanel.scrollHeight;
-      navPanel.style.maxHeight = h + 'px';
+    function close(){
+      var h = navPanel.scrollHeight; navPanel.style.maxHeight = h+'px';
       void navPanel.offsetHeight;
+      navPanel.style.maxHeight = '0px';
+      lemonToggle.setAttribute('aria-expanded','false');
+      appNav.setAttribute('aria-hidden','true');
       appNav.classList.add('u-is-collapsed');
-      appNav.setAttribute('aria-hidden', 'true');
-      lemonToggle.setAttribute('aria-expanded', 'false');
-      navPanel.style.maxHeight = '0';
-      navPanel.style.overflow = 'hidden';
-      hideSuggestions();
     }
-    function isOpen(){ return !appNav.classList.contains('u-is-collapsed'); }
-    lemonToggle.addEventListener('click', function(){ isOpen()?closeNav():openNav(); });
-    if (navSearch) navSearch.addEventListener('focus', ()=>{ if (!isOpen()) openNav(); renderSuggestions(navSearch.value); });
+    lemonToggle.addEventListener('click', function(){
+      var collapsed = appNav.classList.contains('u-is-collapsed') || appNav.getAttribute('aria-hidden')==='true';
+      collapsed ? open() : close();
+    });
   })();
 
-  /* ===== Routes ===== */
-  if (btnSocial)     btnSocial.addEventListener('click',  () => { window.location.href = 'social.html'; });
-  if (btnProfile)    btnProfile.addEventListener('click', () => { window.location.href = 'profile.html'; });
-  if (btnMenu)       btnMenu.addEventListener('click',    () => { window.location.href = 'settings.html'; });
-  if (btnCategories) btnCategories.addEventListener('click', () => { window.location.href = 'categories.html'; });
-
-  /* ===== Planner storage ===== */
-  const STORAGE_KEY = 'plannerTasks';
-  const state = { view:'day', current:new Date(), tasks: loadTasks() };
-
-  function loadTasks() {
-    try { const raw = localStorage.getItem(STORAGE_KEY); const arr = raw?JSON.parse(raw):[]; return Array.isArray(arr)?arr:[]; }
-    catch(e){ return []; }
-  }
-  function saveTasks(){ localStorage.setItem(STORAGE_KEY, JSON.stringify(state.tasks)); }
-
-  /* ===== Social posts ===== */
-  const POSTS_KEY = 'socialPosts';
-  function seedPostsIfEmpty(){
-    try {
-      const raw = localStorage.getItem(POSTS_KEY);
-      if (raw) return;
-      const seed = [
-        {id:'p1', title:'הליכת בוקר בטיילת', desc:'30 דקות עם קפה ומוזיקה רגועה', tags:['בוקר','הליכה','חוץ'], time:'08:00', user:{id:'u_dani', name:'דני', handle:'@dani'}},
-        {id:'p2', title:'ריצה קלה בפארק',    desc:'5 ק״מ קצב נעים',               tags:['ספורט','בריאות','חוץ'],  time:'07:00', user:{id:'u_lia',  name:'ליה',  handle:'@lia'}},
-        {id:'p3', title:'שעת למידה בספרייה', desc:'התמקדות בשקט מוחלט',          tags:['למידה','פוקוס','פנים'],  time:'20:00', user:{id:'u_noa',  name:'נועה', handle:'@noa'}},
-        {id:'p4', title:'קפה עם חבר/ה',      desc:'Catch-up נעים לשעה',           tags:['חברתי','פנאי','קפה'],    time:'10:30', user:{id:'u_ron',  name:'רון',  handle:'@ron'}},
-        {id:'p5', title:'שקיעה וחול ים',     desc:'נשימות עמוקות, בלי טלפון',     tags:['מיינדפולנס','ים','שקיעה'], time:'18:30', user:{id:'u_gal',  name:'גל',   handle:'@gal'}},
-        {id:'p6', title:'שעת יצירה עם ילדים',desc:'פלסטלינה וצבעי גואש',         tags:['משפחה','יצירה','בית'],   time:'17:00', user:{id:'u_maya', name:'מאיה', handle:'@maya'}},
-        {id:'p7', title:'מדיטציה קצרה',      desc:'10 דקות לפני השינה',           tags:['שקט','בריאות','לילה'],   time:'22:00', user:{id:'u_shai', name:'שי',   handle:'@shai'}},
-        {id:'p8', title:'שחמט בשדרה',        desc:'דו-קרב ידידותי בשבת',          tags:['משחק','חוץ','חברתי'],    time:'12:00', user:{id:'u_avi',  name:'אבי',  handle:'@avi'}}
-      ];
-      localStorage.setItem(POSTS_KEY, JSON.stringify(seed));
-    } catch(e){}
-  }
-  function loadPosts(){
-    seedPostsIfEmpty();
-    try { const raw = localStorage.getItem(POSTS_KEY); const arr = raw?JSON.parse(raw):[]; return Array.isArray(arr)?arr:[]; }
-    catch(e){ return []; }
-  }
-  function normalize(s){ return (s||'').toString().toLowerCase(); }
-  function scorePost(post, q){
-    const t = normalize(post.title);
-    const d = normalize(post.desc);
-    const tags = (post.tags||[]).map(normalize).join(' ');
-    const terms = normalize(q).split(/\s+/).filter(Boolean);
-    if (!terms.length) return 0;
-    let score = 0;
-    for (let i=0;i<terms.length;i++){
-      const term = terms[i];
-      if (t.includes(term))   score += 5;
-      if (tags.includes(term))score += 3;
-      if (d.includes(term))   score += 1;
-      if (t.startsWith(term)) score += 2;
-    }
-    return score;
-  }
-  function searchPosts(q){
-    const posts = loadPosts();
-    if (!q.trim()) return [];
-    return posts.map(p=>({p, s:scorePost(p,q)}))
-                .filter(x=>x.s>0)
-                .sort((a,b)=>b.s-a.s)
-                .map(x=>x.p);
-  }
-
-  /* ===== Suggestions engine ===== */
-  function showSuggestions(){
-    if (!sugWrap) return;
-    sugWrap.classList.remove('u-hidden');
-    sugWrap.classList.add('is-open');
-    // ensure panel grows while suggestions open
-    if (navPanel && !appNav.classList.contains('u-is-collapsed')) {
-      // let it auto-grow
-      navPanel.style.maxHeight = '';
-      navPanel.style.overflow = 'visible';
-    }
-  }
-  function hideSuggestions(){
-    if (!sugWrap) return;
-    sugWrap.classList.add('u-hidden');
-    sugWrap.classList.remove('is-open');
-  }
-  function renderSuggestions(q){
-    if (!sugList) return;
-    const posts = loadPosts();
-    let list = [];
-    if (!q.trim()){
-      list = posts.slice(0,6);            // trending
-    } else {
-      list = searchPosts(q).slice(0,6);   // filtered
-    }
-    const html = [];
-    if (!list.length){
-      html.push('<div class="sug-item"><div class="sug-title">לא נמצאו הצעות…</div></div>');
-    } else {
-      for (let i=0;i<list.length;i++){
-        const p = list[i];
-        html.push(
-          `<div class="sug-item" role="option">
-            <div>
-              <h5 class="sug-title">${escapeHtml(p.title)}</h5>
-              <div class="sug-row">
-                ${(p.tags||[]).map(t=>`<span class="sug-tag">${escapeHtml(t)}</span>`).join('')}
-                ${p.time?`<span class="sug-tag">⏰ ${p.time}</span>`:''}
-                ${p.user&&p.user.handle?`<span class="sug-tag">מאת ${escapeHtml(p.user.handle)}</span>`:''}
-              </div>
-            </div>
-            <div class="sug-actions">
-              <button class="sug-btn" data-contact="${p.id}">צור קשר</button>
-              <button class="sug-btn sug-btn--primary" data-use="${p.id}">הוסף</button>
-            </div>
-          </div>`
-        );
-      }
-    }
-    const allCount = q.trim() ? searchPosts(q).length : posts.length;
-    const more = `<div class="sug-more"><button class="sug-more__btn" data-go-all="1">הצג הכל (${allCount})</button></div>`;
-    sugList.innerHTML = html.join('') + more;
-    showSuggestions();
-  }
-
-  // IME-friendly typing
-  let isComposing = false;
-  if (navSearch){
-    navSearch.addEventListener('compositionstart', ()=>{ isComposing = true; });
-    navSearch.addEventListener('compositionend',  ()=>{ isComposing = false; renderSuggestions(navSearch.value); });
-
-    const debounced = debounce(function(){
-      if (!isComposing) renderSuggestions(navSearch.value);
-    }, 120);
-
-    navSearch.addEventListener('input', debounced);
-    navSearch.addEventListener('focus', ()=>renderSuggestions(navSearch.value));
-    navSearch.addEventListener('keydown', function(e){
-      if (e.key==='Escape'){ hideSuggestions(); }
-      if (e.key==='Enter'){ openFullResults(navSearch.value); hideSuggestions(); }
-    });
-  }
-  if (searchGo){
-    searchGo.addEventListener('click', function(){
-      const q = navSearch ? navSearch.value : '';
-      openFullResults(q); hideSuggestions();
-    });
-  }
-  if (searchClear){
-    searchClear.addEventListener('click', function(){
-      if (navSearch) navSearch.value=''; renderSuggestions('');
-      navSearch && navSearch.focus();
-    });
-  }
-  if (sugList){
-    sugList.addEventListener('click', function(e){
-      const useBtn = e.target.closest('[data-use]');
-      const ctBtn  = e.target.closest('[data-contact]');
-      const allBtn = e.target.closest('[data-go-all]');
-      if (useBtn){ usePost(useBtn.getAttribute('data-use')); }
-      if (ctBtn){  contactFor(ctBtn.getAttribute('data-contact')); }
-      if (allBtn){ openFullResults(navSearch ? navSearch.value : ''); hideSuggestions(); }
-    });
-  }
-  document.addEventListener('click', function(e){
-    if (!sugWrap || sugWrap.classList.contains('u-hidden')) return;
-    const inside = e.target.closest('.c-search');
-    if (!inside) hideSuggestions();
-  });
-
-  /* ===== Full results overlay ===== */
-  function openResults(){ srOverlay.classList.remove('u-hidden'); srOverlay.setAttribute('aria-hidden','false'); }
-  function closeResults(){ srOverlay.classList.add('u-hidden');  srOverlay.setAttribute('aria-hidden','true'); srList.innerHTML=''; }
-  function renderResults(q){
-    const list = searchPosts(q);
-    const html = [];
-    if (!list.length){
-      html.push('<div class="sr-card"><div class="sr-sub">לא נמצאו פעילויות מתאימות…</div></div>');
-    } else {
-      for (let i=0;i<list.length;i++){
-        const p = list[i];
-        html.push(
-          `<article class="sr-card" data-id="${p.id}">
-            <h4 class="sr-title">${escapeHtml(p.title)}</h4>
-            <p class="sr-sub">${escapeHtml(p.desc||'')}</p>
-            <div class="sr-meta">
-              ${(p.tags||[]).map(t=>`<span class="sr-tag">${escapeHtml(t)}</span>`).join('')}
-              ${p.time?`<span class="sr-tag">⏰ ${p.time}</span>`:''}
-              ${p.user&&p.user.handle?`<span class="sr-tag">מאת ${escapeHtml(p.user.handle)}</span>`:''}
-            </div>
-            <div class="sr-actions">
-              <button class="sr-btn" data-contact="${p.id}">צור קשר</button>
-              <button class="sr-btn sr-btn--primary" data-use="${p.id}">הוסף</button>
-            </div>
-          </article>`
-        );
-      }
-    }
-    srList.innerHTML = html.join('');
-  }
-  function openFullResults(q){ renderResults(q||''); openResults(); }
-  if (srClose) srClose.addEventListener('click', closeResults);
-  if (srX)     srX.addEventListener('click', closeResults);
-  if (srList){
-    srList.addEventListener('click', function(e){
-      const useBtn = e.target.closest('[data-use]');
-      const ctBtn  = e.target.closest('[data-contact]');
-      if (useBtn){ usePost(useBtn.getAttribute('data-use')); }
-      if (ctBtn){  contactFor(ctBtn.getAttribute('data-contact')); }
-    });
-  }
-
-  /* ===== Use / Contact ===== */
-  function usePost(id){
-    const p = loadPosts().find(x=>x.id===id);
-    if (!p) return;
-    if (titleInput) titleInput.value = p.title || '';
-    if (dateInput)  dateInput.value  = todayYMD();
-    if (timeInput)  timeInput.value  = p.time || '12:00';
-    closeResults(); hideSuggestions(); openSheet();
-  }
-
-  let contactPayload = null;
-  function contactFor(id){
-    const p = loadPosts().find(x=>x.id===id);
-    if (!p || !p.user) return;
-    contactPayload = p.user;
-    if (contactWho) contactWho.textContent = p.user.name + ' ' + (p.user.handle||'');
-    openContactSheet();
-  }
-  function openContactSheet(){ contactSheet.classList.remove('u-hidden'); contactSheet.classList.add('is-open'); }
-  function closeContactSheet(){ contactSheet.classList.remove('is-open'); setTimeout(()=>contactSheet.classList.add('u-hidden'),220); }
-  if (contactSheet){ contactSheet.addEventListener('click', e => { if (e.target.closest('[data-close]')) closeContactSheet(); }); }
-  if (contactMsg){ contactMsg.addEventListener('click', ()=>{ if (contactPayload) window.location.href = 'social.html?to=' + encodeURIComponent(contactPayload.handle||''); }); }
-  if (contactProfile){ contactProfile.addEventListener('click', ()=>{ if (contactPayload) window.location.href = 'profile.html?u=' + encodeURIComponent(contactPayload.id||'user'); }); }
-  if (contactCopy){ contactCopy.addEventListener('click', async ()=>{ try{ await navigator.clipboard.writeText(contactPayload && contactPayload.handle || ''); contactCopy.textContent='הועתק ✓'; setTimeout(()=>contactCopy.textContent='העתק משתמש',900); }catch(e){} }); }
-
-  /* ===== Planner (abridged; unchanged rendering) ===== */
+  /* ===================== Planner rendering ===================== */
   function render(){
+    formatTitle(state.current);
+    markToday();
     if (!plannerRoot) return;
-    updateHeaderDate(state.current);
+
+    if (btnDay)   btnDay.classList.toggle('is-active', state.view==='day');
+    if (btnWeek)  btnWeek.classList.toggle('is-active', state.view==='week');
+    if (btnMonth) btnMonth.classList.toggle('is-active', state.view==='month');
+
     if (state.view==='day') renderDay();
     else if (state.view==='week') renderWeek();
-    else if (state.view==='month') renderMonth();
-    else renderYear();
-    if (btnDay && btnWeek && btnMonth){
-      btnDay.classList.toggle('is-active',   state.view==='day');
-      btnWeek.classList.toggle('is-active',  state.view==='week');
-      btnMonth.classList.toggle('is-active', state.view==='month' || state.view==='year');
-    }
+    else renderMonth();
   }
 
   function renderDay(){
-    const root = plannerRoot; root.innerHTML='';
-    const wrap = document.createElement('div'); wrap.className='p-dayview';
-    const h = document.createElement('div'); h.className='p-dayview__head';
-    const idx = state.current.getDay();
-    h.innerHTML = '<div class="p-dayview__title">'+HEB_DAYS[idx]+'</div><div class="p-dayview__date">'+formatDateHeb(state.current)+'</div>';
-    wrap.appendChild(h);
+    plannerRoot.innerHTML = '';
+    var wrap = document.createElement('div');
+    wrap.className = 'p-dayview';
 
-    const ymd = dateKeyLocal(state.current);
-    const items = state.tasks.filter(t=>t.date===ymd).sort((a,b)=>a.time.localeCompare(b.time));
+    var head = document.createElement('div');
+    head.className = 'p-dayview__head';
+    head.innerHTML =
+      '<div class="p-dayview__title">'+ HEB_DAYS[state.current.getDay()] +'</div>'+
+      '<div class="p-dayview__date">'+ pad2(state.current.getDate())+'.'+pad2(state.current.getMonth()+1)+'.'+state.current.getFullYear() +'</div>';
+    wrap.appendChild(head);
+
+    var ymd = dateKey(state.current);
+    var items = state.tasks
+      .filter(function(t){ return t.date===ymd; })
+      .sort(function(a,b){ return (a.time||'').localeCompare(b.time||''); });
+
     if (!items.length){
-      const empty = document.createElement('div'); empty.className='p-empty'; empty.textContent='אין אירועים ליום זה.'; wrap.appendChild(empty);
+      var empty = document.createElement('div');
+      empty.className = 'p-empty';
+      empty.textContent = 'אין אירועים ליום זה.';
+      wrap.appendChild(empty);
     } else {
-      for (let i=0;i<items.length;i++){
-        const t = items[i];
-        const row = document.createElement('div'); row.className='p-daytask'; row.setAttribute('data-task-id', t.id);
-        row.innerHTML = '<div class="p-daytask__text">'+escapeHtml(t.title)+'</div><div class="p-daytask__time">'+t.time+'</div>'+
-                        '<div class="p-daytask__actions"><button class="p-daytask__btn" data-done="'+t.id+'">בוצע</button><button class="p-daytask__btn" data-del="'+t.id+'">מחק</button></div>';
+      items.forEach(function(t){
+        var row = document.createElement('div');
+        row.className = 'p-daytask';
+        row.innerHTML =
+          '<div class="p-daytask__text">'+ escapeHtml(t.title) +'</div>'+
+          '<div class="p-daytask__time">'+ (t.time||'') +'</div>'+
+          '<div class="p-daytask__actions">'+
+            '<button class="p-daytask__btn" data-done="'+t.id+'">בוצע</button>'+
+            '<button class="p-daytask__btn" data-del="'+t.id+'">מחק</button>'+
+          '</div>';
         wrap.appendChild(row);
-      }
+      });
     }
-    root.appendChild(wrap);
+    plannerRoot.appendChild(wrap);
   }
 
   function renderWeek(){
-    const root = plannerRoot; root.innerHTML='';
-    const wrap = document.createElement('div'); wrap.className='p-week';
-    const start = startOfWeek(state.current);
-    const todayKey = dateKeyLocal(new Date());
+    plannerRoot.innerHTML = '';
 
-    for (let i=0;i<7;i++){
-      const day = new Date(start); day.setDate(start.getDate()+i);
-      const ymd = dateKeyLocal(day);
-      const box = document.createElement('div');
-      box.className='p-day'+(ymd===todayKey?' p-day--today':''); box.setAttribute('data-goto', ymd);
-      const head = document.createElement('div'); head.className='p-day__head';
-      const count = state.tasks.filter(t=>t.date===ymd).length;
-      head.innerHTML = '<span class="p-day__name">'+HEB_DAYS[i]+'</span><span class="p-day__date">'+pad2(day.getDate())+'.'+pad2(day.getMonth()+1)+'</span><span class="p-day__count">'+count+'</span>';
+    // Week bar (prev / title / next)
+    var bar = document.createElement('div');
+    bar.className = 'p-weekbar';
+    bar.innerHTML =
+      '<button class="p-weekbar__btn" data-weeknav="prev" aria-label="שבוע קודם">‹</button>'+
+      '<div class="p-weekbar__title">'+weekLabel(state.current, weekStart)+'</div>'+
+      '<div class="p-weekbar__right">'+
+        '<button class="p-weekbar__btn" data-weeknav="today">היום</button>'+
+        '<button class="p-weekbar__btn" data-weeknav="next" aria-label="שבוע הבא">›</button>'+
+      '</div>';
+    plannerRoot.appendChild(bar);
+
+    bar.addEventListener('click', function(e){
+      var a = e.target.closest('[data-weeknav]');
+      if (!a) return;
+      var kind = a.getAttribute('data-weeknav');
+      if (kind==='prev'){ state.current.setDate(state.current.getDate()-7); }
+      else if (kind==='next'){ state.current.setDate(state.current.getDate()+7); }
+      else { state.current = new Date(); }
+      render(); persistPrefs();
+    });
+
+    // Week grid
+    var wrap = document.createElement('div');
+    wrap.className = 'p-week';
+
+    var start = startOfWeek(state.current, weekStart);
+    for (var i=0;i<7;i++){
+      var day = new Date(start); day.setDate(start.getDate()+i);
+      var ymd = dateKey(day);
+
+      var box = document.createElement('div');
+      box.className = 'p-day' + (sameDay(day, new Date()) ? ' p-day--today' : '');
+      box.dataset.goto = ymd;
+
+      var head = document.createElement('div');
+      head.className = 'p-day__head';
+      head.innerHTML =
+        '<span class="p-day__name">'+ HEB_DAYS[day.getDay()] +'</span>'+
+        '<span class="p-day__date">'+ pad2(day.getDate())+'.'+pad2(day.getMonth()+1) +'</span>';
       box.appendChild(head);
 
-      const dayTasks = state.tasks.filter(t=>t.date===ymd).sort((a,b)=>a.time.localeCompare(b.time));
-      for (let k=0;k<dayTasks.length;k++){
-        const t = dayTasks[k];
-        const row = document.createElement('div'); row.className='p-task'; row.setAttribute('data-task-id', t.id);
-        row.innerHTML = '<div class="p-task__text">'+escapeHtml(t.title)+'</div><div class="p-task__time">'+t.time+'</div>'+
-                        '<div class="p-task__actions"><button class="p-task__btn" data-done="'+t.id+'">בוצע</button><button class="p-task__btn" data-del="'+t.id+'">מחק</button></div>';
+      var dayTasks = state.tasks
+        .filter(function(t){ return t.date===ymd; })
+        .sort(function(a,b){ return (a.time||'').localeCompare(b.time||''); });
+
+      dayTasks.forEach(function(t){
+        var row = document.createElement('div');
+        row.className = 'p-task';
+        row.innerHTML =
+          '<div class="p-task__text">'+ escapeHtml(t.title) +'</div>'+
+          '<div class="p-task__time">'+ (t.time||'') +'</div>'+
+          '<div class="p-task__actions">'+
+            '<button class="p-task__btn" data-done="'+t.id+'">בוצע</button>'+
+            '<button class="p-task__btn" data-del="'+t.id+'">מחק</button>'+
+          '</div>';
         box.appendChild(row);
-      }
+      });
+
       wrap.appendChild(box);
     }
-    root.appendChild(wrap);
+    plannerRoot.appendChild(wrap);
   }
 
   function renderMonth(){
-    const root = plannerRoot; root.innerHTML='';
-    const wrap = document.createElement('div'); wrap.className='p-monthwrap';
+    plannerRoot.innerHTML = '';
 
-    const bar = document.createElement('div'); bar.className='p-monthbar';
-    const left = document.createElement('div'); left.className='p-monthbar__left';
-    const title = document.createElement('div'); title.className='p-monthbar__title';
-    const right = document.createElement('div'); right.className='p-monthbar__right';
-    title.textContent = HEB_MONTHS[state.current.getMonth()]+' '+state.current.getFullYear();
+    // Month bar (prev / title / next)
+    var bar = document.createElement('div');
+    bar.className = 'p-monthbar';
+    bar.innerHTML =
+      '<div class="p-monthbar__left">'+
+        '<button class="p-monthbar__btn" data-monthnav="prev" aria-label="חודש קודם">‹</button>'+
+      '</div>'+
+      '<div class="p-monthbar__title">'+ HEB_MONTHS[state.current.getMonth()] + ' ' + state.current.getFullYear() +'</div>'+
+      '<div class="p-monthbar__right">'+
+        '<button class="p-monthbar__btn" data-monthnav="today">היום</button>'+
+        '<button class="p-monthbar__btn" data-monthnav="next" aria-label="חודש הבא">›</button>'+
+      '</div>';
+    plannerRoot.appendChild(bar);
 
-    const yearSelect = document.createElement('select'); yearSelect.className='p-yearselect';
-    const yearNow = state.current.getFullYear();
-    for (let y = yearNow-5; y <= yearNow+5; y++){
-      const opt = document.createElement('option'); opt.value = String(y); opt.textContent = String(y);
-      if (y===yearNow) opt.selected = true;
-      yearSelect.appendChild(opt);
-    }
-    right.appendChild(yearSelect);
+    bar.addEventListener('click', function(e){
+      var a = e.target.closest('[data-monthnav]');
+      if (!a) return;
+      var kind = a.getAttribute('data-monthnav');
+      if (kind==='prev'){ state.current = addMonths(startOfMonth(state.current), -1); }
+      else if (kind==='next'){ state.current = addMonths(startOfMonth(state.current), 1); }
+      else { state.current = new Date(); }
+      render(); persistPrefs();
+    });
 
-    const chips = document.createElement('div'); chips.className='p-monthbar__chips';
-    for (let m=0; m<12; m++){
-      const chip = document.createElement('button');
-      chip.type='button'; chip.className='p-chip'+(m===state.current.getMonth()?' is-selected':'');
-      chip.textContent = HEB_MONTHS[m]; chip.dataset.month = String(m);
-      chips.appendChild(chip);
-    }
-    left.appendChild(chips);
+    var grid = document.createElement('div');
+    grid.className = 'p-month';
 
-    bar.appendChild(left); bar.appendChild(title); bar.appendChild(right);
-    wrap.appendChild(bar);
+    var anchor = new Date(state.current.getFullYear(), state.current.getMonth(), 1);
+    var firstDow = (anchor.getDay() - weekStart + 7) % 7;
+    var start = new Date(anchor); start.setDate(anchor.getDate() - firstDow);
 
-    const grid = document.createElement('div'); grid.className='p-month';
+    var curKey = dateKey(state.current);
+    for (var i=0;i<42;i++){
+      var day = new Date(start); day.setDate(start.getDate()+i);
+      var ymd = dateKey(day);
 
-    const anchor = new Date(state.current.getFullYear(), state.current.getMonth(), 1);
-    const firstDow = anchor.getDay();
-    const start = new Date(anchor); start.setDate(anchor.getDate()-firstDow);
+      var cell = document.createElement('div');
+      var cls = 'p-cell';
+      if (sameDay(day, new Date())) cls += ' p-cell--today';
+      if (ymd === curKey) cls += ' p-cell--selected';
+      if (day.getMonth() !== state.current.getMonth()) cls += ' p-cell--pad';
+      cell.className = cls;
+      cell.dataset.goto = ymd;
 
-    const curKey   = dateKeyLocal(state.current);
-    const todayKey = dateKeyLocal(new Date());
-    const thisMonth = state.current.getMonth();
-
-    for (let i=0;i<42;i++){
-      const day = new Date(start); day.setDate(start.getDate()+i);
-      const ymd = dateKeyLocal(day);
-
-      const cell = document.createElement('div');
-      let cls = 'p-cell';
-      if (day.getMonth() !== thisMonth) cls += ' p-cell--pad';
-      if (ymd === todayKey) cls += ' p-cell--today';
-      if (ymd === curKey)   cls += ' p-cell--selected';
-      cell.className = cls; cell.setAttribute('data-goto', ymd);
-
-      const num = document.createElement('div'); num.className = 'p-cell__num'; num.textContent = day.getDate();
+      var num = document.createElement('div');
+      num.className = 'p-cell__num';
+      num.textContent = day.getDate();
       cell.appendChild(num);
 
       grid.appendChild(cell);
     }
-
-    wrap.appendChild(grid);
-    plannerRoot.appendChild(wrap);
-
-    chips.addEventListener('click', function(e){
-      const btn = e.target && e.target.closest('.p-chip'); if (!btn) return;
-      const m = parseInt(btn.dataset.month,10);
-      const d = new Date(state.current); d.setMonth(m); d.setDate(1);
-      state.current = d; state.view = 'month'; render();
-    });
-    yearSelect.addEventListener('change', function(){
-      const y = parseInt(yearSelect.value,10);
-      const d = new Date(state.current); d.setFullYear(y); d.setDate(1);
-      state.current = d; state.view = 'month'; render();
-    });
-
-    addVerticalSwipe(grid, function(dir){
-      const d = new Date(state.current);
-      if (dir==='down') d.setMonth(d.getMonth()+1);
-      else              d.setMonth(d.getMonth()-1);
-      d.setDate(1);
-      state.current = d;
-      render();
-    });
+    plannerRoot.appendChild(grid);
   }
 
-  function renderYear(){
-    const root = plannerRoot; root.innerHTML='';
-    const wrap = document.createElement('div'); wrap.className='p-monthwrap';
+  /* ===================== Interactions ===================== */
+  // view tabs
+  if (btnDay)   btnDay.addEventListener('click',  function(){ state.view='day';   render(); prefs.defaultView='day';   persistPrefs(); });
+  if (btnWeek)  btnWeek.addEventListener('click', function(){ state.view='week';  render(); prefs.defaultView='week';  persistPrefs(); });
+  if (btnMonth) btnMonth.addEventListener('click',function(){ state.view='month'; render(); prefs.defaultView='month'; persistPrefs(); });
 
-    const bar = document.createElement('div'); bar.className='p-monthbar';
-    const title = document.createElement('div'); title.className='p-monthbar__title';
-    title.textContent = state.current.getFullYear();
-    bar.appendChild(document.createElement('div')); bar.appendChild(title); bar.appendChild(document.createElement('div'));
-    wrap.appendChild(bar);
-
-    const yearGrid = document.createElement('div'); yearGrid.className='p-year';
-    for (let m=0; m<12; m++){
-      const box = document.createElement('div'); box.className='p-year__month';
-      box.innerHTML = '<h4 class="p-year__title">'+HEB_MONTHS[m]+'</h4>';
-      const g = document.createElement('div'); g.className='p-year__grid';
-
-      const first = new Date(state.current.getFullYear(), m, 1);
-      const dow = first.getDay();
-      const start = new Date(first); start.setDate(first.getDate()-dow);
-
-      for (let i=0;i<42;i++){
-        const d = new Date(start); d.setDate(start.getDate()+i);
-        const cell = document.createElement('div'); cell.className='p-year__cell';
-        if (d.getMonth()!==m) cell.classList.add('p-year__cell--pad');
-        cell.textContent = d.getDate();
-        cell.setAttribute('data-goto', dateKeyLocal(d));
-        g.appendChild(cell);
-      }
-
-      box.appendChild(g);
-      yearGrid.appendChild(box);
-    }
-    wrap.appendChild(yearGrid);
-    root.appendChild(wrap);
-  }
-
-  /* ===== Interactions ===== */
-  if (plannerRoot) {
+  // go to a specific day (week+month cards)
+  if (plannerRoot){
     plannerRoot.addEventListener('click', function(e){
-      const gotoEl = e.target && e.target.closest ? e.target.closest('[data-goto]') : null;
-      if (gotoEl && gotoEl.getAttribute) {
-        const ymd = gotoEl.getAttribute('data-goto');
-        if (ymd) { state.current = parseYMD(ymd); state.view = 'day'; render(); return; }
+      var host = e.target && e.target.closest('[data-goto]');
+      var go = host && host.dataset.goto;
+      if (go){
+        state.current = fromKey(go);
+        state.view = 'day';
+        render();
+        return;
       }
-      const t = e.target;
-      if (t.dataset && t.dataset.done){
-        confettiAtEl(t);
-        state.tasks = state.tasks.filter(x=>x.id!==t.dataset.done);
-        saveTasks(); render();
-      }
-      if (t.dataset && t.dataset.del){
-        state.tasks = state.tasks.filter(x=>x.id!==t.dataset.del);
-        saveTasks(); render();
-      }
+      var doneId = e.target && e.target.getAttribute('data-done');
+      var delId  = e.target && e.target.getAttribute('data-del');
+      if (doneId){ state.tasks = state.tasks.filter(t => t.id!==doneId); saveTasks(); render(); }
+      else if (delId){ state.tasks = state.tasks.filter(t => t.id!==delId); saveTasks(); render(); }
     });
   }
-  if (btnDay)   btnDay.addEventListener('click',  ()=>{ state.view='day';   render(); });
-  if (btnWeek)  btnWeek.addEventListener('click', ()=>{ state.view='week';  render(); });
-  if (btnMonth) btnMonth.addEventListener('click',()=>{ state.view='month'; render(); });
 
-  /* ===== Sheet open/close + quick picks ===== */
-  function openSheet(){ if (!sheet) return; sheet.classList.remove('u-hidden'); sheet.classList.add('is-open'); try{ titleInput&&titleInput.focus(); }catch(e){} }
-  function closeSheet(){ if (!sheet) return; sheet.classList.remove('is-open'); setTimeout(()=>sheet.classList.add('u-hidden'),220); }
-  if (addEventBtn) addEventBtn.addEventListener('click', e=>{ e.preventDefault(); openSheet(); });
-  if (sheetBackdrop) sheetBackdrop.addEventListener('click', closeSheet);
-  if (sheetCloseBtn) sheetCloseBtn.addEventListener('click', closeSheet);
-  if (sheetPanel) sheetPanel.addEventListener('click', e=>e.stopPropagation());
-
-  (function initQuickPicks(){
-    const qp = document.querySelector('.qp'); if (!qp) return;
-    qp.addEventListener('click', function(e){
-      const chip = e.target && e.target.closest('.qp__chip'); if (!chip) return;
-      if (chip.dataset.date){
-        const today = new Date(); let target = new Date(today);
-        if (chip.dataset.date==='tomorrow') target.setDate(today.getDate()+1);
-        else if (chip.dataset.date==='nextweek') target.setDate(today.getDate()+7);
-        else if (chip.dataset.date.startsWith('+')) target.setDate(today.getDate()+parseInt(chip.dataset.date.replace('+',''),10));
-        const v = target.getFullYear()+'-'+pad2(target.getMonth()+1)+'-'+pad2(target.getDate());
-        if (dateInput) dateInput.value = v;
+  /* ===================== Bottom Sheet (Create event) ===================== */
+  function openSheet(){
+    if (!sheet) return;
+    var now = new Date();
+    if (dateInput && !dateInput.value) dateInput.value = dateKey(now);
+    if (timeInput && !timeInput.value) timeInput.value = pad2(now.getHours())+':'+pad2(now.getMinutes());
+    sheet.classList.remove('u-hidden');
+    sheet.classList.add('is-open');
+    try{ titleInput && titleInput.focus(); }catch(_){}
+  }
+  function closeSheet(){
+    if (!sheet) return;
+    sheet.classList.remove('is-open');
+    setTimeout(() => sheet.classList.add('u-hidden'), 220);
+  }
+  document.addEventListener('click', function(e){
+    if (e.target && e.target.closest('#addEventBtn')){ e.preventDefault(); openSheet(); }
+  });
+  if (sheetPanel){
+    sheetPanel.addEventListener('click', function(e){
+      var qd = e.target && e.target.closest('.qp__chip[data-date]');
+      if (qd){
+        e.preventDefault();
+        var kind = qd.getAttribute('data-date');
+        var base = new Date();
+        if (kind==='today'){}
+        else if (kind==='tomorrow'){ base.setDate(base.getDate()+1); }
+        else if (kind==='nextweek'){ base.setDate(base.getDate()+7); }
+        else if (/^\+\d+$/.test(kind)){ base.setDate(base.getDate()+parseInt(kind.slice(1),10)); }
+        if (dateInput) dateInput.value = dateKey(base);
+        return;
       }
-      if (chip.dataset.time){
-        if (chip.dataset.time.indexOf('now+')===0){
-          const addMin = parseInt(chip.dataset.time.split('+')[1],10) || 0;
-          const now = new Date(); now.setMinutes(now.getMinutes()+addMin);
-          const v = pad2(now.getHours())+':'+pad2(now.getMinutes());
-          if (timeInput) timeInput.value = v;
-        } else { if (timeInput) timeInput.value = chip.dataset.time; }
+      var qt = e.target && e.target.closest('.qp__chip[data-time]');
+      if (qt){
+        e.preventDefault();
+        var kindT = qt.getAttribute('data-time');
+        var now = new Date();
+        if (/^now\+\d+$/.test(kindT)){
+          var m = parseInt(kindT.split('+')[1],10)||0;
+          now.setMinutes(now.getMinutes()+m);
+          if (timeInput) timeInput.value = pad2(now.getHours())+':'+pad2(now.getMinutes());
+        } else if (/^\d{2}:\d{2}$/.test(kindT) && timeInput){
+          timeInput.value = kindT;
+        }
+        return;
       }
+      var closeBtn = e.target && e.target.closest('[data-close]');
+      if (closeBtn){ e.preventDefault(); closeSheet(); }
     });
-  })();
+  }
+  if (sheet){
+    sheet.addEventListener('click', function(e){
+      if (e.target && e.target.matches('.c-sheet__backdrop')) closeSheet();
+    });
+  }
+  document.addEventListener('keydown', function(e){ if (e.key==='Escape') closeSheet(); });
 
-  if (sheetForm) {
-    sheetForm.addEventListener('submit', function (e) {
+  if (sheetForm){
+    sheetForm.addEventListener('submit', function(e){
       e.preventDefault();
-      const t = titleInput && titleInput.value ? titleInput.value.trim() : '';
-      const d = dateInput  && dateInput.value  ? dateInput.value.trim()  : '';
-      const h = timeInput  && timeInput.value  ? timeInput.value.trim()  : '';
+      var t = (titleInput && titleInput.value||'').trim();
+      var d = (dateInput  && dateInput.value||'').trim();
+      var h = (timeInput  && timeInput.value||'').trim();
       if (!t || !d || !h) return;
-
-      const id = 't_'+Date.now()+'_'+Math.random().toString(36).slice(2,7);
-      state.tasks.push({ id:id, title:t, date:d, time:h }); saveTasks();
-      sheetForm.reset(); closeSheet();
-      state.current = parseYMD(d); state.view = 'day'; render();
-      const targetEl  = document.querySelector('[data-task-id="'+id+'"]');
-      flyFromTo(addEventBtn, targetEl, t);
+      var id = 't_'+Date.now()+'_'+Math.random().toString(36).slice(2,7);
+      state.tasks.push({ id:id, title:t, date:d, time:h });
+      saveTasks();
+      state.current = fromKey(d);
+      state.view = 'day';
+      render();
+      sheetForm.reset();
+      closeSheet();
     });
   }
 
-  /* ===== Confetti + fly chip ===== */
-  function confettiAtEl(el) {
-    if (!el) return;
-    const r = el.getBoundingClientRect();
-    const originX = r.left + r.width / 2 + window.scrollX;
-    const originY = r.top  + r.height / 2 + window.scrollY;
-    const colors = ['#3B82F6','#60A5FA','#A78BFA','#F59E0B','#F472B6','#34D399','#F87171'];
-    const COUNT=44, MIN_DIST=60, MAX_DIST=160, DURATION=1200;
-    for (let i=0;i<COUNT;i++){
-      const p=document.createElement('span'); p.className='c-confetti';
-      Object.assign(p.style,{position:'absolute',left:originX+'px',top:originY+'px',width:(6+Math.random()*10)+'px',height:(6+Math.random()*10)+'px',
-        borderRadius:'2px',background:colors[i%colors.length],pointerEvents:'none',zIndex:10000,opacity:'1'});
-      document.body.appendChild(p);
-      (function(node){
-        const angle=Math.random()*Math.PI*2;
-        const dist=MIN_DIST+Math.random()*(MAX_DIST-MIN_DIST);
-        const tx=Math.cos(angle)*dist, ty=Math.sin(angle)*dist*(0.75+Math.random()*0.5);
-        const rot=(Math.random()*720-360); let start=null;
-        function step(ts){ if(!start) start=ts; const t=Math.min(1,(ts-start)/DURATION), ease=t*(2-t);
-          node.style.transform='translate('+(tx*ease)+'px,'+(ty*ease)+'px) rotate('+(rot*ease)+'deg) scale('+(1-0.2*ease)+')';
-          node.style.opacity=String(1-ease); if(t<1) requestAnimationFrame(step); else node.remove(); }
-        requestAnimationFrame(step);
-      })(p);
+  /* ===================== Robust Log-out (works for #btnExit or [data-logout]) ===================== */
+  function clearAuthAll(){
+    try{
+      var KEYS = [
+        'authUser','authName','token',
+        'auth.token','auth.user',
+        'looz:justLoggedIn','looz:loggedOut'
+      ];
+      KEYS.forEach(function(k){
+        try{ localStorage.removeItem(k); }catch(e){}
+        try{ sessionStorage.removeItem(k); }catch(e){}
+      });
+    }catch(e){}
+  }
+  function handleLogout(){
+    // prevent any stray handlers from re-writing auth during this tick
+    window.__loozLoggingOut = true;
+    clearAuthAll();
+    // hard replace so Back won’t bounce you into the app again
+    try{
+      // add a small tombstone so auth.html can also clean extras if it wants
+      localStorage.setItem('looz:loggedOut', '1');
+    }catch(e){}
+    window.location.replace('/Calendar/auth.html?loggedout=1');
+  }
+  // attach both direct and delegated handlers (covers late DOM or markup changes)
+  var exitBtn = document.getElementById('btnExit');
+  if (exitBtn) exitBtn.addEventListener('click', function(ev){ ev.preventDefault(); handleLogout(); });
+  document.addEventListener('click', function(e){
+    var trg = e.target && e.target.closest('[data-logout]');
+    if (trg){ e.preventDefault(); handleLogout(); }
+  });
+
+  /* ===================== Elegant post-login intro (glowy lemon) ===================== */
+  function welcomeIntro(){
+    var root = document.createElement('div');
+    root.className = 'looz-welcome';
+    root.innerHTML = '<div class="looz-welcome__scrim"></div>';
+
+    var wrap = document.createElement('div');
+    wrap.className = 'lw-wrap';
+
+    var halo = document.createElement('div');
+    halo.className = 'lw-halo';
+
+    var lemon = document.createElement('div');
+    lemon.className = 'lw-lemon';
+    lemon.innerHTML = `
+      <svg viewBox="0 0 64 64" width="96" height="96" aria-hidden="true">
+        <defs>
+          <radialGradient id="wLemonCore" cx="48%" cy="40%" r="60%">
+            <stop offset="0%"  stop-color="#FFF8C6"/>
+            <stop offset="62%" stop-color="#FFE36E"/>
+            <stop offset="100%" stop-color="#F7C843"/>
+          </radialGradient>
+          <linearGradient id="wLeaf" x1="0%" y1="0%" x2="100%" y2="100%">
+            <stop offset="0%" stop-color="#8BC34A"/>
+            <stop offset="100%" stop-color="#4E8B2A"/>
+          </linearGradient>
+        </defs>
+        <path d="M48 20c-9-9-23-9-32 0-6 6-6 16 0 22 6.4 6 16.9 6.9 23.4 0 6.4-6.1 7.6-15.6 1.6-22"
+              fill="url(#wLemonCore)" stroke="#C59A21" stroke-width="1.2"/>
+        <path d="M45 18c2.9-2.9 5.5-5.8 7.4-8.7" stroke="url(#wLeaf)" stroke-width="2.2" stroke-linecap="round"/>
+      </svg>
+    `;
+
+    var shine = document.createElement('div');
+    shine.className = 'lw-shine';
+
+    var rays = document.createElement('div');
+    rays.className = 'lw-rays';
+    for (var i=0;i<12;i++){
+      var r = document.createElement('span');
+      r.className = 'lw-ray';
+      r.style.setProperty('--a', (i*30)+'deg');
+      r.style.animationDelay = (80 + i*20) + 'ms';
+      rays.appendChild(r);
     }
-  }
-  function flyFromTo(fromEl, toEl, label){
-    if (!fromEl || !toEl) return;
-    const fr = fromEl.getBoundingClientRect();
-    const tr = toEl.getBoundingClientRect();
-    const chip = document.createElement('div'); chip.className='fly-chip';
-    chip.textContent = label.length>18 ? label.slice(0,16)+'…' : label; document.body.appendChild(chip);
-    const sx = fr.left + fr.width/2, sy = fr.top + fr.height/2;
-    const ex = tr.left + tr.width/2, ey = tr.top + tr.height/2;
-    chip.style.left = sx+'px'; chip.style.top = sy+'px';
-    const DURATION = 700; let start = null;
-    function step(ts){ if(!start) start=ts; const t=Math.min(1,(ts-start)/DURATION), e=t*(2-t);
-      const cx = sx + (ex - sx) * e; const cy = sy - (1 - (2*Math.abs(.5-e))) * 90 + (ey - sy) * e;
-      chip.style.left = cx+'px'; chip.style.top = cy+'px'; chip.style.opacity = String(1 - t*0.2);
-      if (t<1) requestAnimationFrame(step); else chip.remove(); }
-    requestAnimationFrame(step);
+
+    wrap.appendChild(halo);
+    wrap.appendChild(lemon);
+    wrap.appendChild(shine);
+    wrap.appendChild(rays);
+    root.appendChild(wrap);
+    document.body.appendChild(root);
+
+    setTimeout(function(){ root.remove(); }, 1500);
   }
 
-  /* ===== Swipe util ===== */
-  function addVerticalSwipe(node, cb){
-    if (!node || !cb) return;
-    let startY = 0, startX = 0, t0 = 0;
-    node.addEventListener('touchstart', function(e){
-      const t = e.changedTouches[0]; startY = t.clientY; startX = t.clientX; t0 = Date.now();
-    }, {passive:true});
-    node.addEventListener('touchend', function(e){
-      const t = e.changedTouches[0]; const dy = t.clientY - startY; const dx = Math.abs(t.clientX - startX); const dt = Date.now() - t0;
-      if (Math.abs(dy) > 40 && dx < 60 && dt < 800){ cb(dy>0 ? 'down' : 'up'); }
-    });
-  }
+  try{
+    if (localStorage.getItem('looz:justLoggedIn') === '1'){
+      localStorage.removeItem('looz:justLoggedIn');
+      setTimeout(welcomeIntro, 40);
+    }
+  }catch(_){}
 
-  /* ===== Prefill from categories / social ===== */
-  (function prefillDraft(){
-    try {
-      const raw = localStorage.getItem('draftEvent'); if (!raw) return;
-      const d = JSON.parse(raw); localStorage.removeItem('draftEvent');
-      if (titleInput && d.title) titleInput.value = d.title;
-      if (dateInput  && d.date)  dateInput.value  = d.date;
-      if (timeInput  && d.time)  timeInput.value  = d.time;
-      openSheet();
-    } catch(e){}
-  })();
-
-  /* ===== Initial render ===== */
-  state.current = new Date(); state.view = 'day'; render();
-
+  /* ===================== Initial render ===================== */
+  formatTitle(today);
+  state.current = today;
+  render();
 })();

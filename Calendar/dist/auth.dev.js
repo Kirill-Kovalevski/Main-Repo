@@ -1,163 +1,126 @@
 "use strict";
 
-// Calendar/auth.js
+// LooZ auth: tabs, eyes, and simple local auth
 (function () {
-  'use strict';
+  'use strict'; // Tabs
 
-  function qp(name) {
-    return new URLSearchParams(location.search).get(name);
-  } // If we arrived with ?loggedout=1, nuke any leftovers *before* we do anything else
+  var tLogin = document.getElementById('tab-login');
+  var tReg = document.getElementById('tab-register');
+  var pLogin = document.getElementById('panel-login');
+  var pReg = document.getElementById('panel-register');
 
-
-  if (qp('loggedout') === '1') {
-    try {
-      localStorage.removeItem('auth.user');
-      localStorage.removeItem('auth.token');
-      sessionStorage.removeItem('auth.session');
-    } catch (e) {}
-  } // If already logged in and this is not a logout visit, go to the app
-
-
-  try {
-    var raw = localStorage.getItem('auth.user');
-
-    if (raw && qp('loggedout') !== '1') {
-      location.replace('/Calendar/index.html');
-      return;
-    }
-  } catch (e) {}
-
-  function $(id) {
-    return document.getElementById(id);
+  function show(which) {
+    var loginOn = which === 'login';
+    tLogin.classList.toggle('is-active', loginOn);
+    tReg.classList.toggle('is-active', !loginOn);
+    pLogin.classList.toggle('is-active', loginOn);
+    pReg.classList.toggle('is-active', !loginOn);
+    pReg.toggleAttribute('hidden', loginOn);
+    pLogin.toggleAttribute('hidden', !loginOn);
   }
 
-  function validEmail(v) {
-    return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(String(v || '').trim());
-  }
+  if (tLogin) tLogin.addEventListener('click', function () {
+    show('login');
+  });
+  if (tReg) tReg.addEventListener('click', function () {
+    show('reg');
+  }); // Password eye
 
-  function validPass(v) {
-    v = String(v || '');
-    return v.length >= 8 && /\d/.test(v);
-  }
+  document.addEventListener('click', function (e) {
+    var btn = e.target.closest('[data-eye]');
+    if (!btn) return;
+    var id = btn.getAttribute('data-eye');
+    var input = document.getElementById(id);
+    if (!input) return;
+    input.type = input.type === 'password' ? 'text' : 'password';
+  }); // Helpers
 
-  document.addEventListener('DOMContentLoaded', function () {
-    // Tabs
-    var tLogin = $('tab-login'),
-        tReg = $('tab-register');
-    var pLogin = $('panel-login'),
-        pReg = $('panel-register');
+  function okEmail(v) {
+    return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(v || '');
+  } // LOGIN
 
-    function activate(which) {
-      var isLogin = which === 'login';
-      tLogin.classList.toggle('is-active', isLogin);
-      tReg.classList.toggle('is-active', !isLogin);
-      pLogin.hidden = !isLogin;
-      pReg.hidden = isLogin;
-      pLogin.classList.toggle('is-active', isLogin);
-      pReg.classList.toggle('is-active', !isLogin);
-    }
 
-    tLogin.addEventListener('click', function () {
-      activate('login');
-    });
-    tReg.addEventListener('click', function () {
-      activate('register');
-    }); // show/hide password
+  var loginForm = document.getElementById('loginForm');
 
-    document.querySelectorAll('.f-eye[data-eye]').forEach(function (btn) {
-      btn.addEventListener('click', function () {
-        var input = $(btn.getAttribute('data-eye'));
-        if (!input) return;
-        input.type = input.type === 'password' ? 'text' : 'password';
-      });
-    }); // LOGIN
-
-    $('loginForm').addEventListener('submit', function (e) {
+  if (loginForm) {
+    loginForm.addEventListener('submit', function (e) {
       e.preventDefault();
-      var email = ($('loginEmail').value || '').trim();
-      var pass = $('loginPassword').value || '';
-      var remember = $('rememberMe').checked;
-      $('loginEmailErr').textContent = '';
-      $('loginPasswordErr').textContent = '';
-      var ok = true;
+      var email = (document.getElementById('loginEmail') || {}).value || '';
+      var pass = (document.getElementById('loginPassword') || {}).value || '';
 
-      if (!validEmail(email)) {
-        $('loginEmailErr').textContent = 'אימייל לא תקין';
-        ok = false;
+      if (!okEmail(email) || pass.length < 1) {
+        (document.getElementById('loginEmailErr') || {}).textContent = okEmail(email) ? '' : 'אימייל לא תקין';
+        (document.getElementById('loginPasswordErr') || {}).textContent = pass ? '' : 'נדרש סיסמה';
+        return;
       }
 
-      if (!pass) {
-        $('loginPasswordErr').textContent = 'נא להזין סיסמה';
-        ok = false;
-      }
-
-      if (!ok) return;
       var user = {
+        id: Date.now(),
         email: email,
-        name: email.split('@')[0],
-        ts: Date.now(),
-        remember: !!remember
+        name: email.split('@')[0]
       };
 
       try {
-        localStorage.setItem('auth.user', JSON.stringify(user));
-        if (remember) sessionStorage.setItem('auth.session', 'keep');
-      } catch (e) {}
+        localStorage.setItem('authUser', JSON.stringify(user));
+        localStorage.removeItem('looz:loggedOut');
+        localStorage.setItem('looz:justLoggedIn', '1');
+      } catch (_) {}
 
-      location.replace('/Calendar/index.html');
-    }); // REGISTER
+      window.location.replace('/Calendar/index.html');
+    });
+  } // REGISTER
 
-    $('registerForm').addEventListener('submit', function (e) {
+
+  var regForm = document.getElementById('registerForm');
+
+  if (regForm) {
+    regForm.addEventListener('submit', function (e) {
       e.preventDefault();
-      var name = ($('regName').value || '').trim();
-      var email = ($('regEmail').value || '').trim();
-      var pass = $('regPassword').value || '';
-      var conf = $('regConfirm').value || '';
-      var terms = $('regTerms').checked;
-      $('regNameErr').textContent = '';
-      $('regEmailErr').textContent = '';
-      $('regPasswordErr').textContent = '';
-      $('regConfirmErr').textContent = '';
+      var name = (document.getElementById('regName') || {}).value || '';
+      var email = (document.getElementById('regEmail') || {}).value || '';
+      var pass = (document.getElementById('regPassword') || {}).value || '';
+      var conf = (document.getElementById('regConfirm') || {}).value || '';
+      var terms = (document.getElementById('regTerms') || {}).checked;
       var ok = true;
 
       if (!name) {
-        $('regNameErr').textContent = 'נא להזין שם';
+        (document.getElementById('regNameErr') || {}).textContent = 'נדרש שם';
         ok = false;
-      }
+      } else (document.getElementById('regNameErr') || {}).textContent = '';
 
-      if (!validEmail(email)) {
-        $('regEmailErr').textContent = 'אימייל לא תקין';
+      if (!okEmail(email)) {
+        (document.getElementById('regEmailErr') || {}).textContent = 'אימייל לא תקין';
         ok = false;
-      }
+      } else (document.getElementById('regEmailErr') || {}).textContent = '';
 
-      if (!validPass(pass)) {
-        $('regPasswordErr').textContent = 'סיסמה: 8+ תווים ולפחות ספרה אחת';
+      if (pass.length < 8 || !/\d/.test(pass)) {
+        (document.getElementById('regPasswordErr') || {}).textContent = 'לפחות 8 תווים ומספר';
         ok = false;
-      }
+      } else (document.getElementById('regPasswordErr') || {}).textContent = '';
 
-      if (pass !== conf) {
-        $('regConfirmErr').textContent = 'סיסמאות אינן תואמות';
+      if (conf !== pass) {
+        (document.getElementById('regConfirmErr') || {}).textContent = 'לא תואם';
         ok = false;
-      }
+      } else (document.getElementById('regConfirmErr') || {}).textContent = '';
 
       if (!terms) {
-        alert('יש לאשר את התנאים');
         ok = false;
       }
 
       if (!ok) return;
       var user = {
+        id: Date.now(),
         email: email,
-        name: name,
-        ts: Date.now(),
-        "new": true
+        name: name
       };
 
       try {
-        localStorage.setItem('auth.user', JSON.stringify(user));
-      } catch (e) {}
+        localStorage.setItem('authUser', JSON.stringify(user));
+        localStorage.removeItem('looz:loggedOut');
+        localStorage.setItem('looz:justLoggedIn', '1');
+      } catch (_) {}
 
-      location.replace('/Calendar/index.html');
+      window.location.replace('/Calendar/index.html');
     });
-  });
+  }
 })();
