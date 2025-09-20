@@ -1,4 +1,3 @@
-
 /* LooZ — Planner App (home) */
 (function(){
   'use strict';
@@ -267,6 +266,7 @@
         '<span class="p-day__date">'+ pad2(day.getDate())+'.'+pad2(day.getMonth()+1) +'</span>';
       box.appendChild(head);
 
+      // (No tasks list shown in week view — just the counter)
       wrap.appendChild(box);
     }
     plannerRoot.appendChild(wrap);
@@ -492,8 +492,47 @@
     if (trg){ e.preventDefault(); handleLogout(); }
   });
 
-  /* ===================== Welcome Lemon (v3 — anchored to #lemonToggle) ===================== */
-  (function setupWelcomeIntro(){
+  /* ===================== Style injections (alignment, counters, effects) ===================== */
+  (function injectRuntimeStyles(){
+    if (document.getElementById('looz-runtime-style')) return;
+    var s = document.createElement('style');
+    s.id = 'looz-runtime-style';
+    s.textContent = `
+      /* Week header: 3-column grid: day | counter | date  */
+      .p-day__head--grid{display:grid;grid-template-columns:1fr auto 1fr;align-items:center;gap:.25rem}
+      .p-day__head--grid .p-day__name{justify-self:end}
+      .p-day__head--grid .p-day__date{justify-self:start}
+
+      /* Counters — hairline border, small footprint */
+      .p-counter{font:600 .68rem/1.05 'Rubik',system-ui,sans-serif;padding:.15rem .33rem;border:.75px solid currentColor;border-radius:999rem;opacity:.9}
+      .cnt--0{opacity:.28}
+      .cnt--1{color:#16a34a}
+      .cnt--2{color:#f59e0b}
+      .cnt--3{color:#ec4899}
+      .cnt--4{color:#6366f1}
+      .cnt--5{color:#06b6d4}
+      .cnt--6{color:#dc2626}
+      .cnt--7{color:hsl(calc(20 + (var(--h,0))*1deg),90%,50%)}
+
+      /* Month cell counter: tiny chip, never overlaps center date */
+      .p-month .p-cell{position:relative}
+      .p-month .p-cell__num{position:relative;z-index:1}
+      .p-month .p-cell__count{position:absolute;inset-inline-start:6px;inset-block-start:6px;z-index:2;font-size:.62rem;padding:.10rem .28rem}
+
+      /* Confetti + scratch styles */
+      .confetti{position:fixed;transform:translate(-50%,-50%);pointer-events:none;z-index:9999}
+      .confetti i{position:absolute;left:0;top:0;border-radius:2px;opacity:0;animation:cf 700ms ease forwards}
+      @keyframes cf{0%{opacity:1;transform:translate(0,0) scale(1)}100%{opacity:0;transform:translate(var(--tx),var(--ty)) scale(.9)}}
+      .scratch-out{position:relative;animation:scratchFade .42s ease forwards}
+      .scratch-out::after{content:"";position:absolute;inset-inline-start:-6px;inset-block-start:50%;height:2px;width:0;background:currentColor;opacity:.9;box-shadow:0 0 1px rgba(0,0,0,.25);animation:scratch 0.42s ease forwards}
+      @keyframes scratch{to{width:110%;opacity:0}}
+      @keyframes scratchFade{to{opacity:.0;transform:translateX(-8px)}}
+    `;
+    document.head.appendChild(s);
+  })();
+
+  /* ===================== Welcome Lemon on BLANK page (veil → reveal) ===================== */
+  (function setupWelcomeVeil(){
     function injectStyleOnce(id, css){
       if (document.getElementById(id)) return;
       var s = document.createElement('style');
@@ -501,94 +540,90 @@
       document.head.appendChild(s);
     }
 
-    injectStyleOnce('looz-welcome-style-v3', `
-      .wl{ position:fixed; inset:0; z-index:9999; pointer-events:none; }
-      .wl__anchor{ position:fixed; transform:translate(-50%,-50%); width: var(--wl-size, 108px); height:auto; filter: drop-shadow(0 14px 34px rgba(6,12,26,.38)); }
-      .wl__wrap{ position:relative; width:100%; opacity:0; transform: scale(.84); filter: blur(12px); animation: wl-in-v3 1400ms cubic-bezier(.16,1,.3,1) forwards; }
-      .wl__wrap::after{ content:""; position:absolute; left:50%; bottom:-10px; transform:translateX(-50%); width:120%; height:16px; border-radius:50%; background: radial-gradient(50% 70% at 50% 50%, rgba(255,232,150,.38), rgba(0,0,0,0) 70%); filter: blur(3px); opacity:0; animation: wl-halo 1400ms ease forwards 200ms; }
-      .wl__svg{ display:block; width:100%; height:auto; }
-      .wl__sweep{ transform: translateY(80%); animation: wl-sweep-vibrant 1600ms cubic-bezier(.16,1,.3,1) 550ms forwards; }
-      .wl__glint{ transform: translateY(78%) scale(.9); opacity:0; animation: wl-glint 1300ms cubic-bezier(.16,1,.3,1) 680ms forwards; }
-      .wl__wrap.is-collapsing{ animation: wl-collapse 520ms cubic-bezier(.4,0,.2,1) forwards; }
-      @keyframes wl-in-v3{ 0%{opacity:0;transform:scale(.84);filter:blur(12px)} 50%{opacity:.9;filter:blur(3px)} 100%{opacity:1;transform:scale(1);filter:blur(0)} }
-      @keyframes wl-halo{ 0%{opacity:0;transform:translateX(-50%) scale(.9)} 100%{opacity:1;transform:translateX(-50%) scale(1)} }
-      @keyframes wl-sweep-vibrant{ 0%{transform:translateY(80%);opacity:.65} 70%{transform:translateY(-6%);opacity:.95} 100%{transform:translateY(-16%);opacity:0} }
-      @keyframes wl-glint{ 0%{transform:translateY(78%) scale(.9);opacity:0} 55%{opacity:.95} 100%{transform:translateY(-10%) scale(1.06);opacity:0} }
-      @keyframes wl-collapse{ 0%{opacity:1;transform:scale(1);filter:blur(0)} 60%{opacity:.5;transform:scale(.88);filter:blur(1.5px)} 100%{opacity:0;transform:scale(.84);filter:blur(2.5px)} }
+    injectStyleOnce('looz-welcome-veil-style', `
+      .wveil{position:fixed;inset:0;z-index:10000;display:grid;place-items:center;pointer-events:none;opacity:1;transition:opacity .9s ease}
+      .wveil.is-fade{opacity:0}
+      .wveil__wrap{position:relative;width:clamp(96px,26vw,168px);opacity:0;transform:scale(.78);filter:blur(16px);animation:wv-in 2000ms cubic-bezier(.16,1,.3,1) forwards}
+      .wveil__wrap::after{content:"";position:absolute;left:50%;bottom:-12px;transform:translateX(-50%);width:120%;height:16px;border-radius:50%;background:radial-gradient(50% 70% at 50% 50%, rgba(255,232,150,.38), rgba(0,0,0,0) 70%);filter:blur(3px);opacity:0;animation: wv-halo 2000ms ease forwards 300ms}
+      .wveil__svg{display:block;width:100%;height:auto;filter:drop-shadow(0 18px 38px rgba(6,12,26,.38))}
+      .wveil__sweep{transform:translateY(82%);animation:wv-sweep 1800ms cubic-bezier(.16,1,.3,1) 700ms forwards}
+      .wveil__glint{transform:translateY(80%) scale(.9);opacity:0;animation:wv-glint 1500ms cubic-bezier(.16,1,.3,1) 820ms forwards}
+      .wveil__wrap.is-collapse{animation: wv-collapse 560ms cubic-bezier(.4,0,.2,1) forwards}
+      @keyframes wv-in{0%{opacity:0;transform:scale(.78);filter:blur(16px)}60%{opacity:.95;filter:blur(3px)}100%{opacity:1;transform:scale(1);filter:blur(0)}}
+      @keyframes wv-halo{0%{opacity:0;transform:translateX(-50%) scale(.9)}100%{opacity:1;transform:translateX(-50%) scale(1)}}
+      @keyframes wv-sweep{0%{transform:translateY(82%);opacity:.65}70%{transform:translateY(-6%);opacity:.95}100%{transform:translateY(-16%);opacity:0}}
+      @keyframes wv-glint{0%{transform:translateY(80%) scale(.9);opacity:0}55%{opacity:.95}100%{transform:translateY(-10%) scale(1.06);opacity:0}}
+      @keyframes wv-collapse{0%{opacity:1;transform:scale(1);filter:blur(0)}60%{opacity:.55;transform:scale(.9);filter:blur(1.5px)}100%{opacity:0;transform:scale(.84);filter:blur(2px)}}
     `);
 
-    function getAnchor(){
-      var btn = document.getElementById('lemonToggle');
-      if (btn){
-        var r = btn.getBoundingClientRect();
-        var size = Math.max(90, Math.min(140, r.width * 1.6));
-        return { x:r.left + r.width/2, y:r.top + r.height/2, size:size };
-      }
-      return { x: window.innerWidth/2, y: window.innerHeight - 120, size:120 };
+    function isDarkBG(){
+      try{
+        if (document.documentElement.dataset.theme === 'dark') return true;
+        if (document.documentElement.classList.contains('is-dark')) return true;
+        return window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
+      }catch(e){ return false; }
     }
 
-    function welcomeIntro(){
-      var a = getAnchor();
-      var root = document.createElement('div');
-      root.className = 'wl';
-
-      var anchor = document.createElement('div');
-      anchor.className = 'wl__anchor';
-      anchor.style.left = a.x + 'px';
-      anchor.style.top  = a.y + 'px';
-      anchor.style.setProperty('--wl-size', a.size + 'px');
+    function showVeil(){
+      var veil = document.createElement('div');
+      veil.className = 'wveil';
+      veil.style.background = isDarkBG() ? '#0b1220' : '#ffffff';
 
       var wrap = document.createElement('div');
-      wrap.className = 'wl__wrap';
-
+      wrap.className = 'wveil__wrap';
       wrap.innerHTML = `
-        <svg class="wl__svg" viewBox="0 0 24 24" aria-hidden="true">
+        <svg class="wveil__svg" viewBox="0 0 24 24" aria-hidden="true">
           <defs>
-            <radialGradient id="lemFill3" cx="50%" cy="40%" r="75%">
+            <radialGradient id="lemFillV" cx="50%" cy="40%" r="75%">
               <stop offset="0%"  stop-color="#FFF8C6"/>
               <stop offset="50%" stop-color="#FFE36E"/>
               <stop offset="100%" stop-color="#F7C843"/>
             </radialGradient>
-            <linearGradient id="sweepVibrant" x1="0" y1="1" x2="0" y2="0">
+            <linearGradient id="sweepV" x1="0" y1="1" x2="0" y2="0">
               <stop offset="0%"   stop-color="rgba(0,229,255,0)"/>
               <stop offset="28%"  stop-color="rgba(0,229,255,.30)"/>
               <stop offset="54%"  stop-color="rgba(255,215,102,.70)"/>
               <stop offset="78%"  stop-color="rgba(136,167,255,.40)"/>
               <stop offset="100%" stop-color="rgba(0,229,255,0)"/>
             </linearGradient>
-            <radialGradient id="glintGrad3" cx="50%" cy="50%" r="60%">
+            <radialGradient id="glintV" cx="50%" cy="50%" r="60%">
               <stop offset="0%" stop-color="rgba(255,248,198,.98)"/>
               <stop offset="70%" stop-color="rgba(255,214,100,.45)"/>
               <stop offset="100%" stop-color="rgba(255,214,100,0)"/>
             </radialGradient>
-            <clipPath id="lemClip3">
+            <clipPath id="lemClipV">
               <path d="M19 7c-3-3-8-3-11 0-2 2.3-2 6 0 8 2.2 2.1 5.8 2.4 8 0 2.2-2.1 2.6-5.4 1-7.6"/>
             </clipPath>
           </defs>
           <g>
             <path d="M19 7c-3-3-8-3-11 0-2 2.3-2 6 0 8 2.2 2.1 5.8 2.4 8 0 2.2-2.1 2.6-5.4 1-7.6"
-                  fill="url(#lemFill3)" stroke="#C59A21" stroke-width="1.15"/>
+                  fill="url(#lemFillV)" stroke="#C59A21" stroke-width="1.15"/>
             <path d="M18 6c.9-.9 1.7-1.8 2.3-2.8" stroke="#6FA14D" stroke-linecap="round" stroke-width="1.2"/>
           </g>
-          <g clip-path="url(#lemClip3)">
-            <rect class="wl__sweep" x="0" y="0" width="100%" height="140%" fill="url(#sweepVibrant)"/>
-            <circle class="wl__glint" cx="12" cy="22" r="3.6" fill="url(#glintGrad3)"/>
+          <g clip-path="url(#lemClipV)">
+            <rect class="wveil__sweep" x="0" y="0" width="100%" height="140%" fill="url(#sweepV)"/>
+            <circle class="wveil__glint" cx="12" cy="22" r="3.6" fill="url(#glintV)"/>
           </g>
         </svg>
       `;
 
-      anchor.appendChild(wrap);
-      root.appendChild(anchor);
-      document.body.appendChild(root);
+      veil.appendChild(wrap);
+      document.body.appendChild(veil);
 
-      setTimeout(function(){ wrap.classList.add('is-collapsing'); }, 1750);
-      setTimeout(function(){ root.remove(); }, 2450);
+      // Collapse lemon then fade the veil to reveal app
+      var collapseAt = 2200;      // more noticeable fade-in time
+      var removeAt   = collapseAt + 900;
+
+      setTimeout(function(){ wrap.classList.add('is-collapse'); }, collapseAt);
+      setTimeout(function(){ veil.classList.add('is-fade'); }, collapseAt + 200);
+      setTimeout(function(){ veil.remove(); }, removeAt);
     }
 
     try{
       if (localStorage.getItem('looz:justLoggedIn') === '1'){
         localStorage.removeItem('looz:justLoggedIn');
-        requestAnimationFrame(function(){ setTimeout(welcomeIntro, 60); });
+        // Show the blank veil immediately on first paint
+        requestAnimationFrame(showVeil);
       }
     }catch(e){}
   })();
@@ -598,4 +633,3 @@
   state.current = today;
   render();
 })();
-
