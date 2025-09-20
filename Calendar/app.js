@@ -1,3 +1,4 @@
+
 /* LooZ — Planner App (home) */
 (function(){
   'use strict';
@@ -93,7 +94,7 @@
   function setGreeting(){
     const name = getDisplayName();
     const au = getAuth();
-    const SPECIAL_EMAIL = 'special.person@example.com'; // set your VIP here
+    const SPECIAL_EMAIL = 'special.person@example.com'; // your VIP
     if (subtitleEl){
       if (au && au.email === SPECIAL_EMAIL){
         subtitleEl.innerHTML = '✨ שמחים לראותך שוב, <strong>'+escapeHtml(name)+'</strong>. לוח מושלם מחכה לך.';
@@ -120,6 +121,23 @@
   var state = { view:(prefs.defaultView||'day'), current:today, tasks:loadTasks() };
 
   function markToday(){ if (titleBadge) titleBadge.setAttribute('data-today','1'); }
+
+  /* ===================== Counter helpers ===================== */
+  function tasksCountFor(ymd){
+    var n = 0;
+    for (var i=0;i<state.tasks.length;i++) if (state.tasks[i].date===ymd) n++;
+    return n;
+  }
+  function counterClassFor(n){
+    if (n<=0)  return 'cnt--0';
+    if (n<=2)  return 'cnt--1';
+    if (n<=5)  return 'cnt--2';
+    if (n<=8)  return 'cnt--3';
+    if (n<=12) return 'cnt--4';
+    if (n<=16) return 'cnt--5';
+    if (n<=20) return 'cnt--6';
+    return 'cnt--7';
+  }
 
   /* ===================== Lemon nav ===================== */
   (function initNav(){
@@ -208,7 +226,6 @@
   function renderWeek(){
     plannerRoot.innerHTML = '';
 
-    // Week bar (prev / title / next)
     var bar = document.createElement('div');
     bar.className = 'p-weekbar';
     bar.innerHTML =
@@ -221,8 +238,7 @@
     plannerRoot.appendChild(bar);
 
     bar.addEventListener('click', function(e){
-      var a = e.target.closest('[data-weeknav]');
-      if (!a) return;
+      var a = e.target.closest('[data-weeknav]'); if (!a) return;
       var kind = a.getAttribute('data-weeknav');
       if (kind==='prev'){ state.current.setDate(state.current.getDate()-7); }
       else if (kind==='next'){ state.current.setDate(state.current.getDate()+7); }
@@ -230,7 +246,6 @@
       render(); persistPrefs();
     });
 
-    // Week grid
     var wrap = document.createElement('div');
     wrap.className = 'p-week';
 
@@ -238,34 +253,19 @@
     for (var i=0;i<7;i++){
       var day = new Date(start); day.setDate(start.getDate()+i);
       var ymd = dateKey(day);
+      var n   = tasksCountFor(ymd);
 
       var box = document.createElement('div');
       box.className = 'p-day' + (sameDay(day, new Date()) ? ' p-day--today' : '');
       box.dataset.goto = ymd;
 
       var head = document.createElement('div');
-      head.className = 'p-day__head';
+      head.className = 'p-day__head p-day__head--grid';
       head.innerHTML =
         '<span class="p-day__name">'+ HEB_DAYS[day.getDay()] +'</span>'+
+        (n>0 ? ('<span class="p-counter '+counterClassFor(n)+'" title="'+n+' משימות">'+n+'</span>') : '<span class="p-counter cnt--0" aria-hidden="true">0</span>')+
         '<span class="p-day__date">'+ pad2(day.getDate())+'.'+pad2(day.getMonth()+1) +'</span>';
       box.appendChild(head);
-
-      var dayTasks = state.tasks
-        .filter(function(t){ return t.date===ymd; })
-        .sort(function(a,b){ return (a.time||'').localeCompare(b.time||''); });
-
-      dayTasks.forEach(function(t){
-        var row = document.createElement('div');
-        row.className = 'p-task';
-        row.innerHTML =
-          '<div class="p-task__text">'+ escapeHtml(t.title) +'</div>'+
-          '<div class="p-task__time">'+ (t.time||'') +'</div>'+
-          '<div class="p-task__actions">'+
-            '<button class="p-task__btn" data-done="'+t.id+'">בוצע</button>'+
-            '<button class="p-task__btn" data-del="'+t.id+'">מחק</button>'+
-          '</div>';
-        box.appendChild(row);
-      });
 
       wrap.appendChild(box);
     }
@@ -275,7 +275,6 @@
   function renderMonth(){
     plannerRoot.innerHTML = '';
 
-    // Month bar (prev / title / next)
     var bar = document.createElement('div');
     bar.className = 'p-monthbar';
     bar.innerHTML =
@@ -290,8 +289,7 @@
     plannerRoot.appendChild(bar);
 
     bar.addEventListener('click', function(e){
-      var a = e.target.closest('[data-monthnav]');
-      if (!a) return;
+      var a = e.target.closest('[data-monthnav]'); if (!a) return;
       var kind = a.getAttribute('data-monthnav');
       if (kind==='prev'){ state.current = addMonths(startOfMonth(state.current), -1); }
       else if (kind==='next'){ state.current = addMonths(startOfMonth(state.current), 1); }
@@ -310,6 +308,7 @@
     for (var i=0;i<42;i++){
       var day = new Date(start); day.setDate(start.getDate()+i);
       var ymd = dateKey(day);
+      var n   = tasksCountFor(ymd);
 
       var cell = document.createElement('div');
       var cls = 'p-cell';
@@ -324,18 +323,23 @@
       num.textContent = day.getDate();
       cell.appendChild(num);
 
+      if (n>0){
+        var cnt = document.createElement('span');
+        cnt.className = 'p-cell__count p-counter '+counterClassFor(n);
+        cnt.textContent = n;
+        cell.appendChild(cnt);
+      }
+
       grid.appendChild(cell);
     }
     plannerRoot.appendChild(grid);
   }
 
   /* ===================== Interactions ===================== */
-  // view tabs
   if (btnDay)   btnDay.addEventListener('click',  function(){ state.view='day';   render(); prefs.defaultView='day';   persistPrefs(); });
   if (btnWeek)  btnWeek.addEventListener('click', function(){ state.view='week';  render(); prefs.defaultView='week';  persistPrefs(); });
   if (btnMonth) btnMonth.addEventListener('click',function(){ state.view='month'; render(); prefs.defaultView='month'; persistPrefs(); });
 
-  // go to a specific day (week+month cards)
   if (plannerRoot){
     plannerRoot.addEventListener('click', function(e){
       var host = e.target && e.target.closest('[data-goto]');
@@ -348,8 +352,8 @@
       }
       var doneId = e.target && e.target.getAttribute('data-done');
       var delId  = e.target && e.target.getAttribute('data-del');
-      if (doneId){ state.tasks = state.tasks.filter(t => t.id!==doneId); saveTasks(); render(); }
-      else if (delId){ state.tasks = state.tasks.filter(t => t.id!==delId); saveTasks(); render(); }
+      if (doneId){ completeTask(doneId, e); }
+      else if (delId){ removeTask(delId, e); }
     });
   }
 
@@ -378,8 +382,7 @@
         e.preventDefault();
         var kind = qd.getAttribute('data-date');
         var base = new Date();
-        if (kind==='today'){}
-        else if (kind==='tomorrow'){ base.setDate(base.getDate()+1); }
+        if (kind==='tomorrow'){ base.setDate(base.getDate()+1); }
         else if (kind==='nextweek'){ base.setDate(base.getDate()+7); }
         else if (/^\+\d+$/.test(kind)){ base.setDate(base.getDate()+parseInt(kind.slice(1),10)); }
         if (dateInput) dateInput.value = dateKey(base);
@@ -399,15 +402,10 @@
         }
         return;
       }
-      var closeBtn = e.target && e.target.closest('[data-close]');
-      if (closeBtn){ e.preventDefault(); closeSheet(); }
+      var closeBtn = e.target && e.target.closest('[data-close]'); if (closeBtn){ e.preventDefault(); closeSheet(); }
     });
   }
-  if (sheet){
-    sheet.addEventListener('click', function(e){
-      if (e.target && e.target.matches('.c-sheet__backdrop')) closeSheet();
-    });
-  }
+  if (sheet){ sheet.addEventListener('click', function(e){ if (e.target && e.target.matches('.c-sheet__backdrop')) closeSheet(); }); }
   document.addEventListener('keydown', function(e){ if (e.key==='Escape') closeSheet(); });
 
   if (sheetForm){
@@ -428,7 +426,46 @@
     });
   }
 
-  /* ===================== Robust Log-out (works for #btnExit or [data-logout]) ===================== */
+  /* ===================== Complete / Delete animations ===================== */
+  function completeTask(id, evt){
+    var idx = state.tasks.findIndex(function(x){ return x.id===id; });
+    if (idx === -1) return;
+    var x = (evt && evt.clientX) || window.innerWidth/2;
+    var y = (evt && evt.clientY) || window.innerHeight/2;
+    confettiBurst(x,y);
+    state.tasks.splice(idx,1);
+    saveTasks(); render();
+  }
+  function removeTask(id, evt){
+    var el = evt && evt.target && evt.target.closest('.p-daytask');
+    if (el) { el.classList.add('scratch-out'); setTimeout(function(){ reallyRemove(id); }, 420); }
+    else { reallyRemove(id); }
+  }
+  function reallyRemove(id){
+    state.tasks = state.tasks.filter(function(t){ return t.id!==id; });
+    saveTasks(); render();
+  }
+  function confettiBurst(x,y){
+    var root = document.createElement('div');
+    root.className = 'confetti';
+    document.body.appendChild(root);
+    var colors = ['#60a5fa','#34d399','#f472b6','#f59e0b','#a78bfa','#22d3ee'];
+    for (var i=0;i<80;i++){
+      var s = document.createElement('i');
+      var deg = Math.random()*360;
+      var dist = 40 + Math.random()*120;
+      var size = 6 + Math.random()*10;
+      s.style.setProperty('--tx', (Math.cos(deg)*dist).toFixed(1)+'px');
+      s.style.setProperty('--ty', (Math.sin(deg)*dist).toFixed(1)+'px');
+      s.style.width = size+'px'; s.style.height=size+'px';
+      s.style.background = colors[i % colors.length];
+      root.appendChild(s);
+    }
+    root.style.left = x+'px'; root.style.top = y+'px';
+    setTimeout(function(){ root.remove(); }, 900);
+  }
+
+  /* ===================== Robust Log-out ===================== */
   function clearAuthAll(){
     try{
       var KEYS = [
@@ -443,17 +480,11 @@
     }catch(e){}
   }
   function handleLogout(){
-    // prevent any stray handlers from re-writing auth during this tick
     window.__loozLoggingOut = true;
     clearAuthAll();
-    // hard replace so Back won’t bounce you into the app again
-    try{
-      // add a small tombstone so auth.html can also clean extras if it wants
-      localStorage.setItem('looz:loggedOut', '1');
-    }catch(e){}
+    try{ localStorage.setItem('looz:loggedOut', '1'); }catch(e){}
     window.location.replace('/Calendar/auth.html?loggedout=1');
   }
-  // attach both direct and delegated handlers (covers late DOM or markup changes)
   var exitBtn = document.getElementById('btnExit');
   if (exitBtn) exitBtn.addEventListener('click', function(ev){ ev.preventDefault(); handleLogout(); });
   document.addEventListener('click', function(e){
@@ -461,71 +492,110 @@
     if (trg){ e.preventDefault(); handleLogout(); }
   });
 
-  /* ===================== Elegant post-login intro (glowy lemon) ===================== */
-  function welcomeIntro(){
-    var root = document.createElement('div');
-    root.className = 'looz-welcome';
-    root.innerHTML = '<div class="looz-welcome__scrim"></div>';
-
-    var wrap = document.createElement('div');
-    wrap.className = 'lw-wrap';
-
-    var halo = document.createElement('div');
-    halo.className = 'lw-halo';
-
-    var lemon = document.createElement('div');
-    lemon.className = 'lw-lemon';
-    lemon.innerHTML = `
-      <svg viewBox="0 0 64 64" width="96" height="96" aria-hidden="true">
-        <defs>
-          <radialGradient id="wLemonCore" cx="48%" cy="40%" r="60%">
-            <stop offset="0%"  stop-color="#FFF8C6"/>
-            <stop offset="62%" stop-color="#FFE36E"/>
-            <stop offset="100%" stop-color="#F7C843"/>
-          </radialGradient>
-          <linearGradient id="wLeaf" x1="0%" y1="0%" x2="100%" y2="100%">
-            <stop offset="0%" stop-color="#8BC34A"/>
-            <stop offset="100%" stop-color="#4E8B2A"/>
-          </linearGradient>
-        </defs>
-        <path d="M48 20c-9-9-23-9-32 0-6 6-6 16 0 22 6.4 6 16.9 6.9 23.4 0 6.4-6.1 7.6-15.6 1.6-22"
-              fill="url(#wLemonCore)" stroke="#C59A21" stroke-width="1.2"/>
-        <path d="M45 18c2.9-2.9 5.5-5.8 7.4-8.7" stroke="url(#wLeaf)" stroke-width="2.2" stroke-linecap="round"/>
-      </svg>
-    `;
-
-    var shine = document.createElement('div');
-    shine.className = 'lw-shine';
-
-    var rays = document.createElement('div');
-    rays.className = 'lw-rays';
-    for (var i=0;i<12;i++){
-      var r = document.createElement('span');
-      r.className = 'lw-ray';
-      r.style.setProperty('--a', (i*30)+'deg');
-      r.style.animationDelay = (80 + i*20) + 'ms';
-      rays.appendChild(r);
+  /* ===================== Welcome Lemon (v3 — anchored to #lemonToggle) ===================== */
+  (function setupWelcomeIntro(){
+    function injectStyleOnce(id, css){
+      if (document.getElementById(id)) return;
+      var s = document.createElement('style');
+      s.id = id; s.textContent = css;
+      document.head.appendChild(s);
     }
 
-    wrap.appendChild(halo);
-    wrap.appendChild(lemon);
-    wrap.appendChild(shine);
-    wrap.appendChild(rays);
-    root.appendChild(wrap);
-    document.body.appendChild(root);
+    injectStyleOnce('looz-welcome-style-v3', `
+      .wl{ position:fixed; inset:0; z-index:9999; pointer-events:none; }
+      .wl__anchor{ position:fixed; transform:translate(-50%,-50%); width: var(--wl-size, 108px); height:auto; filter: drop-shadow(0 14px 34px rgba(6,12,26,.38)); }
+      .wl__wrap{ position:relative; width:100%; opacity:0; transform: scale(.84); filter: blur(12px); animation: wl-in-v3 1400ms cubic-bezier(.16,1,.3,1) forwards; }
+      .wl__wrap::after{ content:""; position:absolute; left:50%; bottom:-10px; transform:translateX(-50%); width:120%; height:16px; border-radius:50%; background: radial-gradient(50% 70% at 50% 50%, rgba(255,232,150,.38), rgba(0,0,0,0) 70%); filter: blur(3px); opacity:0; animation: wl-halo 1400ms ease forwards 200ms; }
+      .wl__svg{ display:block; width:100%; height:auto; }
+      .wl__sweep{ transform: translateY(80%); animation: wl-sweep-vibrant 1600ms cubic-bezier(.16,1,.3,1) 550ms forwards; }
+      .wl__glint{ transform: translateY(78%) scale(.9); opacity:0; animation: wl-glint 1300ms cubic-bezier(.16,1,.3,1) 680ms forwards; }
+      .wl__wrap.is-collapsing{ animation: wl-collapse 520ms cubic-bezier(.4,0,.2,1) forwards; }
+      @keyframes wl-in-v3{ 0%{opacity:0;transform:scale(.84);filter:blur(12px)} 50%{opacity:.9;filter:blur(3px)} 100%{opacity:1;transform:scale(1);filter:blur(0)} }
+      @keyframes wl-halo{ 0%{opacity:0;transform:translateX(-50%) scale(.9)} 100%{opacity:1;transform:translateX(-50%) scale(1)} }
+      @keyframes wl-sweep-vibrant{ 0%{transform:translateY(80%);opacity:.65} 70%{transform:translateY(-6%);opacity:.95} 100%{transform:translateY(-16%);opacity:0} }
+      @keyframes wl-glint{ 0%{transform:translateY(78%) scale(.9);opacity:0} 55%{opacity:.95} 100%{transform:translateY(-10%) scale(1.06);opacity:0} }
+      @keyframes wl-collapse{ 0%{opacity:1;transform:scale(1);filter:blur(0)} 60%{opacity:.5;transform:scale(.88);filter:blur(1.5px)} 100%{opacity:0;transform:scale(.84);filter:blur(2.5px)} }
+    `);
 
-    setTimeout(function(){ root.remove(); }, 1500);
-  }
-
-  try{
-    if (localStorage.getItem('looz:justLoggedIn') === '1'){
-      localStorage.removeItem('looz:justLoggedIn');
-      setTimeout(welcomeIntro, 40);
+    function getAnchor(){
+      var btn = document.getElementById('lemonToggle');
+      if (btn){
+        var r = btn.getBoundingClientRect();
+        var size = Math.max(90, Math.min(140, r.width * 1.6));
+        return { x:r.left + r.width/2, y:r.top + r.height/2, size:size };
+      }
+      return { x: window.innerWidth/2, y: window.innerHeight - 120, size:120 };
     }
-  }catch(_){}
+
+    function welcomeIntro(){
+      var a = getAnchor();
+      var root = document.createElement('div');
+      root.className = 'wl';
+
+      var anchor = document.createElement('div');
+      anchor.className = 'wl__anchor';
+      anchor.style.left = a.x + 'px';
+      anchor.style.top  = a.y + 'px';
+      anchor.style.setProperty('--wl-size', a.size + 'px');
+
+      var wrap = document.createElement('div');
+      wrap.className = 'wl__wrap';
+
+      wrap.innerHTML = `
+        <svg class="wl__svg" viewBox="0 0 24 24" aria-hidden="true">
+          <defs>
+            <radialGradient id="lemFill3" cx="50%" cy="40%" r="75%">
+              <stop offset="0%"  stop-color="#FFF8C6"/>
+              <stop offset="50%" stop-color="#FFE36E"/>
+              <stop offset="100%" stop-color="#F7C843"/>
+            </radialGradient>
+            <linearGradient id="sweepVibrant" x1="0" y1="1" x2="0" y2="0">
+              <stop offset="0%"   stop-color="rgba(0,229,255,0)"/>
+              <stop offset="28%"  stop-color="rgba(0,229,255,.30)"/>
+              <stop offset="54%"  stop-color="rgba(255,215,102,.70)"/>
+              <stop offset="78%"  stop-color="rgba(136,167,255,.40)"/>
+              <stop offset="100%" stop-color="rgba(0,229,255,0)"/>
+            </linearGradient>
+            <radialGradient id="glintGrad3" cx="50%" cy="50%" r="60%">
+              <stop offset="0%" stop-color="rgba(255,248,198,.98)"/>
+              <stop offset="70%" stop-color="rgba(255,214,100,.45)"/>
+              <stop offset="100%" stop-color="rgba(255,214,100,0)"/>
+            </radialGradient>
+            <clipPath id="lemClip3">
+              <path d="M19 7c-3-3-8-3-11 0-2 2.3-2 6 0 8 2.2 2.1 5.8 2.4 8 0 2.2-2.1 2.6-5.4 1-7.6"/>
+            </clipPath>
+          </defs>
+          <g>
+            <path d="M19 7c-3-3-8-3-11 0-2 2.3-2 6 0 8 2.2 2.1 5.8 2.4 8 0 2.2-2.1 2.6-5.4 1-7.6"
+                  fill="url(#lemFill3)" stroke="#C59A21" stroke-width="1.15"/>
+            <path d="M18 6c.9-.9 1.7-1.8 2.3-2.8" stroke="#6FA14D" stroke-linecap="round" stroke-width="1.2"/>
+          </g>
+          <g clip-path="url(#lemClip3)">
+            <rect class="wl__sweep" x="0" y="0" width="100%" height="140%" fill="url(#sweepVibrant)"/>
+            <circle class="wl__glint" cx="12" cy="22" r="3.6" fill="url(#glintGrad3)"/>
+          </g>
+        </svg>
+      `;
+
+      anchor.appendChild(wrap);
+      root.appendChild(anchor);
+      document.body.appendChild(root);
+
+      setTimeout(function(){ wrap.classList.add('is-collapsing'); }, 1750);
+      setTimeout(function(){ root.remove(); }, 2450);
+    }
+
+    try{
+      if (localStorage.getItem('looz:justLoggedIn') === '1'){
+        localStorage.removeItem('looz:justLoggedIn');
+        requestAnimationFrame(function(){ setTimeout(welcomeIntro, 60); });
+      }
+    }catch(e){}
+  })();
 
   /* ===================== Initial render ===================== */
   formatTitle(today);
   state.current = today;
   render();
 })();
+
