@@ -4,7 +4,29 @@
 (function () {
   'use strict';
 
-  // Tabs
+  // ---------- helpers ----------
+  function okEmail(v) {
+    return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(v || '');
+  }
+
+  // build a URL to a file in the app root that works
+  // - locally (no <base>)
+  // - on GitHub Pages (/username.github.io/<repo>/… via <base>)
+  function appUrl(file) {
+    var b = document.querySelector('base');
+    if (b && b.href) return new URL(file, b.href).href; // respect <base>
+    if (/github\.io$/.test(location.hostname)) {
+      // safety net
+      var seg = location.pathname.split('/').filter(Boolean)[0] || '';
+      return '/' + (seg ? seg + '/' : '') + file;
+    }
+    return file; // local
+  }
+  function go(file) {
+    location.assign(appUrl(file));
+  }
+
+  // ---------- tabs ----------
   var tLogin = document.getElementById('tab-login');
   var tReg = document.getElementById('tab-register');
   var pLogin = document.getElementById('panel-login');
@@ -25,33 +47,24 @@
     show('reg');
   });
 
-  // Password eye
+  // ---------- password eye ----------
   document.addEventListener('click', function (e) {
     var btn = e.target.closest('[data-eye]');
     if (!btn) return;
-    var id = btn.getAttribute('data-eye');
-    var input = document.getElementById(id);
-    if (!input) return;
-    input.type = input.type === 'password' ? 'text' : 'password';
+    var input = document.getElementById(btn.getAttribute('data-eye'));
+    if (input) input.type = input.type === 'password' ? 'text' : 'password';
   });
 
-  // Helpers
-  function okEmail(v) {
-    return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(v || '');
-  }
-
-  // LOGIN
+  // ---------- LOGIN ----------
   var loginForm = document.getElementById('loginForm');
   if (loginForm) {
     loginForm.addEventListener('submit', function (e) {
       e.preventDefault();
       var email = (document.getElementById('loginEmail') || {}).value || '';
       var pass = (document.getElementById('loginPassword') || {}).value || '';
-      if (!okEmail(email) || pass.length < 1) {
-        (document.getElementById('loginEmailErr') || {}).textContent = okEmail(email) ? '' : 'אימייל לא תקין';
-        (document.getElementById('loginPasswordErr') || {}).textContent = pass ? '' : 'נדרש סיסמה';
-        return;
-      }
+      (document.getElementById('loginEmailErr') || {}).textContent = okEmail(email) ? '' : 'אימייל לא תקין';
+      (document.getElementById('loginPasswordErr') || {}).textContent = pass ? '' : 'נדרש סיסמה';
+      if (!okEmail(email) || !pass) return;
       var user = {
         id: Date.now(),
         email: email,
@@ -62,11 +75,11 @@
         localStorage.removeItem('looz:loggedOut');
         localStorage.setItem('looz:justLoggedIn', '1');
       } catch (_) {}
-      window.location.replace('/index.html');
+      go('index.html'); // <<< relative navigation (works on GH Pages)
     });
   }
 
-  // REGISTER
+  // ---------- REGISTER ----------
   var regForm = document.getElementById('registerForm');
   if (regForm) {
     regForm.addEventListener('submit', function (e) {
@@ -77,25 +90,11 @@
       var conf = (document.getElementById('regConfirm') || {}).value || '';
       var terms = (document.getElementById('regTerms') || {}).checked;
       var ok = true;
-      if (!name) {
-        (document.getElementById('regNameErr') || {}).textContent = 'נדרש שם';
-        ok = false;
-      } else (document.getElementById('regNameErr') || {}).textContent = '';
-      if (!okEmail(email)) {
-        (document.getElementById('regEmailErr') || {}).textContent = 'אימייל לא תקין';
-        ok = false;
-      } else (document.getElementById('regEmailErr') || {}).textContent = '';
-      if (pass.length < 8 || !/\d/.test(pass)) {
-        (document.getElementById('regPasswordErr') || {}).textContent = 'לפחות 8 תווים ומספר';
-        ok = false;
-      } else (document.getElementById('regPasswordErr') || {}).textContent = '';
-      if (conf !== pass) {
-        (document.getElementById('regConfirmErr') || {}).textContent = 'לא תואם';
-        ok = false;
-      } else (document.getElementById('regConfirmErr') || {}).textContent = '';
-      if (!terms) {
-        ok = false;
-      }
+      (document.getElementById('regNameErr') || {}).textContent = name ? '' : (ok = false, 'נדרש שם');
+      (document.getElementById('regEmailErr') || {}).textContent = okEmail(email) ? '' : (ok = false, 'אימייל לא תקין');
+      (document.getElementById('regPasswordErr') || {}).textContent = pass.length >= 8 && /\d/.test(pass) ? '' : (ok = false, 'לפחות 8 תווים ומספר');
+      (document.getElementById('regConfirmErr') || {}).textContent = conf === pass ? '' : (ok = false, 'לא תואם');
+      if (!terms) ok = false;
       if (!ok) return;
       var user = {
         id: Date.now(),
@@ -107,7 +106,7 @@
         localStorage.removeItem('looz:loggedOut');
         localStorage.setItem('looz:justLoggedIn', '1');
       } catch (_) {}
-      window.location.replace('/index.html');
+      go('index.html'); // <<< relative navigation
     });
   }
 })();

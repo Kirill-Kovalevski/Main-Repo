@@ -1,18 +1,18 @@
-/* LooZ — Planner App (home) */
+
+/* ===== LooZ — Planner App (home) ===== */
 (function(){
   'use strict';
 
-  /* ===================== Helpers & Path ===================== */
-  var BASE = (function(){
-    // <base> may already be set in head snippet; fall back to folder
-    var b = window.__BASE__;
-    if (b) return b;
-    var p = location.pathname.replace(/[^\/]*$/, '');
-    return p || './';
+  /* -------- AUTH GUARD (runs before anything else) -------- */
+  (function guard(){
+    try{
+      var u = localStorage.getItem('authUser') || localStorage.getItem('auth.user');
+      if (!u) { location.replace('auth.html'); }
+    }catch(_){ location.replace('auth.html'); }
   })();
 
-  function go(href){ window.location.href = href; } // href is now relative thanks to <base>
-
+  /* ===================== Helpers & Path ===================== */
+  function go(href){ window.location.href = href; }
   function pad2(n){ return String(n).padStart(2,'0'); }
   function escapeHtml(s){
     return (s||'').replace(/[&<>"']/g, m => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m]));
@@ -37,8 +37,7 @@
     return s.getDate()+' '+sM+' – '+e.getDate()+' '+eM+' '+e.getFullYear();
   }
 
-  /* ===================== DOM ===================== */
-  // main nav
+  /* ===================== DOM refs ===================== */
   var btnProfile    = document.getElementById('btnProfile');
   var btnMenu       = document.getElementById('btnMenu');
   var btnCategories = document.getElementById('btnCategories');
@@ -49,7 +48,7 @@
   if (btnSocial)     btnSocial.addEventListener('click',    () => go('social.html'));
 
   var lemonToggle = document.getElementById('lemonToggle');
-  var lemonHost   = document.getElementById('lemonIcon'); // <span id="lemonIcon" class="lemon-host"></span> (must exist in header)
+  var lemonHost   = document.getElementById('lemonIcon');
   var appNav      = document.getElementById('appNav');
   var navPanel    = appNav ? appNav.querySelector('.c-nav__panel') : null;
 
@@ -73,10 +72,10 @@
   var subtitleEl = document.querySelector('.c-subtitle');
   var addEventBtn = document.getElementById('addEventBtn');
 
-  /* ===================== Greeting / profile name ===================== */
+  /* ===================== Greeting ===================== */
   function getAuth(){
     try{
-      const raw = localStorage.getItem('authUser');
+      const raw = localStorage.getItem('authUser') || localStorage.getItem('auth.user');
       if (!raw) return null;
       const o = JSON.parse(raw);
       return (o && typeof o === 'object') ? o : null;
@@ -98,11 +97,11 @@
   (function setGreeting(){
     var name = escapeHtml(getDisplayName());
     var au = getAuth();
-    var SPECIAL_EMAIL = 'special.person@example.com'; // your VIP email
+    var SPECIAL_EMAIL = 'special.person@example.com';
     if (subtitleEl){
       subtitleEl.innerHTML = (au && au.email === SPECIAL_EMAIL)
         ? '✨ שמחים לראותך שוב, <strong>'+name+'</strong>. לוח מושלם מחכה לך.'
-        : 'ברוך/ה השב/ה, <strong id="uiName">'+name+'</strong><br>מה בלוז היום?';
+        : 'ברוכה השבה, <strong id="uiName">'+name+'</strong>!<br>מה בלוז היום?';
     } else {
       var u = document.getElementById('uiName');
       if (u) u.textContent = name;
@@ -168,7 +167,7 @@
     if (n<=12) return 'cnt--violet';
     if (n<=16) return 'cnt--teal';
     if (n<=20) return 'cnt--amber';
-    return 'cnt--over'; // >20 hue-rotated
+    return 'cnt--over';
   }
 
   /* ===================== Renderers ===================== */
@@ -261,17 +260,16 @@
       box.className = 'p-day' + (sameDay(day, new Date()) ? ' p-day--today' : '');
       box.dataset.goto = ymd;
 
-      // header: [date-left] [counter-center] [day-right]
+      // header: [day-name] [counter-center] [date-number]
       var head = document.createElement('div');
       head.className = 'p-day__head';
       var count = state.tasks.filter(t=>t.date===ymd).length;
       head.innerHTML =
-        '<span class="p-day__date">'+ pad2(day.getDate())+'.'+pad2(day.getMonth()+1) +'</span>'+
+        '<span class="p-day__name">'+ HEB_DAYS[day.getDay()] +'</span>'+
         '<button class="p-day__count '+counterClass(count)+'" data-open="'+ymd+'" aria-label="צפה במשימות">'+ count +'</button>'+
-        '<span class="p-day__name">'+ HEB_DAYS[day.getDay()] +'</span>';
+        '<span class="p-day__date">'+ pad2(day.getDate())+'.'+pad2(day.getMonth()+1) +'</span>';
       box.appendChild(head);
 
-      // no tasks by default — added only when the counter is clicked
       wrap.appendChild(box);
     }
     plannerRoot.appendChild(wrap);
@@ -328,7 +326,7 @@
       num.textContent = day.getDate();
       cell.appendChild(num);
 
-      // tiny counter at top-left (never overlaps)
+      // tiny counter at top-left (won't overlap the number)
       var c = state.tasks.filter(t=>t.date===ymd).length;
       if (c>0){
         var badge = document.createElement('button');
@@ -356,21 +354,17 @@
   }
 
   /* ===================== Interactions ===================== */
-  // view tabs
   if (btnDay)   btnDay.addEventListener('click',  function(){ state.view='day';   render(); prefs.defaultView='day';   persistPrefs(); });
   if (btnWeek)  btnWeek.addEventListener('click', function(){ state.view='week';  render(); prefs.defaultView='week';  persistPrefs(); });
   if (btnMonth) btnMonth.addEventListener('click',function(){ state.view='month'; render(); prefs.defaultView='month'; persistPrefs(); });
 
-  // planner delegated interactions
   if (plannerRoot){
     plannerRoot.addEventListener('click', function(e){
-      // counters in week/month
       var openBtn = e.target && e.target.closest('[data-open]');
       if (openBtn){
         var dayKey = openBtn.getAttribute('data-open');
         var host = openBtn.closest('.p-day');
         if (host){
-          // week: first click shows list; second click jumps to day view
           if (!host.classList.contains('is-open')){
             host.classList.add('is-open');
             var items = state.tasks
@@ -403,7 +397,6 @@
             return;
           }
         } else {
-          // month: go straight to day view
           state.current = fromKey(dayKey);
           state.view = 'day';
           render();
@@ -411,20 +404,18 @@
         }
       }
 
-      // go to a specific day by clicking the card/cell area
       var hostGoto = e.target && e.target.closest('[data-goto]');
-      if (hostGoto && !e.target.closest('[data-open]')){ // ignore if clicking counter
+      if (hostGoto && !e.target.closest('[data-open]')){
         state.current = fromKey(hostGoto.dataset.goto);
         state.view = 'day';
         render();
         return;
       }
 
-      // done / delete buttons (day & week lists)
       var doneId = e.target && e.target.getAttribute('data-done');
       var delId  = e.target && e.target.getAttribute('data-del');
       if (doneId){
-        blastConfetti(e.clientX, e.clientY, 1.25); // bigger confetti
+        blastConfetti(e.clientX, e.clientY, 1.25);
         state.tasks = state.tasks.filter(t => t.id!==doneId);
         saveTasks(); render();
       } else if (delId){
@@ -443,14 +434,12 @@
     });
   }
 
-  /* ===================== Bottom Sheet (Create event) ===================== */
-  // Replace text button with biblical icon (same id) + keep aria-label
+  /* ===================== Bottom Sheet ===================== */
   if (addEventBtn){
     addEventBtn.classList.add('fab-new');
     addEventBtn.setAttribute('aria-label','יצירת אירוע חדש');
     addEventBtn.innerHTML = `
       <svg viewBox="0 0 48 48" class="fab-new__svg" aria-hidden="true">
-        <!-- stone tablet + quill (biblical vibe) -->
         <defs>
           <linearGradient id="tablet" x1="0" y1="0" x2="0" y2="1">
             <stop offset="0%" stop-color="#fdf6e3"/>
@@ -488,7 +477,6 @@
     if (sheetClose) sheetClose.addEventListener('click', e => { e.preventDefault(); closeSheet(); });
     if (sheetPanel){
       sheetPanel.addEventListener('click', function(e){
-        // quick date
         var qd = e.target && e.target.closest('.qp__chip[data-date]');
         if (qd){
           e.preventDefault();
@@ -500,7 +488,6 @@
           if (dateInput) dateInput.value = dateKey(base);
           return;
         }
-        // quick time
         var qt = e.target && e.target.closest('.qp__chip[data-time]');
         if (qt){
           e.preventDefault();
@@ -541,7 +528,7 @@
     });
   }
 
-  /* ===================== Logout (icon handled in HTML, ids/data are same) ===================== */
+  /* ===================== Logout ===================== */
   function clearAuthAll(){
     try{
       ['authUser','authName','token','auth.token','auth.user','looz:justLoggedIn','looz:loggedOut']
@@ -559,7 +546,7 @@
     if (trg){ e.preventDefault(); handleLogout(); }
   });
 
-  /* ===================== Effects: Confetti & Scratch ===================== */
+  /* ===================== Effects & injected CSS ===================== */
   function blastConfetti(x,y,scale){
     var layer = document.createElement('div');
     layer.className = 'fx-confetti';
@@ -579,147 +566,138 @@
     setTimeout(()=> layer.remove(), 1600);
   }
 
-  // CSS for scratch is in the CSS block below; we just add the class 'is-scratching' before removal.
-
-  /* ===================== Login Intro (blank screen -> center lemon -> fly to icon) ===================== */
-  (function intro(){
-    // inject style once
-    if (!document.getElementById('intro-style')){
-      var s = document.createElement('style'); s.id='intro-style';
-      s.textContent = `
-      .intro-screen{position:fixed;inset:0;z-index:10000;display:grid;place-items:center;pointer-events:none;
-        background:var(--intro-bg, #fff);}
-      html[data-theme="dark"] .intro-screen{--intro-bg:#0b1529;}
-      .intro-wrap{opacity:0;transform:scale(.8);filter:blur(18px);transition:opacity 900ms cubic-bezier(.16,1,.3,1),
-        transform 900ms cubic-bezier(.16,1,.3,1), filter 900ms;}
-      .intro-wrap.is-in{opacity:1;transform:scale(1);filter:blur(0);}
-      .intro-lemon{display:block;width:clamp(96px,28vw,160px);filter:drop-shadow(0 20px 42px rgba(6,12,26,.35));}
-      .intro-sweep{transform:translateY(80%);opacity:.7;animation:introSweep 1600ms cubic-bezier(.16,1,.3,1) 450ms forwards;}
-      .intro-glint{transform: translateY(78%) scale(.9);opacity:0;animation:introGlint 1300ms cubic-bezier(.16,1,.3,1) 600ms forwards;}
-      @keyframes introSweep{
-        0%{transform:translateY(80%);opacity:.65;}
-        70%{transform:translateY(-6%);opacity:.95;}
-        100%{transform:translateY(-16%);opacity:0;}
-      }
-      @keyframes introGlint{
-        0%{opacity:0;transform: translateY(78%) scale(.9);}
-        55%{opacity:.95;}
-        100%{opacity:0;transform: translateY(-10%) scale(1.06);}
-      }
-      .intro-screen.is-fly .intro-wrap{transition:transform 700ms cubic-bezier(.4,0,.2,1), opacity 500ms; }
-      /* Confetti */
-      .fx-confetti{position:fixed;inset:0;pointer-events:none;z-index:9999}
-      .fx-c{position:absolute;width:10px;height:10px;background: hsl(calc(360*var(--h, .5)), 90%, 60%); 
-        transform:translate(-50%,-50%); border-radius:2px;
-        animation:confThrow var(--t) ease-out forwards;}
-      .fx-c:nth-child(4n){--h:.1}.fx-c:nth-child(4n+1){--h:.22}.fx-c:nth-child(4n+2){--h:.62}.fx-c:nth-child(4n+3){--h:.82}
-      @keyframes confThrow{
-        to{ transform: translate(calc(-50% + var(--dx)), calc(-50% + var(--dy))) rotate(var(--r)); opacity:0;}
-      }
-      /* Scratch-out */
-      .is-scratching{position:relative;overflow:hidden}
-      .is-scratching::after{
-        content:""; position:absolute; inset:-2px; 
-        background:repeating-linear-gradient(135deg, rgba(255,255,255,.9) 0 6px, rgba(0,0,0,0) 6px 12px);
-        animation:scratchOut 520ms ease forwards;
-      }
-      @keyframes scratchOut{ to{ transform:translateX(40%); opacity:0; } }
-      /* Week head perfect alignment */
-      .p-day__head{display:grid;grid-template-columns:1fr auto 1fr;align-items:center}
-      .p-day__name{justify-self:end;font-weight:700}
-      .p-day__date{justify-self:start;opacity:.8}
+  // Inject only-once CSS to fix the layouts you mentioned
+  if (!document.getElementById('looz-inline-fixes')){
+    var s = document.createElement('style'); s.id='looz-inline-fixes';
+    s.textContent = `
+      /* Week head: edge-aligned labels + centered counter */
+      .p-day__head{display:grid;grid-template-columns:1fr auto 1fr;align-items:center;padding:0 8px}
+      .p-day__name{justify-self:start;font-weight:700}
+      .p-day__date{justify-self:end;opacity:.85}
       .p-day__count{justify-self:center;inline-size:24px;block-size:24px;border-radius:999px;font:600 12px/24px 'Rubik',system-ui,sans-serif;
-        border:1px solid currentColor;background:rgba(255,255,255,.8);box-shadow:0 2px 6px rgba(0,0,0,.08)}
-      html[data-theme="dark"] .p-day__count{background:rgba(13,23,44,.8)}
-      /* Month tiny counters */
+        border:1px solid currentColor;background:rgba(255,255,255,.9);box-shadow:0 2px 6px rgba(0,0,0,.08)}
+      html[data-theme="dark"] .p-day__count{background:rgba(13,23,44,.9)}
+
+      /* Month: keep number and counter apart */
       .p-cell{position:relative}
+      .p-cell__num{position:absolute;top:4px;right:6px;font-weight:700}
       .p-cell__count{position:absolute;top:4px;left:6px;inline-size:16px;height:16px;border-radius:50%;
-        font:700 10px/16px 'Rubik',system-ui,sans-serif;border:1px solid currentColor;background:rgba(255,255,255,.9)}
+        font:700 10px/16px 'Rubik',system-ui,sans-serif;border:1px solid currentColor;background:rgba(255,255,255,.9);z-index:2}
       html[data-theme="dark"] .p-cell__count{background:rgba(13,23,44,.9)}
-      /* counter tones */
+
+      /* Counter tones */
       .cnt--none{display:none}
       .cnt--green{color:#16a34a}.cnt--orange{color:#ea580c}.cnt--pink{color:#db2777}
       .cnt--violet{color:#7c3aed}.cnt--teal{color:#0d9488}.cnt--amber{color:#d97706}
       .cnt--over{color:#2563eb; filter:hue-rotate(45deg)}
-      /* FAB new (biblical icon) */
-      .fab-new{position:relative; display:grid; place-items:center; width:64px;height:64px;border-radius:999px;border:0;cursor:pointer;
-        margin:18px auto 8px; background:linear-gradient(135deg,#1e68ff,#06b6d4); box-shadow:0 .8rem 1.6rem rgba(6,182,212,.35)}
-      .fab-new__svg{width:36px;height:36px}
+
+      /* Confetti + scratch */
+      .fx-confetti{position:fixed;inset:0;pointer-events:none;z-index:9999}
+      .fx-c{position:absolute;width:10px;height:10px;background: hsl(calc(360*var(--h, .5)), 90%, 60%); 
+        transform:translate(-50%,-50%); border-radius:2px; animation:confThrow var(--t) ease-out forwards;}
+      .fx-c:nth-child(4n){--h:.1}.fx-c:nth-child(4n+1){--h:.22}.fx-c:nth-child(4n+2){--h:.62}.fx-c:nth-child(4n+3){--h:.82}
+      @keyframes confThrow{ to{ transform: translate(calc(-50% + var(--dx)), calc(-50% + var(--dy))) rotate(var(--r)); opacity:0;} }
+      .is-scratching{position:relative;overflow:hidden}
+      .is-scratching::after{content:""; position:absolute; inset:-2px; background:repeating-linear-gradient(135deg, rgba(255,255,255,.9) 0 6px, rgba(0,0,0,0) 6px 12px); animation:scratchOut 520ms ease forwards;}
+      @keyframes scratchOut{ to{ transform:translateX(40%); opacity:0; } }
+
+      /* Exit pill button (center bottom) */
+      .c-exit-wrap{display:grid;place-items:center;margin:8px 0 18px}
+      .exit-pill{display:inline-grid;place-items:center;width:56px;height:36px;border-radius:999px;border:1px solid rgba(0,0,0,.15);
+        background:linear-gradient(180deg,#fff,#f7f7fb);box-shadow:0 .35rem .9rem rgba(0,0,0,.08);cursor:pointer}
+      .exit-pill__svg{width:26px;height:26px}
+      html[data-theme="dark"] .exit-pill{background:linear-gradient(180deg,#0e162d,#0a1226);border-color:rgba(255,255,255,.12)}
+    `;
+    document.head.appendChild(s);
+  }
+
+  /* ===================== Login Intro ===================== */
+  (function intro(){
+    if (!lemonHost) return;
+    try{
+      if (localStorage.getItem('looz:justLoggedIn') !== '1') return;
+      localStorage.removeItem('looz:justLoggedIn');
+    }catch(e){}
+
+    var screen = document.createElement('div');
+    screen.className = 'intro-screen';
+    var wrap = document.createElement('div'); wrap.className = 'intro-wrap';
+    wrap.innerHTML = `
+      <svg class="intro-lemon" viewBox="0 0 24 24" aria-hidden="true">
+        <defs>
+          <radialGradient id="introLem" cx="50%" cy="40%" r="75%">
+            <stop offset="0%" stop-color="#FFF8C6"/><stop offset="50%" stop-color="#FFE36E"/><stop offset="100%" stop-color="#F7C843"/>
+          </radialGradient>
+          <linearGradient id="introSweepG" x1="0" y1="1" x2="0" y2="0">
+            <stop offset="0" stop-color="rgba(0,229,255,0)"/><stop offset=".28" stop-color="rgba(0,229,255,.30)"/>
+            <stop offset=".54" stop-color="rgba(255,215,102,.70)"/><stop offset=".78" stop-color="rgba(136,167,255,.40)"/>
+            <stop offset="1" stop-color="rgba(0,229,255,0)"/>
+          </linearGradient>
+          <radialGradient id="introGlintG" cx="50%" cy="50%" r="60%">
+            <stop offset="0%" stop-color="rgba(255,248,198,.98)"/><stop offset="70%" stop-color="rgba(255,214,100,.45)"/>
+            <stop offset="100%" stop-color="rgba(255,214,100,0)"/>
+          </radialGradient>
+          <clipPath id="introClip"><path d="M19 7c-3-3-8-3-11 0-2 2.3-2 6 0 8 2.2 2.1 5.8 2.4 8 0 2.2-2.1 2.6-5.4 1-7.6"/></clipPath>
+        </defs>
+        <g>
+          <path d="M19 7c-3-3-8-3-11 0-2 2.3-2 6 0 8 2.2 2.1 5.8 2.4 8 0 2.2-2.1 2.6-5.4 1-7.6" fill="url(#introLem)" stroke="#C59A21" stroke-width="1.1"/>
+          <path d="M18 6c.9-.9 1.7-1.8 2.3-2.8" stroke="#6FA14D" stroke-linecap="round" stroke-width="1.2"/>
+        </g>
+        <g clip-path="url(#introClip)">
+          <rect class="intro-sweep" x="0" y="0" width="100%" height="140%" fill="url(#introSweepG)"/>
+          <circle class="intro-glint" cx="12" cy="22" r="3.6" fill="url(#introGlintG)"/>
+        </g>
+      </svg>`;
+    screen.appendChild(wrap);
+    document.body.appendChild(screen);
+
+    requestAnimationFrame(function(){ wrap.classList.add('is-in'); });
+    setTimeout(function(){
+      var r = lemonHost.getBoundingClientRect();
+      var w = wrap.getBoundingClientRect();
+      var dx = (r.left + r.width/2) - (w.left + w.width/2);
+      var dy = (r.top  + r.height/2) - (w.top  + w.height/2);
+      var scale = (r.width / w.width) * 0.92;
+      screen.classList.add('is-fly');
+      wrap.style.transform = 'translate('+dx+'px,'+dy+'px) scale('+scale+')';
+      wrap.style.opacity = '0.98';
+      setTimeout(function(){ screen.remove(); }, 850);
+    }, 1700);
+
+    // minimal styles for intro
+    if (!document.getElementById('intro-style')){
+      var s = document.createElement('style'); s.id='intro-style';
+      s.textContent = `
+        .intro-screen{position:fixed;inset:0;z-index:10000;display:grid;place-items:center;pointer-events:none;background:#fff;}
+        html[data-theme="dark"] .intro-screen{background:#0b1529;}
+        .intro-wrap{opacity:0;transform:scale(.8);filter:blur(18px);transition:opacity 900ms cubic-bezier(.16,1,.3,1),transform 900ms cubic-bezier(.16,1,.3,1),filter 900ms;}
+        .intro-wrap.is-in{opacity:1;transform:scale(1);filter:blur(0);}
+        .intro-lemon{display:block;width:clamp(96px,28vw,160px);filter:drop-shadow(0 20px 42px rgba(6,12,26,.35));}
+        .intro-sweep{transform:translateY(80%);opacity:.7;animation:introSweep 1600ms cubic-bezier(.16,1,.3,1) 450ms forwards;}
+        .intro-glint{transform: translateY(78%) scale(.9);opacity:0;animation:introGlint 1300ms cubic-bezier(.16,1,.3,1) 600ms forwards;}
+        @keyframes introSweep{0%{transform:translateY(80%);opacity:.65;}70%{transform:translateY(-6%);opacity:.95;}100%{transform:translateY(-16%);opacity:0;}}
+        @keyframes introGlint{0%{opacity:0;transform: translateY(78%) scale(.9);}55%{opacity:.95;}100%{opacity:0;transform: translateY(-10%) scale(1.06);}}
+        .intro-screen.is-fly .intro-wrap{transition:transform 700ms cubic-bezier(.4,0,.2,1), opacity 500ms; }
       `;
       document.head.appendChild(s);
     }
-
-    function lemonSVG(clsSweep, clsGlint){
-      return `
-        <svg class="intro-lemon" viewBox="0 0 24 24" aria-hidden="true">
-          <defs>
-            <radialGradient id="introLem" cx="50%" cy="40%" r="75%">
-              <stop offset="0%" stop-color="#FFF8C6"/>
-              <stop offset="50%" stop-color="#FFE36E"/>
-              <stop offset="100%" stop-color="#F7C843"/>
-            </radialGradient>
-            <linearGradient id="introSweepG" x1="0" y1="1" x2="0" y2="0">
-              <stop offset="0%" stop-color="rgba(0,229,255,0)"/>
-              <stop offset="28%" stop-color="rgba(0,229,255,.30)"/>
-              <stop offset="54%" stop-color="rgba(255,215,102,.70)"/>
-              <stop offset="78%" stop-color="rgba(136,167,255,.40)"/>
-              <stop offset="100%" stop-color="rgba(0,229,255,0)"/>
-            </linearGradient>
-            <radialGradient id="introGlintG" cx="50%" cy="50%" r="60%">
-              <stop offset="0%" stop-color="rgba(255,248,198,.98)"/>
-              <stop offset="70%" stop-color="rgba(255,214,100,.45)"/>
-              <stop offset="100%" stop-color="rgba(255,214,100,0)"/>
-            </radialGradient>
-            <clipPath id="introClip"><path d="M19 7c-3-3-8-3-11 0-2 2.3-2 6 0 8 2.2 2.1 5.8 2.4 8 0 2.2-2.1 2.6-5.4 1-7.6"/></clipPath>
-          </defs>
-          <g>
-            <path d="M19 7c-3-3-8-3-11 0-2 2.3-2 6 0 8 2.2 2.1 5.8 2.4 8 0 2.2-2.1 2.6-5.4 1-7.6"
-              fill="url(#introLem)" stroke="#C59A21" stroke-width="1.1"/>
-            <path d="M18 6c.9-.9 1.7-1.8 2.3-2.8" stroke="#6FA14D" stroke-linecap="round" stroke-width="1.2"/>
-          </g>
-          <g clip-path="url(#introClip)">
-            <rect class="${clsSweep}" x="0" y="0" width="100%" height="140%" fill="url(#introSweepG)"/>
-            <circle class="${clsGlint}" cx="12" cy="22" r="3.6" fill="url(#introGlintG)"/>
-          </g>
-        </svg>`;
-    }
-
-    function introRun(){
-      // only right after login
-      try{
-        if (localStorage.getItem('looz:justLoggedIn') !== '1') return;
-        localStorage.removeItem('looz:justLoggedIn');
-      }catch(e){}
-
-      var screen = document.createElement('div');
-      screen.className = 'intro-screen';
-      var wrap = document.createElement('div'); wrap.className = 'intro-wrap';
-      wrap.innerHTML = lemonSVG('intro-sweep','intro-glint');
-      screen.appendChild(wrap);
-      document.body.appendChild(screen);
-
-      requestAnimationFrame(function(){ wrap.classList.add('is-in'); });
-
-      // after reveal, fly to header lemon
-      setTimeout(function(){
-        if (!lemonHost){ screen.remove(); return; }
-        var r = lemonHost.getBoundingClientRect();
-        var w = wrap.getBoundingClientRect();
-        var dx = (r.left + r.width/2) - (w.left + w.width/2);
-        var dy = (r.top  + r.height/2) - (w.top  + w.height/2);
-        var scale = (r.width / w.width) * 0.92;
-        screen.classList.add('is-fly');
-        wrap.style.transform = 'translate('+dx+'px,'+dy+'px) scale('+scale+')';
-        wrap.style.opacity = '0.98';
-        setTimeout(function(){ screen.remove(); }, 850);
-      }, 1700); // longer, more noticeable fade
-    }
-    introRun();
   })();
 
   /* ===================== Initial ===================== */
+  var today = new Date();
   formatTitle(today);
   state.current = today;
   render();
 
 })();
+// --- AUTH GUARD (skip on auth page) ---
+(function () {
+  try {
+    if (/auth\.html(?:$|\?)/.test(location.pathname)) return;
+    var u = localStorage.getItem('authUser') || localStorage.getItem('auth.user');
+    if (!u) location.replace('auth.html'); // relative, works on GH Pages
+  } catch (_) {
+    location.replace('auth.html');
+  }
+})();
+
