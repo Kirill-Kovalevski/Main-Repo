@@ -1,6 +1,21 @@
 <!DOCTYPE html>
 <html lang="he" dir="rtl">
 <head>
+  <!-- GH Pages base (must be first in <head>) -->
+<script>
+(function () {
+  if (/github\.io$/.test(location.hostname)) {
+    var seg = (location.pathname.split('/').filter(Boolean)[0] || '');
+    var base = '/' + (seg ? seg + '/' : '');
+    var el = document.createElement('base'); el.href = base;
+    document.head.appendChild(el);
+    window.__BASE__ = base;
+  } else {
+    window.__BASE__ = './';
+  }
+})();
+</script>
+
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
   <title>LooZ • חברתי</title>
