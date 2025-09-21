@@ -51,7 +51,7 @@
         localStorage.removeItem('looz:loggedOut');
         localStorage.setItem('looz:justLoggedIn','1');
       }catch(_){}
-      window.location.replace('/Calendar/index.html');
+      window.location.replace('/index.html');
     });
   }
 
@@ -85,7 +85,7 @@
         localStorage.removeItem('looz:loggedOut');
         localStorage.setItem('looz:justLoggedIn','1');
       }catch(_){}
-      window.location.replace('/Calendar/index.html');
+      window.location.replace('/index.html');
     });
   }
 })();

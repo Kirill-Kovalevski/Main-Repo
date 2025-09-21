@@ -2,16 +2,20 @@
 (function(){
   'use strict';
 
-  /* ===================== NAV across pages ===================== */
-  function go(href){ window.location.href = href; }
-  var btnProfile    = document.getElementById('btnProfile');
-  var btnMenu       = document.getElementById('btnMenu');       // 3-dots -> settings
-  var btnCategories = document.getElementById('btnCategories'); // in lemon nav
-  var btnSocial     = document.getElementById('btnSocial');     // in lemon nav
-  if (btnProfile)    btnProfile.addEventListener('click', () => go('/Calendar/profile.html'));
-  if (btnMenu)       btnMenu.addEventListener('click',    () => go('/Calendar/settings.html'));
-  if (btnCategories) btnCategories.addEventListener('click', () => go('/Calendar/categories.html'));
-  if (btnSocial)     btnSocial.addEventListener('click',    () => go('/Calendar/social.html'));
+/* ===================== NAV across pages ===================== */
+function go(href){ window.location.href = href; }
+
+var btnProfile    = document.getElementById('btnProfile');
+var btnMenu       = document.getElementById('btnMenu');       // 3-dots -> settings
+var btnCategories = document.getElementById('btnCategories'); // in lemon nav
+var btnSocial     = document.getElementById('btnSocial');     // in lemon nav
+
+// All relative to the current page/root folder:
+if (btnProfile)    btnProfile.addEventListener('click', () => go('profile.html'));
+if (btnMenu)       btnMenu.addEventListener('click',    () => go('settings.html'));
+if (btnCategories) btnCategories.addEventListener('click', () => go('categories.html'));
+if (btnSocial)     btnSocial.addEventListener('click',    () => go('social.html'));
+
 
   /* ===================== DOM ===================== */
   var lemonToggle   = document.getElementById('lemonToggle');
@@ -483,7 +487,7 @@
     window.__loozLoggingOut = true;
     clearAuthAll();
     try{ localStorage.setItem('looz:loggedOut', '1'); }catch(e){}
-    window.location.replace('/Calendar/auth.html?loggedout=1');
+    window.location.replace('/auth.html?loggedout=1');
   }
   var exitBtn = document.getElementById('btnExit');
   if (exitBtn) exitBtn.addEventListener('click', function(ev){ ev.preventDefault(); handleLogout(); });

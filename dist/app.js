@@ -13,17 +13,19 @@ function _typeof(o) { "@babel/helpers - typeof"; return _typeof = "function" == 
   var btnMenu = document.getElementById('btnMenu'); // 3-dots -> settings
   var btnCategories = document.getElementById('btnCategories'); // in lemon nav
   var btnSocial = document.getElementById('btnSocial'); // in lemon nav
+
+  // All relative to the current page/root folder:
   if (btnProfile) btnProfile.addEventListener('click', function () {
-    return go('/Calendar/profile.html');
+    return go('profile.html');
   });
   if (btnMenu) btnMenu.addEventListener('click', function () {
-    return go('/Calendar/settings.html');
+    return go('settings.html');
   });
   if (btnCategories) btnCategories.addEventListener('click', function () {
-    return go('/Calendar/categories.html');
+    return go('categories.html');
   });
   if (btnSocial) btnSocial.addEventListener('click', function () {
-    return go('/Calendar/social.html');
+    return go('social.html');
   });
 
   /* ===================== DOM ===================== */
@@ -577,7 +579,7 @@ function _typeof(o) { "@babel/helpers - typeof"; return _typeof = "function" == 
     try {
       localStorage.setItem('looz:loggedOut', '1');
     } catch (e) {}
-    window.location.replace('/Calendar/auth.html?loggedout=1');
+    window.location.replace('/auth.html?loggedout=1');
   }
   var exitBtn = document.getElementById('btnExit');
   if (exitBtn) exitBtn.addEventListener('click', function (ev) {

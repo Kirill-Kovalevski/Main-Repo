@@ -17,7 +17,7 @@
 
 
   if (!getUser()) {
-    location.replace('/Calendar/auth.html');
+    location.replace('/auth.html');
     return;
   } // expose a logout() the header can call
 
@@ -30,6 +30,6 @@
     } catch (e) {} // IMPORTANT: add a flag so auth.html knows not to bounce back
 
 
-    location.replace('/Calendar/auth.html?loggedout=1');
+    location.replace('/auth.html?loggedout=1');
   };
 })();
