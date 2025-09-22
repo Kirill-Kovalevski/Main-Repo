@@ -1,30 +1,28 @@
 <!DOCTYPE html>
 <html lang="he" dir="rtl">
 <head>
-<!-- Put this at the very top of <head> -->
-<meta charset="utf-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
-<title>LooZ</title>
+  <!-- Put this at the very top of <head> -->
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <title>LooZ</title>
 
-<!-- Optional: keeps links working when the site is served from /LooZ/ on GitHub Pages -->
-<script>
-  (function () {
-    if (/github\.io$/.test(location.hostname)) {
-      var seg = (location.pathname.split('/').filter(Boolean)[0] || '');
-      var base = '/' + (seg ? seg + '/' : '');
-      var el = document.createElement('base'); el.href = base;
-      document.head.appendChild(el);
-    }
-  })();
-</script>
+  <!-- Optional: keeps links working when the site is served from /LooZ/ on GitHub Pages -->
+  <script>
+    (function () {
+      if (/github\.io$/.test(location.hostname)) {
+        var seg = (location.pathname.split('/').filter(Boolean)[0] || '');
+        var base = '/' + (seg ? seg + '/' : '');
+        var el = document.createElement('base'); el.href = base;
+        document.head.appendChild(el);
+      }
+    })();
+  </script>
 
-<!-- IMPORTANT: use RELATIVE paths (no leading /) -->
-<link rel="stylesheet" href="css/dist/main.css" />
-<link rel="stylesheet" href="css/dist/dark-overrides.css" />
-<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@500;600&family=Rubik:wght@400;500;700&display=swap" rel="stylesheet" />
-<script src="js/theme.js"></script>
-
-
+  <!-- IMPORTANT: use RELATIVE paths (no leading /) -->
+  <link rel="stylesheet" href="css/dist/main.css" />
+  <link rel="stylesheet" href="css/dist/dark-overrides.css" />
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@500;600&family=Rubik:wght@400;500;700&display=swap" rel="stylesheet" />
+  <script src="js/theme.js"></script>
 </head>
 <body>
   <main class="o-page">
@@ -49,88 +47,28 @@
             <circle cx="12" cy="5" r="2"></circle><circle cx="12" cy="12" r="2"></circle><circle cx="12" cy="19" r="2"></circle>
           </svg>
         </button>
-<!-- Lemon toggle (opens/closes nav, pushes content down) -->
-<button id="lemonToggle" class="c-icon-btn c-icon-btn--lemon" type="button"
-        aria-label="פתח/סגור תפריט" aria-expanded="false" aria-controls="appNav">
-        <!-- header lemon icon host (the animation collapses into this) -->
-<span id="lemonIcon" class="lemon-host" aria-hidden="true"></span>
 
-  <!-- PURE • SIMPLE • MYTHIC LEMON (fills the button) -->
-  <svg class="lemon-svg" viewBox="0 0 64 64" aria-hidden="true" focusable="false">
-    <defs>
-      <!-- body -->
-      <radialGradient id="lemBody" cx="34%" cy="28%" r="72%">
-        <stop offset="0"  stop-color="#FFFBE6"/>
-        <stop offset=".55" stop-color="#FFE178"/>
-        <stop offset="1"  stop-color="#FFC845"/>
-      </radialGradient>
-      <!-- rim / depth -->
-      <linearGradient id="lemRim" x1="0" y1="0" x2="0" y2="1">
-        <stop offset="0" stop-color="#B47B16" stop-opacity=".25"/>
-        <stop offset="1" stop-color="#B47B16" stop-opacity=".05"/>
-      </linearGradient>
-      <!-- leaf -->
-      <linearGradient id="lemLeaf" x1="0" y1="0" x2="1" y2="1">
-        <stop offset="0" stop-color="#7BE46A"/>
-        <stop offset="1" stop-color="#2C7F24"/>
-      </linearGradient>
-      <!-- inner glow -->
-      <radialGradient id="lemGlow" cx="50%" cy="50%" r="48%">
-        <stop offset="0" stop-color="rgba(255,235,150,.85)"/>
-        <stop offset=".7" stop-color="rgba(255,215,90,.22)"/>
-        <stop offset="1" stop-color="rgba(255,215,90,0)"/>
-      </radialGradient>
-      <filter id="soft" x="-50%" y="-50%" width="200%" height="200%">
-        <feGaussianBlur stdDeviation="1.6"/>
-      </filter>
-    </defs>
+        <!-- Lemon toggle (opens/closes nav, pushes content down) -->
+        <button id="lemonToggle" class="c-icon-btn c-icon-btn--lemon" type="button"
+                aria-label="פתח/סגור תפריט" aria-expanded="false" aria-controls="appNav">
+          <span id="lemonIcon" class="lemon-host" aria-hidden="true"></span>
 
-    <!-- halo (subtle, breathing) -->
-    <g class="lem-halo" transform="translate(0,1)">
-      <circle cx="32" cy="30" r="18" fill="url(#lemGlow)" filter="url(#soft)"/>
-    </g>
-
-    <!-- fruit body -->
-    <g transform="translate(0,1)">
-      <path d="M16 30
-               C16 22, 26 17, 34 19
-               C42 21, 50 27, 50 32
-               C50 37, 42 43, 34 45
-               C26 47, 16 38, 16 30Z"
-            fill="url(#lemBody)" stroke="#FFF7D6" stroke-width="1.4"/>
-      <path d="M16 30
-               C16 22, 26 17, 34 19
-               C42 21, 50 27, 50 32
-               C50 37, 42 43, 34 45
-               C26 47, 16 38, 16 30Z"
-            fill="url(#lemRim)" opacity=".45"/>
-
-      <!-- highlight -->
-      <ellipse cx="27" cy="26" rx="5.2" ry="3.4" fill="#fff" opacity=".55"/>
-
-      <!-- three “seed star” ovals (clean & iconic) -->
-      <g fill="#FFF6D1" opacity=".85">
-        <ellipse cx="34.8" cy="31.2" rx="1.9" ry="3.2" transform="rotate(-8 34.8 31.2)"/>
-        <ellipse cx="37.8" cy="29.2" rx="1.7" ry="2.9" transform="rotate(24 37.8 29.2)"/>
-        <ellipse cx="37.2" cy="33.8" rx="1.7" ry="2.9" transform="rotate(-22 37.2 33.8)"/>
-      </g>
-
-      <!-- stem + single biblical leaf -->
-      <rect x="33.4" y="19.1" width="2.8" height="6.4" rx="1.3"
-            fill="#6E4C18" transform="rotate(14 33.4 19.1)"/>
-      <path d="M41 20.2
-               C45 22.8, 48 23.8, 51 23.2
-               C49.2 26.9, 45.8 29.5, 42 30.4 Z"
-            fill="url(#lemLeaf)"/>
-
-      <!-- tiny sparkle -->
-      <g class="lem-spark">
-        <path d="M22 23h4M24 21v4" stroke="#fff" stroke-width="1.3" stroke-linecap="round" opacity=".8"/>
-      </g>
-    </g>
-  </svg>
-</button>
-
+          <!-- EXACT LEMON FROM INTRO ANIMATION -->
+          <svg class="lemon-svg" viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+            <defs>
+              <radialGradient id="introLemBody" cx="50%" cy="40%" r="75%">
+                <stop offset="0%" stop-color="#FFF8C6"/>
+                <stop offset="50%" stop-color="#FFE36E"/>
+                <stop offset="100%" stop-color="#F7C843"/>
+              </radialGradient>
+            </defs>
+            <g>
+              <path d="M19 7c-3-3-8-3-11 0-2 2.3-2 6 0 8 2.2 2.1 5.8 2.4 8 0 2.2-2.1 2.6-5.4 1-7.6"
+                    fill="url(#introLemBody)" stroke="#C59A21" stroke-width="1.1"/>
+              <path d="M18 6c.9-.9 1.7-1.8 2.3-2.8" stroke="#6FA14D" stroke-linecap="round" stroke-width="1.2"/>
+            </g>
+          </svg>
+        </button>
 
         <!-- In-flow NAV -->
         <nav id="appNav" class="c-nav u-is-collapsed" aria-label="ראשי" aria-hidden="true">
@@ -144,7 +82,8 @@
 
               <!-- Search with live suggestions -->
               <label class="c-search" aria-label="חיפוש פעילויות">
-                <input id="navSearch" class="c-search__input" type="search" placeholder="חיפוש פעילויות" autocomplete="off" />
+                <input id="navSearch" class="c-search__input" type="search" placeholder="חיפוש פעילויות" autocomplete="off"
+                       aria-autocomplete="list" aria-expanded="false" aria-controls="sugList" />
                 <button id="searchClear" class="c-search__clear" type="button" aria-label="נקה">×</button>
                 <button id="searchGo" class="c-search__go" type="button" aria-label="חפש">
                   <svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true">
@@ -176,7 +115,11 @@
             <span id="titleDay"  class="c-title__day">—</span>,
             <span id="titleDate" class="c-title__date">—</span>
           </p>
-          <p class="c-subtitle">ברוכה השבה, <span id="uiName">דניאלה</span>!<br>מה בלוז היום?</p>
+          <p class="c-subtitle">
+            <span class="c-subtitle__hello">ברוכים השבים,</span>
+            <strong id="uiName" class="c-subtitle__name">דניאלה</strong>!
+            <br><span>מה בלוז היום?</span>
+          </p>
         </div>
       </header>
 
@@ -196,28 +139,25 @@
       <div class="c-bottom-cta o-inner">
         <button id="addEventBtn" class="c-cta c-cta--bang" type="button" aria-label="יצירת אירוע חדש">יצירת אירוע חדש</button>
       </div>
+
       <!-- Exit button (bottom center) -->
-<div class="c-exit-wrap o-inner">
-  <button id="btnExit" class="exit-pill" aria-label="התנתקות">
-  <svg viewBox="0 0 28 28" class="exit-pill__svg" aria-hidden="true">
-    <defs>
-      <linearGradient id="exDoor" x1="0" y1="0" x2="1" y2="1">
-        <stop offset="0%" stop-color="#F4D27A"/><stop offset="100%" stop-color="#C8A043"/>
-      </linearGradient>
-      <linearGradient id="exArrow" x1="0" y1="0" x2="1" y2="0">
-        <stop offset="0%" stop-color="#22D3EE"/><stop offset="100%" stop-color="#60A5FA"/>
-      </linearGradient>
-    </defs>
-    <!-- gate -->
-    <rect x="4" y="6" width="10" height="16" rx="2" fill="url(#exDoor)" stroke="#9A7A2E"/>
-    <circle cx="11" cy="14" r="1" fill="#7C5B13"/>
-    <!-- radiant arrow -->
-    <path d="M14 14h8m0 0-3-3m3 3-3 3" fill="none" stroke="url(#exArrow)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-  </svg>
-</button>
-
-</div>
-
+      <div class="c-exit-wrap o-inner">
+        <button id="btnExit" class="exit-pill" aria-label="התנתקות">
+          <svg viewBox="0 0 28 28" class="exit-pill__svg" aria-hidden="true">
+            <defs>
+              <linearGradient id="exDoor" x1="0" y1="0" x2="1" y2="1">
+                <stop offset="0%" stop-color="#F4D27A"/><stop offset="100%" stop-color="#C8A043"/>
+              </linearGradient>
+              <linearGradient id="exArrow" x1="0" y1="0" x2="1" y2="0">
+                <stop offset="0%" stop-color="#22D3EE"/><stop offset="100%" stop-color="#60A5FA"/>
+              </linearGradient>
+            </defs>
+            <rect x="4" y="6" width="10" height="16" rx="2" fill="url(#exDoor)" stroke="#9A7A2E"/>
+            <circle cx="11" cy="14" r="1" fill="#7C5B13"/>
+            <path d="M14 14h8m0 0-3-3m3 3-3 3" fill="none" stroke="url(#exArrow)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+        </button>
+      </div>
 
       <!-- Bottom Sheet: Event -->
       <section id="eventSheet" class="c-sheet u-hidden" dir="rtl" aria-hidden="true">
@@ -227,71 +167,67 @@
             <h3 id="sheetTitle" class="c-sheet__title">אירוע חדש</h3>
             <button class="c-icon-btn c-icon-btn--ghost" type="button" data-close aria-label="סגור">✕</button>
           </header>
+<form id="sheetForm" class="c-sheet__form">
+  <label class="f-field">
+    <span class="f-label">כותרת</span>
+    <input id="evtTitle" class="f-input" type="text" placeholder="שם האירוע" required>
+  </label>
 
-          <form id="sheetForm" class="c-sheet__form">
-            <label class="f-field">
-              <span class="f-label">כותרת</span>
-              <input id="evtTitle" class="f-input" type="text" placeholder="שם האירוע" required>
-            </label>
+  <div class="f-grid">
+    <label class="f-field f-field--icon f-field--elevated">
+      <span class="f-label">שעה</span>
+      <input id="evtTime" class="f-input f-input--big" type="time" required>
+      <span class="f-icon" aria-hidden="true">
+        <svg viewBox="0 0 24 24" width="18" height="18">
+          <circle cx="12" cy="13" r="7" fill="none" stroke="currentColor"></circle>
+          <path d="M12 13V9M12 13l3 3" stroke="currentColor" stroke-linecap="round"></path>
+        </svg>
+      </span>
+    </label>
 
-            <div class="f-grid">
-              <label class="f-field f-field--icon f-field--elevated">
-                <span class="f-label">תאריך</span>
-                <input id="evtDate" class="f-input f-input--big" type="date" required>
-                <span class="f-icon" aria-hidden="true">
-                  <svg viewBox="0 0 24 24" width="18" height="18">
-                    <rect x="3" y="5" width="18" height="16" rx="3" fill="none" stroke="currentColor"></rect>
-                    <path d="M3 9h18" stroke="currentColor"></path>
-                    <path d="M8 3v4M16 3v4" stroke="currentColor"></path>
-                  </svg>
-                </span>
-              </label>
+    <label class="f-field f-field--icon f-field--elevated">
+      <span class="f-label">תאריך</span>
+      <input id="evtDate" class="f-input f-input--big" type="date" required>
+      <span class="f-icon" aria-hidden="true">
+        <svg viewBox="0 0 24 24" width="18" height="18">
+          <rect x="3" y="5" width="18" height="16" rx="3" fill="none" stroke="currentColor"></rect>
+          <path d="M3 9h18" stroke="currentColor"></path>
+          <path d="M8 3v4M16 3v4" stroke="currentColor"></path>
+        </svg>
+      </span>
+    </label>
+  </div>
 
-              <label class="f-field f-field--icon f-field--elevated">
-                <span class="f-label">שעה</span>
-                <input id="evtTime" class="f-input f-input--big" type="time" required>
-                <span class="f-icon" aria-hidden="true">
-                  <svg viewBox="0 0 24 24" width="18" height="18">
-                    <circle cx="12" cy="13" r="7" fill="none" stroke="currentColor"></circle>
-                    <path d="M12 13V9M12 13l3 3" stroke="currentColor" stroke-linecap="round"></path>
-                    <rect x="10" y="2" width="4" height="3" rx="1.2" fill="none" stroke="currentColor"></rect>
-                  </svg>
-                </span>
-              </label>
-            </div>
+  <div class="qp">
+    <div class="qp__row">
+      <span class="qp__label">תאריך מהיר:</span>
+      <button class="qp__chip" type="button" data-date="today">היום</button>
+      <button class="qp__chip" type="button" data-date="tomorrow">מחר</button>
+      <button class="qp__chip" type="button" data-date="+2">בעוד יומיים</button>
+      <button class="qp__chip" type="button" data-date="nextweek">שבוע הבא</button>
+    </div>
+    <div class="qp__row">
+      <span class="qp__label">שעה מהירה:</span>
+      <button class="qp__chip" type="button" data-time="now+30">+30 דק׳</button>
+      <button class="qp__chip" type="button" data-time="now+60">+ שעה</button>
+      <button class="qp__chip" type="button" data-time="12:00">12:00</button>
+      <button class="qp__chip" type="button" data-time="20:00">20:00</button>
+    </div>
+  </div>
 
-            <div class="qp">
-              <div class="qp__row">
-                <span class="qp__label">תאריך מהיר:</span>
-                <button class="qp__chip" type="button" data-date="today">היום</button>
-                <button class="qp__chip" type="button" data-date="tomorrow">מחר</button>
-                <button class="qp__chip" type="button" data-date="nextweek">שבוע הבא</button>
-                <button class="qp__chip" type="button" data-date="+2">בעוד יומיים</button>
-                <button class="qp__chip" type="button" data-date="+7">בעוד 7 ימים</button>
-              </div>
-              <div class="qp__row">
-                <span class="qp__label">שעה מהירה:</span>
-                <button class="qp__chip" type="button" data-time="now+30">+30 דק׳</button>
-                <button class="qp__chip" type="button" data-time="now+60">+ שעה</button>
-                <button class="qp__chip" type="button" data-time="08:00">08:00</button>
-                <button class="qp__chip" type="button" data-time="12:00">12:00</button>
-                <button class="qp__chip" type="button" data-time="16:00">16:00</button>
-                <button class="qp__chip" type="button" data-time="21:00">21:00</button>
-              </div>
-            </div>
+  <div class="c-sheet__actions">
+    <!-- אין ביטול — ה־X למעלה סוגר -->
+    <button class="c-btn c-btn--primary" type="submit">הוסף</button>
+  </div>
+</form>
 
-            <div class="c-sheet__actions">
-              <button class="c-btn c-btn--ghost" type="button" data-close>ביטול</button>
-              <button class="c-btn c-btn--primary" type="submit">הוסף</button>
-            </div>
-          </form>
         </div>
       </section>
 
     </div>
   </main>
-<!-- IMPORTANT: relative path -->
-<script src="app.js" defer></script>
 
+  <!-- IMPORTANT: relative path -->
+  <script src="app.js" defer></script>
 </body>
 </html>

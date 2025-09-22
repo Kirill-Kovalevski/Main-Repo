@@ -1,7 +1,7 @@
 "use strict";
 
 function _typeof(o) { "@babel/helpers - typeof"; return _typeof = "function" == typeof Symbol && "symbol" == typeof Symbol.iterator ? function (o) { return typeof o; } : function (o) { return o && "function" == typeof Symbol && o.constructor === Symbol && o !== Symbol.prototype ? "symbol" : typeof o; }, _typeof(o); }
-/* ===== LooZ — Planner App (home) ===== */
+/* ===== LooZ — Planner App (home) — FULL ===== */
 (function () {
   'use strict';
 
@@ -107,7 +107,10 @@ function _typeof(o) { "@babel/helpers - typeof"; return _typeof = "function" == 
   var dateInput = document.getElementById('evtDate');
   var timeInput = document.getElementById('evtTime');
   var subtitleEl = document.querySelector('.c-subtitle');
-  var addEventBtn = document.getElementById('addEventBtn');
+
+  // small icon buttons pinned at bottom
+  var addEventBtn = document.getElementById('addEventBtn'); // reuse existing
+  var btnExit = document.getElementById('btnExit');
 
   /* ===================== Greeting ===================== */
   function getAuth() {
@@ -140,8 +143,9 @@ function _typeof(o) { "@babel/helpers - typeof"; return _typeof = "function" == 
     var name = escapeHtml(getDisplayName());
     var au = getAuth();
     var SPECIAL_EMAIL = 'special.person@example.com';
+    var isSpecial = au && String(au.email || '').toLowerCase() === SPECIAL_EMAIL.toLowerCase();
     if (subtitleEl) {
-      subtitleEl.innerHTML = au && au.email === SPECIAL_EMAIL ? '✨ שמחים לראותך שוב, <strong>' + name + '</strong>. לוח מושלם מחכה לך.' : 'ברוכה השבה, <strong id="uiName">' + name + '</strong>!<br>מה בלוז היום?';
+      subtitleEl.innerHTML = isSpecial ? '✨ שמחים לראותך שוב, <strong>' + name + '</strong>. לוח מושלם מחכה לך.' : 'ברוכים השבים, <strong id="uiName">' + name + '</strong>!<br>מה בלוז היום?';
     } else {
       var u = document.getElementById('uiName');
       if (u) u.textContent = name;
@@ -181,7 +185,7 @@ function _typeof(o) { "@babel/helpers - typeof"; return _typeof = "function" == 
   var weekStart = prefs.weekStart === 'mon' ? 1 : 0;
   var today = new Date();
   var state = {
-    view: prefs.defaultView || 'day',
+    view: prefs.defaultView || 'week',
     current: today,
     tasks: loadTasks()
   };
@@ -226,16 +230,49 @@ function _typeof(o) { "@babel/helpers - typeof"; return _typeof = "function" == 
     });
   })();
 
-  /* ===================== Counters colors ===================== */
-  function counterClass(n) {
-    if (n <= 0) return 'cnt--none';
-    if (n <= 2) return 'cnt--green';
-    if (n <= 5) return 'cnt--orange';
-    if (n <= 8) return 'cnt--pink';
-    if (n <= 12) return 'cnt--violet';
-    if (n <= 16) return 'cnt--teal';
-    if (n <= 20) return 'cnt--amber';
-    return 'cnt--over';
+  /* ===================== Color scales ===================== */
+  // Pastel ladder — changes every 3 tasks (0..∞)
+  function pastelFor(n) {
+    // bucket: 0:(0), 1:(1-3), 2:(4-6), 3:(7-9), 4:(10-12), 5:(13-15), 6:(16+)
+    var bucket = n <= 0 ? 0 : Math.floor((n - 1) / 3) + 1;
+    if (bucket > 6) bucket = 6;
+    // soft, biblical palette
+    var tones = [{
+      fg: '#64748b',
+      ring: '#cbd5e1'
+    },
+    // 0
+    {
+      fg: '#0e7490',
+      ring: '#a5f3fc'
+    },
+    // 1 cyan
+    {
+      fg: '#7c3aed',
+      ring: '#ddd6fe'
+    },
+    // 2 violet
+    {
+      fg: '#a16207',
+      ring: '#fde68a'
+    },
+    // 3 amber
+    {
+      fg: '#16a34a',
+      ring: '#bbf7d0'
+    },
+    // 4 green
+    {
+      fg: '#0ea5e9',
+      ring: '#bae6fd'
+    },
+    // 5 blue
+    {
+      fg: '#db2777',
+      ring: '#fbcfe8'
+    } // 6 rose
+    ];
+    return tones[bucket];
   }
 
   /* ===================== Renderers ===================== */
@@ -304,18 +341,39 @@ function _typeof(o) { "@babel/helpers - typeof"; return _typeof = "function" == 
       var day = new Date(start);
       day.setDate(start.getDate() + i);
       var ymd = dateKey(day);
-      var box = document.createElement('div');
-      box.className = 'p-day' + (sameDay(day, new Date()) ? ' p-day--today' : '');
-      box.dataset["goto"] = ymd;
-
-      // header: [day-name] [counter-center] [date-number]
-      var head = document.createElement('div');
-      head.className = 'p-day__head';
       var count = state.tasks.filter(function (t) {
         return t.date === ymd;
       }).length;
-      head.innerHTML = '<span class="p-day__name">' + HEB_DAYS[day.getDay()] + '</span>' + '<button class="p-day__count ' + counterClass(count) + '" data-open="' + ymd + '" aria-label="צפה במשימות">' + count + '</button>' + '<span class="p-day__date">' + pad2(day.getDate()) + '.' + pad2(day.getMonth() + 1) + '</span>';
+      var tone = pastelFor(count);
+      var box = document.createElement('div');
+      box.className = 'p-day' + (sameDay(day, new Date()) ? ' p-day--today' : '');
+      box.dataset["goto"] = ymd;
+      var head = document.createElement('div');
+      head.className = 'p-day__head';
+      head.innerHTML = '<span class="p-day__name">' + HEB_DAYS[day.getDay()] + '</span>' + '<span class="p-day__date">' + pad2(day.getDate()) + '.' + pad2(day.getMonth() + 1) + '</span>' + '<button class="p-day__count" style="color:' + tone.fg + ';border-color:' + tone.fg + ';" data-open="' + ymd + '">' + count + '</button>';
       box.appendChild(head);
+
+      // expanded list if open (on first click)
+      if (state._openWeek && state._openWeek === ymd) {
+        var items = state.tasks.filter(function (t) {
+          return t.date === ymd;
+        }).sort(function (a, b) {
+          return (a.time || '').localeCompare(b.time || '');
+        });
+        var list = document.createElement('div');
+        list.className = 'p-day__list';
+        if (!items.length) {
+          list.innerHTML = '<div class="p-empty small">אין אירועים</div>';
+        } else {
+          items.forEach(function (t) {
+            var row = document.createElement('div');
+            row.className = 'p-task';
+            row.innerHTML = '<div class="p-task__text">' + escapeHtml(t.title) + '</div>' + '<div class="p-task__time">' + (t.time || '') + '</div>' + '<div class="p-task__actions">' + '<button class="p-task__btn" data-done="' + t.id + '">בוצע</button>' + '<button class="p-task__btn" data-del="' + t.id + '">מחק</button>' + '</div>';
+            list.appendChild(row);
+          });
+        }
+        box.appendChild(list);
+      }
       wrap.appendChild(box);
     }
     plannerRoot.appendChild(wrap);
@@ -347,13 +405,20 @@ function _typeof(o) { "@babel/helpers - typeof"; return _typeof = "function" == 
     var start = new Date(anchor);
     start.setDate(anchor.getDate() - firstDow);
     var curKey = dateKey(state.current);
+    var now = new Date();
     for (var i = 0; i < 42; i++) {
       var day = new Date(start);
       day.setDate(start.getDate() + i);
       var ymd = dateKey(day);
+      var count = state.tasks.filter(function (t) {
+        return t.date === ymd;
+      }).length;
+      var tone = pastelFor(count);
+      // degree for conic ring; cap at 24 tasks
+      var pct = Math.max(0, Math.min(100, Math.round(Math.min(count, 24) / 24 * 100)));
       var cell = document.createElement('div');
       var cls = 'p-cell';
-      if (sameDay(day, new Date())) cls += ' p-cell--today';
+      if (sameDay(day, now)) cls += ' p-cell--today';
       if (ymd === curKey) cls += ' p-cell--selected';
       if (day.getMonth() !== state.current.getMonth()) cls += ' p-cell--pad';
       cell.className = cls;
@@ -361,19 +426,18 @@ function _typeof(o) { "@babel/helpers - typeof"; return _typeof = "function" == 
       var num = document.createElement('div');
       num.className = 'p-cell__num';
       num.textContent = day.getDate();
-      cell.appendChild(num);
+      // Ring variables: very thin ring via CSS, and tone color varies by load
+      num.style.setProperty('--ring', pct + '%');
+      num.style.setProperty('--tone', tone.ring);
 
-      // tiny counter at top-left (won't overlap the number)
-      var c = state.tasks.filter(function (t) {
-        return t.date === ymd;
-      }).length;
-      if (c > 0) {
-        var badge = document.createElement('button');
-        badge.className = 'p-cell__count ' + counterClass(c);
-        badge.setAttribute('data-open', ymd);
-        badge.textContent = c > 99 ? '99+' : c;
-        cell.appendChild(badge);
-      }
+      // tiny badge (top-left) — avoids the number
+      var badge = document.createElement('div');
+      badge.className = 'p-cell__count';
+      badge.textContent = count > 0 ? String(count) : '';
+      badge.style.color = tone.fg;
+      badge.style.borderColor = tone.fg;
+      cell.appendChild(num);
+      if (count > 0) cell.appendChild(badge);
       grid.appendChild(cell);
     }
     plannerRoot.appendChild(grid);
@@ -426,41 +490,10 @@ function _typeof(o) { "@babel/helpers - typeof"; return _typeof = "function" == 
       var openBtn = e.target && e.target.closest('[data-open]');
       if (openBtn) {
         var dayKey = openBtn.getAttribute('data-open');
-        var host = openBtn.closest('.p-day');
-        if (host) {
-          if (!host.classList.contains('is-open')) {
-            host.classList.add('is-open');
-            var items = state.tasks.filter(function (t) {
-              return t.date === dayKey;
-            }).sort(function (a, b) {
-              return (a.time || '').localeCompare(b.time || '');
-            });
-            var list = document.createElement('div');
-            list.className = 'p-day__list';
-            if (!items.length) {
-              list.innerHTML = '<div class="p-empty small">אין אירועים</div>';
-            } else {
-              items.forEach(function (t) {
-                var row = document.createElement('div');
-                row.className = 'p-task';
-                row.innerHTML = '<div class="p-task__text">' + escapeHtml(t.title) + '</div>' + '<div class="p-task__time">' + (t.time || '') + '</div>' + '<div class="p-task__actions">' + '<button class="p-task__btn" data-done="' + t.id + '">בוצע</button>' + '<button class="p-task__btn" data-del="' + t.id + '">מחק</button>' + '</div>';
-                list.appendChild(row);
-              });
-            }
-            host.appendChild(list);
-            return;
-          } else {
-            state.current = fromKey(dayKey);
-            state.view = 'day';
-            render();
-            return;
-          }
-        } else {
-          state.current = fromKey(dayKey);
-          state.view = 'day';
-          render();
-          return;
-        }
+        // toggle expand in week view
+        state._openWeek = state._openWeek === dayKey ? null : dayKey;
+        render();
+        return;
       }
       var hostGoto = e.target && e.target.closest('[data-goto]');
       if (hostGoto && !e.target.closest('[data-open]')) {
@@ -472,7 +505,8 @@ function _typeof(o) { "@babel/helpers - typeof"; return _typeof = "function" == 
       var doneId = e.target && e.target.getAttribute('data-done');
       var delId = e.target && e.target.getAttribute('data-del');
       if (doneId) {
-        blastConfetti(e.clientX, e.clientY, 1.25);
+        // lighter confetti in WEEK (vs day)
+        blastConfetti(e.clientX, e.clientY, 1.0);
         state.tasks = state.tasks.filter(function (t) {
           return t.id !== doneId;
         });
@@ -502,9 +536,10 @@ function _typeof(o) { "@babel/helpers - typeof"; return _typeof = "function" == 
 
   /* ===================== Bottom Sheet ===================== */
   if (addEventBtn) {
-    addEventBtn.classList.add('fab-new');
+    // Turn the big CTA into a small circular icon button (same as header buttons)
+    addEventBtn.className = 'c-topbtn c-topbtn--action';
     addEventBtn.setAttribute('aria-label', 'יצירת אירוע חדש');
-    addEventBtn.innerHTML = "\n      <svg viewBox=\"0 0 48 48\" class=\"fab-new__svg\" aria-hidden=\"true\">\n        <defs>\n          <linearGradient id=\"tablet\" x1=\"0\" y1=\"0\" x2=\"0\" y2=\"1\">\n            <stop offset=\"0%\" stop-color=\"#fdf6e3\"/>\n            <stop offset=\"100%\" stop-color=\"#e8dcc3\"/>\n          </linearGradient>\n          <linearGradient id=\"ink\" x1=\"0\" y1=\"0\" x2=\"1\" y2=\"1\">\n            <stop offset=\"0%\" stop-color=\"#1e3a8a\"/>\n            <stop offset=\"100%\" stop-color=\"#0ea5e9\"/>\n          </linearGradient>\n        </defs>\n        <rect x=\"10\" y=\"9\" rx=\"6\" ry=\"6\" width=\"20\" height=\"28\" fill=\"url(#tablet)\" stroke=\"#bda77a\"/>\n        <path d=\"M28 26c6 0 10 4 10 10l-8-1-7 4 3-7\" fill=\"url(#ink)\"/>\n        <g stroke=\"#374151\" stroke-width=\"2\" stroke-linecap=\"round\">\n          <line x1=\"15\" y1=\"16\" x2=\"25\" y2=\"16\"/>\n          <line x1=\"15\" y1=\"21\" x2=\"25\" y2=\"21\"/>\n        </g>\n        <circle cx=\"36\" cy=\"12\" r=\"6\" fill=\"url(#ink)\"/>\n        <path d=\"M36 9v6M33 12h6\" stroke=\"#fff\" stroke-width=\"2\" stroke-linecap=\"round\"/>\n      </svg>";
+    addEventBtn.innerHTML = "\n      <svg viewBox=\"0 0 48 48\" width=\"22\" height=\"22\" aria-hidden=\"true\">\n        <defs>\n          <linearGradient id=\"t1\" x1=\"0\" y1=\"0\" x2=\"0\" y2=\"1\">\n            <stop offset=\"0%\" stop-color=\"#fff8e1\"/><stop offset=\"100%\" stop-color=\"#f3e1b5\"/>\n          </linearGradient>\n          <linearGradient id=\"ink1\" x1=\"0\" y1=\"0\" x2=\"1\" y2=\"1\">\n            <stop offset=\"0%\" stop-color=\"#1e3a8a\"/><stop offset=\"100%\" stop-color=\"#0ea5e9\"/>\n          </linearGradient>\n        </defs>\n        <rect x=\"12\" y=\"10\" rx=\"5\" ry=\"5\" width=\"20\" height=\"28\" fill=\"url(#t1)\" stroke=\"#bda77a\"/>\n        <g stroke=\"#374151\" stroke-width=\"2\" stroke-linecap=\"round\">\n          <line x1=\"16\" y1=\"16\" x2=\"28\" y2=\"16\"/>\n          <line x1=\"16\" y1=\"21\" x2=\"28\" y2=\"21\"/>\n        </g>\n        <circle cx=\"34\" cy=\"12\" r=\"6\" fill=\"url(#ink1)\"/>\n        <path d=\"M34 9v6M31 12h6\" stroke=\"#fff\" stroke-width=\"2\" stroke-linecap=\"round\"/>\n      </svg>";
     addEventBtn.addEventListener('click', function (e) {
       e.preventDefault();
       openSheet();
@@ -529,21 +564,24 @@ function _typeof(o) { "@babel/helpers - typeof"; return _typeof = "function" == 
     }, 220);
   }
   if (sheet) {
+    // X button and backdrop use [data-close] or backdrop click
     if (sheetClose) sheetClose.addEventListener('click', function (e) {
       e.preventDefault();
       closeSheet();
     });
     if (sheetPanel) {
       sheetPanel.addEventListener('click', function (e) {
+        // Quick date chips (4 options)
         var qd = e.target && e.target.closest('.qp__chip[data-date]');
         if (qd) {
           e.preventDefault();
           var kind = qd.getAttribute('data-date');
           var base = new Date();
-          if (kind === 'tomorrow') base.setDate(base.getDate() + 1);else if (kind === 'nextweek') base.setDate(base.getDate() + 7);else if (/^\+\d+$/.test(kind)) base.setDate(base.getDate() + parseInt(kind.slice(1), 10));
+          if (kind === 'today') {/* no change */} else if (kind === 'tomorrow') base.setDate(base.getDate() + 1);else if (kind === 'nextweek') base.setDate(base.getDate() + 7);else if (/^\+\d+$/.test(kind)) base.setDate(base.getDate() + parseInt(kind.slice(1), 10));
           if (dateInput) dateInput.value = dateKey(base);
           return;
         }
+        // Quick time chips
         var qt = e.target && e.target.closest('.qp__chip[data-time]');
         if (qt) {
           e.preventDefault();
@@ -590,6 +628,18 @@ function _typeof(o) { "@babel/helpers - typeof"; return _typeof = "function" == 
     });
   }
 
+  /* ===================== Exit button (small icon, same size as header) ===================== */
+  function wireExitButton() {
+    if (!btnExit) return;
+    btnExit.className = 'c-topbtn';
+    btnExit.innerHTML = "\n      <svg viewBox=\"0 0 28 28\" width=\"18\" height=\"18\" aria-hidden=\"true\">\n        <defs>\n          <linearGradient id=\"exDoor2\" x1=\"0\" y1=\"0\" x2=\"1\" y2=\"1\">\n            <stop offset=\"0%\" stop-color=\"#F4D27A\"/><stop offset=\"100%\" stop-color=\"#C8A043\"/>\n          </linearGradient>\n          <linearGradient id=\"exArrow2\" x1=\"0\" y1=\"0\" x2=\"1\" y2=\"0\">\n            <stop offset=\"0%\" stop-color=\"#22D3EE\"/><stop offset=\"100%\" stop-color=\"#60A5FA\"/>\n          </linearGradient>\n        </defs>\n        <rect x=\"4\" y=\"6\" width=\"10\" height=\"16\" rx=\"2\" fill=\"url(#exDoor2)\" stroke=\"#9A7A2E\"/>\n        <circle cx=\"11\" cy=\"14\" r=\"1\" fill=\"#7C5B13\"/>\n        <path d=\"M14 14h8m0 0-3-3m3 3-3 3\" fill=\"none\" stroke=\"url(#exArrow2)\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\"/>\n      </svg>";
+    btnExit.addEventListener('click', function (e) {
+      e.preventDefault();
+      handleLogout();
+    });
+  }
+  wireExitButton();
+
   /* ===================== Logout ===================== */
   function clearAuthAll() {
     try {
@@ -611,27 +661,20 @@ function _typeof(o) { "@babel/helpers - typeof"; return _typeof = "function" == 
     } catch (e) {}
     window.location.replace('auth.html?loggedout=1');
   }
-  document.addEventListener('click', function (e) {
-    var trg = e.target && e.target.closest('[data-logout],#btnExit');
-    if (trg) {
-      e.preventDefault();
-      handleLogout();
-    }
-  });
 
   /* ===================== Effects & injected CSS ===================== */
   function blastConfetti(x, y, scale) {
     var layer = document.createElement('div');
     layer.className = 'fx-confetti';
     document.body.appendChild(layer);
-    var N = 120;
+    var N = 110;
     for (var i = 0; i < N; i++) {
       var s = document.createElement('span');
       s.className = 'fx-c';
       s.style.left = x + 'px';
       s.style.top = y + 'px';
-      s.style.setProperty('--dx', (Math.random() * 2 - 1) * 220 * scale + 'px');
-      s.style.setProperty('--dy', -Math.random() * 260 * scale + 'px');
+      s.style.setProperty('--dx', (Math.random() * 2 - 1) * 200 * scale + 'px');
+      s.style.setProperty('--dy', -Math.random() * 240 * scale + 'px');
       s.style.setProperty('--r', Math.random() * 720 + 'deg');
       s.style.setProperty('--t', 600 + Math.random() * 700 + 'ms');
       layer.appendChild(s);
@@ -640,18 +683,17 @@ function _typeof(o) { "@babel/helpers - typeof"; return _typeof = "function" == 
       return layer.remove();
     }, 1600);
   }
-
-  // Inject only-once CSS to fix the layouts you mentioned
   if (!document.getElementById('looz-inline-fixes')) {
     var s = document.createElement('style');
     s.id = 'looz-inline-fixes';
-    s.textContent = "\n      /* Week head: edge-aligned labels + centered counter */\n      .p-day__head{display:grid;grid-template-columns:1fr auto 1fr;align-items:center;padding:0 8px}\n      .p-day__name{justify-self:start;font-weight:700}\n      .p-day__date{justify-self:end;opacity:.85}\n      .p-day__count{justify-self:center;inline-size:24px;block-size:24px;border-radius:999px;font:600 12px/24px 'Rubik',system-ui,sans-serif;\n        border:1px solid currentColor;background:rgba(255,255,255,.9);box-shadow:0 2px 6px rgba(0,0,0,.08)}\n      html[data-theme=\"dark\"] .p-day__count{background:rgba(13,23,44,.9)}\n\n      /* Month: keep number and counter apart */\n      .p-cell{position:relative}\n      .p-cell__num{position:absolute;top:4px;right:6px;font-weight:700}\n      .p-cell__count{position:absolute;top:4px;left:6px;inline-size:16px;height:16px;border-radius:50%;\n        font:700 10px/16px 'Rubik',system-ui,sans-serif;border:1px solid currentColor;background:rgba(255,255,255,.9);z-index:2}\n      html[data-theme=\"dark\"] .p-cell__count{background:rgba(13,23,44,.9)}\n\n      /* Counter tones */\n      .cnt--none{display:none}\n      .cnt--green{color:#16a34a}.cnt--orange{color:#ea580c}.cnt--pink{color:#db2777}\n      .cnt--violet{color:#7c3aed}.cnt--teal{color:#0d9488}.cnt--amber{color:#d97706}\n      .cnt--over{color:#2563eb; filter:hue-rotate(45deg)}\n\n      /* Confetti + scratch */\n      .fx-confetti{position:fixed;inset:0;pointer-events:none;z-index:9999}\n      .fx-c{position:absolute;width:10px;height:10px;background: hsl(calc(360*var(--h, .5)), 90%, 60%); \n        transform:translate(-50%,-50%); border-radius:2px; animation:confThrow var(--t) ease-out forwards;}\n      .fx-c:nth-child(4n){--h:.1}.fx-c:nth-child(4n+1){--h:.22}.fx-c:nth-child(4n+2){--h:.62}.fx-c:nth-child(4n+3){--h:.82}\n      @keyframes confThrow{ to{ transform: translate(calc(-50% + var(--dx)), calc(-50% + var(--dy))) rotate(var(--r)); opacity:0;} }\n      .is-scratching{position:relative;overflow:hidden}\n      .is-scratching::after{content:\"\"; position:absolute; inset:-2px; background:repeating-linear-gradient(135deg, rgba(255,255,255,.9) 0 6px, rgba(0,0,0,0) 6px 12px); animation:scratchOut 520ms ease forwards;}\n      @keyframes scratchOut{ to{ transform:translateX(40%); opacity:0; } }\n\n      /* Exit pill button (center bottom) */\n      .c-exit-wrap{display:grid;place-items:center;margin:8px 0 18px}\n      .exit-pill{display:inline-grid;place-items:center;width:56px;height:36px;border-radius:999px;border:1px solid rgba(0,0,0,.15);\n        background:linear-gradient(180deg,#fff,#f7f7fb);box-shadow:0 .35rem .9rem rgba(0,0,0,.08);cursor:pointer}\n      .exit-pill__svg{width:26px;height:26px}\n      html[data-theme=\"dark\"] .exit-pill{background:linear-gradient(180deg,#0e162d,#0a1226);border-color:rgba(255,255,255,.12)}\n    ";
+    s.textContent = "\n      /* week chip alignment + count chip baseline */\n      .p-day__head{display:grid;grid-template-columns:1fr auto 1fr;align-items:center;padding:0 8px}\n      .p-day__name{justify-self:start;font-weight:700}\n      .p-day__date{justify-self:end;opacity:.85}\n      .p-day__count{justify-self:center;inline-size:26px;block-size:26px;border-radius:999px;font:700 12px/26px 'Rubik',system-ui,sans-serif;\n        background:#fff;border:1px solid currentColor;box-shadow:0 2px 6px rgba(0,0,0,.08)}\n      html[data-theme=\"dark\"] .p-day__count{background:rgba(13,23,44,.92)}\n      /* confetti */\n      .fx-confetti{position:fixed;inset:0;pointer-events:none;z-index:9999}\n      .fx-c{position:absolute;width:9px;height:9px;background: hsl(calc(360*var(--h, .5)), 90%, 60%); \n        transform:translate(-50%,-50%); border-radius:2px; animation:confThrow var(--t) ease-out forwards;}\n      .fx-c:nth-child(4n){--h:.1}.fx-c:nth-child(4n+1){--h:.22}.fx-c:nth-child(4n+2){--h:.62}.fx-c:nth-child(4n+3){--h:.82}\n      @keyframes confThrow{ to{ transform: translate(calc(-50% + var(--dx)), calc(-50% + var(--dy))) rotate(var(--r)); opacity:0;} }\n\n      /* Month ring \u2014 thinner */\n      .p-month .p-cell{position:relative}\n      .p-month .p-cell__num{position:relative;z-index:1;font-weight:900}\n      .p-month .p-cell__num::after{\n        content:\"\";position:absolute;inset:-6px;border-radius:50%;pointer-events:none;z-index:0;\n        background:\n          radial-gradient(closest-side, transparent calc(100% - 4px), var(--tone,#93c5fd) 0 100%) top/100% 100% no-repeat,\n          conic-gradient(var(--tone,#3b82f6) var(--ring,0%), #e2e8f0 0);\n        opacity:.95;mix-blend-mode:multiply;\n      }\n      html[data-theme=\"dark\"] .p-month .p-cell__num::after{\n        background:\n          radial-gradient(closest-side, transparent calc(100% - 4px), rgba(96,165,250,.85) 0 100%) top/100% 100% no-repeat,\n          conic-gradient(#60a5fa var(--ring,0%), rgba(15,23,42,.35) 0);\n        mix-blend-mode:screen;opacity:.9;\n      }\n      /* tiny badge */\n      .p-cell__count{position:absolute;top:6px;left:8px;min-width:14px;height:14px;border-radius:999px;\n        font:700 9px/14px 'Rubik',system-ui,sans-serif;border:1px solid currentColor;background:rgba(255,255,255,.96);box-shadow:0 1px 2px rgba(0,0,0,.06)}\n      html[data-theme=\"dark\"] .p-cell__count{background:rgba(13,23,44,.92)}\n\n      /* small bottom buttons container */\n      .c-bottom-cta{position:sticky;bottom:max(12px,env(safe-area-inset-bottom));display:grid;justify-items:center;background:transparent;padding:0;margin-top:.5rem}\n      .c-bottom-cta .c-topbtn{inline-size:2.4rem;height:2.4rem;border-radius:50%}\n      .c-exit-wrap{display:flex;justify-content:center;padding:6px 0}\n      #btnExit.c-topbtn{inline-size:2.4rem;height:2.4rem;border-radius:50%}\n\n      /* center lemon button under title */\n      .o-header{grid-template-columns:1fr auto 1fr;grid-template-rows:auto auto auto auto}\n      #lemonToggle.c-icon-btn--lemon{grid-column:2;grid-row:2;justify-self:center;margin-top:.1rem}\n    ";
     document.head.appendChild(s);
   }
 
-  /* ===================== Login Intro ===================== */
+  /* ===================== Login Intro (lemon splash -> icon) ===================== */
   (function intro() {
-    if (!lemonHost) return;
+    var lemonBtn = document.getElementById('lemonToggle');
+    if (!lemonBtn) return;
     try {
       if (localStorage.getItem('looz:justLoggedIn') !== '1') return;
       localStorage.removeItem('looz:justLoggedIn');
@@ -666,36 +708,45 @@ function _typeof(o) { "@babel/helpers - typeof"; return _typeof = "function" == 
     requestAnimationFrame(function () {
       wrap.classList.add('is-in');
     });
+
+    // Hold ~3s then glide to lemon button and fade
     setTimeout(function () {
-      var r = lemonHost.getBoundingClientRect();
+      var r = lemonBtn.getBoundingClientRect();
       var w = wrap.getBoundingClientRect();
       var dx = r.left + r.width / 2 - (w.left + w.width / 2);
       var dy = r.top + r.height / 2 - (w.top + w.height / 2);
-      var scale = r.width / w.width * 0.92;
+      var scale = r.width / w.width * 1.0;
       screen.classList.add('is-fly');
       wrap.style.transform = 'translate(' + dx + 'px,' + dy + 'px) scale(' + scale + ')';
-      wrap.style.opacity = '0.98';
+      wrap.style.opacity = '0.0';
       setTimeout(function () {
         screen.remove();
-      }, 850);
-    }, 1700);
-
-    // minimal styles for intro
+      }, 900);
+    }, 3000);
     if (!document.getElementById('intro-style')) {
-      var s = document.createElement('style');
-      s.id = 'intro-style';
-      s.textContent = "\n        .intro-screen{position:fixed;inset:0;z-index:10000;display:grid;place-items:center;pointer-events:none;background:#fff;}\n        html[data-theme=\"dark\"] .intro-screen{background:#0b1529;}\n        .intro-wrap{opacity:0;transform:scale(.8);filter:blur(18px);transition:opacity 900ms cubic-bezier(.16,1,.3,1),transform 900ms cubic-bezier(.16,1,.3,1),filter 900ms;}\n        .intro-wrap.is-in{opacity:1;transform:scale(1);filter:blur(0);}\n        .intro-lemon{display:block;width:clamp(96px,28vw,160px);filter:drop-shadow(0 20px 42px rgba(6,12,26,.35));}\n        .intro-sweep{transform:translateY(80%);opacity:.7;animation:introSweep 1600ms cubic-bezier(.16,1,.3,1) 450ms forwards;}\n        .intro-glint{transform: translateY(78%) scale(.9);opacity:0;animation:introGlint 1300ms cubic-bezier(.16,1,.3,1) 600ms forwards;}\n        @keyframes introSweep{0%{transform:translateY(80%);opacity:.65;}70%{transform:translateY(-6%);opacity:.95;}100%{transform:translateY(-16%);opacity:0;}}\n        @keyframes introGlint{0%{opacity:0;transform: translateY(78%) scale(.9);}55%{opacity:.95;}100%{opacity:0;transform: translateY(-10%) scale(1.06);}}\n        .intro-screen.is-fly .intro-wrap{transition:transform 700ms cubic-bezier(.4,0,.2,1), opacity 500ms; }\n      ";
-      document.head.appendChild(s);
+      var s2 = document.createElement('style');
+      s2.id = 'intro-style';
+      s2.textContent = "\n        .intro-screen{position:fixed;inset:0;z-index:10000;display:grid;place-items:center;pointer-events:none;background:#fff;}\n        html[data-theme=\"dark\"] .intro-screen{background:#0b1529;}\n        .intro-wrap{opacity:0;transform:scale(.85);filter:blur(18px);transition:opacity 900ms cubic-bezier(.16,1,.3,1),transform 900ms cubic-bezier(.16,1,.3,1),filter 900ms;}\n        .intro-wrap.is-in{opacity:1;transform:scale(1);filter:blur(0);}\n        .intro-lemon{display:block;width:clamp(120px,34vw,180px);filter:drop-shadow(0 20px 42px rgba(6,12,26,.35));}\n        .intro-sweep{transform:translateY(80%);opacity:.7;animation:introSweep 1600ms cubic-bezier(.16,1,.3,1) 450ms forwards;}\n        .intro-glint{transform: translateY(78%) scale(.9);opacity:0;animation:introGlint 1300ms cubic-bezier(.16,1,.3,1) 600ms forwards;}\n        @keyframes introSweep{0%{transform:translateY(80%);opacity:.65;}70%{transform:translateY(-6%);opacity:.95;}100%{transform:translateY(-16%);opacity:0;}}\n        @keyframes introGlint{0%{opacity:0;transform: translateY(78%) scale(.9);}55%{opacity:.95;}100%{opacity:0;transform: translateY(-10%) scale(1.06);}}\n        .intro-screen.is-fly .intro-wrap{transition:transform 800ms cubic-bezier(.4,0,.2,1), opacity 800ms; }\n      ";
+      document.head.appendChild(s2);
     }
   })();
 
   /* ===================== Initial ===================== */
-  var today = new Date();
-  formatTitle(today);
-  state.current = today;
+  // convert bottom CTA container to host the two small buttons stacked
+  (function pinBottomIcons() {
+    var ctaWrap = document.querySelector('.c-bottom-cta');
+    if (!ctaWrap || !addEventBtn) return;
+    ctaWrap.innerHTML = '';
+    ctaWrap.appendChild(addEventBtn);
+    // exit lives just below in .c-exit-wrap already; sizes handled by CSS/JS
+  })();
+  var _today = new Date();
+  formatTitle(_today);
+  state.current = _today;
   render();
 })();
-// --- AUTH GUARD (skip on auth page) ---
+
+/* --- AUTH GUARD (skip on auth page) --- */
 (function () {
   try {
     if (/auth\.html(?:$|\?)/.test(location.pathname)) return;
