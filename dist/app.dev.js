@@ -6,7 +6,7 @@ function _objectSpread(target) { for (var i = 1; i < arguments.length; i++) { va
 
 function _defineProperty(obj, key, value) { if (key in obj) { Object.defineProperty(obj, key, { value: value, enumerable: true, configurable: true, writable: true }); } else { obj[key] = value; } return obj; }
 
-/* ===== LooZ — Planner App (home) — vFinal.3 (icon actions) ===== */
+/* ===== LooZ — Planner App (home) — vFinal.6 (Day: X icon + equal arrows) ===== */
 (function () {
   'use strict';
   /* -------- AUTH GUARD (runs before anything else) -------- */
@@ -85,7 +85,7 @@ function _defineProperty(obj, key, value) { if (key in obj) { Object.definePrope
   };
 
   var HEB_DAYS = ['ראשון', 'שני', 'שלישי', 'רביעי', 'חמישי', 'שישי', 'שבת'];
-  var HEB_MONTHS = ['ינואר', 'פברואר', 'מרץ', 'אפריל', 'מאי', 'יוני', 'יולי', 'אוגוסט', 'ספטמבר', 'אוקטובר', 'נובמבר', 'דצמבר'];
+  var HEB_MONTHS = ['ינואר', 'פברואר', 'מרץ', 'אפריל', 'מאי', 'יוני', 'יולי', 'אוגוסט', 'ספטמבר', 'אוקטובר', 'דצמבר'];
 
   var weekLabel = function weekLabel(d, weekStart) {
     var s = startOfWeek(d, weekStart);
@@ -134,7 +134,7 @@ function _defineProperty(obj, key, value) { if (key in obj) { Object.definePrope
   var subtitleEl = $('.c-subtitle');
   var addEventBtn = $('#addEventBtn');
   var btnExit = $('#btnExit');
-  /* ===================== Greeting (special user – 3 rows) ===================== */
+  /* ===================== Greeting ===================== */
 
   function getAuth() {
     try {
@@ -169,7 +169,7 @@ function _defineProperty(obj, key, value) { if (key in obj) { Object.definePrope
     var isSpecial = au && String(au.email || '').toLowerCase() === SPECIAL_EMAIL.toLowerCase();
 
     if (subtitleEl) {
-      subtitleEl.innerHTML = isSpecial ? '<div style="font-weight:800;margin-bottom:.15rem">מלכה שלי</div>' + '<div>איזה כיף שחזרת <strong>' + name + '</strong></div>' + '<div>לוז מושלם מחכה לך</div>' : 'ברוכים השבים, <strong id="uiName">' + name + '</strong>!<br>מה בלוז היום?';
+      subtitleEl.innerHTML = isSpecial ? '<div style="font-weight:800;margin-bottom:.15rem">נשמולית שלי</div>' + '<div>איזה כיף שחזרת <strong>' + name + '</strong></div>' + '<div>לוז מושלם מחכה לך</div>' : 'ברוכים השבים, <strong id="uiName">' + name + '</strong>!<br>מה בלוז היום?';
     }
   })();
   /* ===================== State ===================== */
@@ -317,6 +317,8 @@ function _defineProperty(obj, key, value) { if (key in obj) { Object.definePrope
 
     var bar = document.createElement('div');
     bar.className = 'p-weekbar';
+    bar.setAttribute('data-scope', 'day'); // scope for day-only CSS
+
     bar.innerHTML = '<button class="p-weekbar__btn" data-daynav="prev" aria-label="יום קודם">‹</button>' + "<div class=\"p-weekbar__title\">".concat(HEB_DAYS[state.current.getDay()], " \u2014 ").concat(pad2(state.current.getDate()), ".").concat(pad2(state.current.getMonth() + 1), ".").concat(state.current.getFullYear(), "</div>") + '<div class="p-weekbar__right">' + '<button class="p-weekbar__btn" data-daynav="today">היום</button>' + '<button class="p-weekbar__btn" data-daynav="next" aria-label="יום הבא">›</button>' + '</div>';
     plannerRoot.appendChild(bar);
     bar.addEventListener('click', function (e) {
@@ -344,9 +346,11 @@ function _defineProperty(obj, key, value) { if (key in obj) { Object.definePrope
     } else {
       items.forEach(function (t) {
         var row = document.createElement('div');
-        row.className = 'p-daytask';
-        row.innerHTML = "<div class=\"p-daytask__text\">".concat(escapeHtml(t.title), "</div>") + "<div class=\"p-daytask__time\">".concat(t.time || '', "</div>") + '<div class="p-daytask__actions">' + // ——— Icon buttons (keep data-* the same) ———
-        "<button class=\"p-ico p-ico--ok\"  title=\"\u05D1\u05D5\u05E6\u05E2\" data-done=\"".concat(t.id, "\" aria-label=\"\u05D1\u05D5\u05E6\u05E2\"></button>") + "<button class=\"p-ico p-ico--del\" title=\"\u05DE\u05D7\u05E7\"  data-del=\"".concat(t.id, "\"  aria-label=\"\u05DE\u05D7\u05E7\"></button>") + '</div>';
+        row.className = 'p-daytask'; // ORDER (RTL): X, V, hour, text
+
+        row.innerHTML = '<div class="p-daytask__actions">' + "<button class=\"p-ico p-ico--del\" title=\"\u05DE\u05D7\u05E7\"  data-del=\"".concat(t.id, "\"  aria-label=\"\u05DE\u05D7\u05E7\"></button>") + // ❌ pill
+        "<button class=\"p-ico p-ico--ok\"  title=\"\u05D1\u05D5\u05E6\u05E2\" data-done=\"".concat(t.id, "\" aria-label=\"\u05D1\u05D5\u05E6\u05E2\"></button>") + // ✓ pill
+        '</div>' + "<div class=\"p-daytask__time\">".concat(t.time || '', "</div>") + "<div class=\"p-daytask__text\">".concat(escapeHtml(t.title), "</div>");
         wrap.appendChild(row);
       });
     }
@@ -403,7 +407,7 @@ function _defineProperty(obj, key, value) { if (key in obj) { Object.definePrope
           items.forEach(function (t) {
             var row = document.createElement('div');
             row.className = 'p-task';
-            row.innerHTML = "<div class=\"p-task__text\">".concat(escapeHtml(t.title), "</div>") + "<div class=\"p-task__time\">".concat(t.time || '', "</div>") + '<div class="p-task__actions">' + "<button class=\"p-ico p-ico--ok\"  title=\"\u05D1\u05D5\u05E6\u05E2\" data-done=\"".concat(t.id, "\" aria-label=\"\u05D1\u05D5\u05E6\u05E2\"></button>") + "<button class=\"p-ico p-ico--del\" title=\"\u05DE\u05D7\u05E7\"  data-del=\"".concat(t.id, "\"  aria-label=\"\u05DE\u05D7\u05E7\"></button>") + '</div>';
+            row.innerHTML = '<div class="p-task__actions">' + "<button class=\"p-ico p-ico--del\" title=\"\u05DE\u05D7\u05E7\"  data-del=\"".concat(t.id, "\"  aria-label=\"\u05DE\u05D7\u05E7\"></button>") + "<button class=\"p-ico p-ico--ok\"  title=\"\u05D1\u05D5\u05E6\u05E2\" data-done=\"".concat(t.id, "\" aria-label=\"\u05D1\u05D5\u05E6\u05E2\"></button>") + '</div>' + "<div class=\"p-task__time\">".concat(t.time || '', "</div>") + "<div class=\"p-task__text\">".concat(escapeHtml(t.title), "</div>");
             list.appendChild(row);
           });
         }
@@ -551,7 +555,6 @@ function _defineProperty(obj, key, value) { if (key in obj) { Object.definePrope
       var delId = e.target && e.target.getAttribute('data-del');
 
       if (doneId) {
-        // light confetti
         blastConfetti(e.clientX || 0, e.clientY || 0, 1.0);
         state.tasks = state.tasks.filter(function (t) {
           return t.id !== doneId;
@@ -718,11 +721,11 @@ function _defineProperty(obj, key, value) { if (key in obj) { Object.definePrope
   } // Replace previous injected styles
 
 
-  var prev = document.getElementById('looz-fixes-v9');
+  var prev = document.getElementById('looz-fixes-v12');
   if (prev) prev.remove();
   var style = document.createElement('style');
-  style.id = 'looz-fixes-v9';
-  style.textContent = "\n  /* --- Week header: counter to far end --- */\n  .p-day__head.p-day__head--flex{\n    display:grid; grid-template-columns:1fr auto auto; align-items:center; column-gap:.5rem; padding:0 .5rem;\n  }\n  .p-day__name{justify-self:start;font-weight:700}\n  .p-day__date{justify-self:center;opacity:.9;font-weight:800}\n  .p-day__count{\n    justify-self:end; width:22px; height:22px; border-radius:999px; display:grid; place-items:center;\n    font:800 11px/1 'Rubik',system-ui,sans-serif; background:#fff; border:1.5px solid var(--tone,#e5e7eb);\n    box-shadow:0 2px 6px rgba(0,0,0,.08);\n  }\n  html[data-theme=\"dark\"] .p-day__count{background:rgba(13,23,44,.92);}\n\n  /* --- Task rows: icon buttons (biblical ink + scroll) --- */\n  .p-task__actions, .p-daytask__actions{ display:flex; gap:.35rem; align-items:center; }\n  .p-ico{\n    width:30px; height:30px; border-radius:999px; display:inline-grid; place-items:center; cursor:pointer;\n    background:\n      radial-gradient(140% 120% at 35% 30%, #fff 0%, rgba(255,255,255,.45) 46%, rgba(255,255,255,0) 70%),\n      linear-gradient(180deg,#fff7df,#f2e5bf);\n    border:1px solid #e2d4a6;\n    box-shadow:0 2px 6px rgba(0,0,0,.08), inset 0 0 .4rem rgba(255,255,255,.75);\n  }\n  .p-ico:active{ transform:translateY(1px); }\n\n  .p-ico--ok::before,\n  .p-ico--del::before{\n    content:\"\"; display:block; width:18px; height:18px; background:transparent;\n    mask-repeat:no-repeat; mask-position:center; mask-size:contain;\n  }\n  /* \u2713 \u2014 deep emerald ink */\n  .p-ico--ok::before{\n    mask-image:url('data:image/svg+xml;utf8,<svg xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 20 20\" fill=\"%23000\"><path d=\"M7.8 13.6 3.9 9.8l-1.4 1.4 5.3 5.2L18 6.2l-1.4-1.4z\"/></svg>');\n    background:#0f7b4b;\n  }\n  /* \u2717 \u2014 lapis/cranberry ink */\n  .p-ico--del::before{\n    mask-image:url('data:image/svg+xml;utf8,<svg xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 20 20\" fill=\"%23000\"><path d=\"M6 6l8 8M14 6L6 14\"/></svg>');\n    background:#b3261e;\n  }\n\n  /* --- Month grid: single elegant ring + top counter --- */\n  .p-month{display:grid;grid-template-columns:repeat(7,1fr);gap:.7rem}\n  .p-cell{\n    position:relative; aspect-ratio:1/1; border-radius:16px; background:#fff;\n    box-shadow: inset 0 0 0 2px var(--ring-color, #e5e7eb), 0 8px 16px rgba(15,23,42,.06);\n    display:grid; place-items:center; cursor:pointer;\n  }\n  .p-cell--pad{background:#f8fafc; opacity:.9}\n  .p-cell__num{\n    font-weight:900; font-size:1.15rem; color:#0f172a; position:relative; z-index:1;\n  }\n\n  /* TODAY: readable, classy gold glow on the digits */\n  .p-cell--today{ --ring-color:#e8c65c; }\n  .p-cell--today .p-cell__num{\n    color:#b98109;\n    text-shadow:0 1px 0 #fff, 0 0 10px rgba(245,199,70,.55), 0 0 18px rgba(245,199,70,.35);\n  }\n\n  /* Remove any legacy caps */\n  .p-cell::before, .p-cell::after, .p-cell__num::before, .p-cell__num::after, .p-cap, .p-cap::before, .p-cap::after {\n    display:none !important; content:none !important;\n  }\n\n  /* Counter badge \u2014 top/center, clear spacing from date */\n  .p-count{\n    position:absolute; top:-9px; left:50%; transform:translateX(-50%);\n    min-width:18px; height:18px; padding:0 6px; border-radius:999px;\n    display:grid; place-items:center; font:800 10px/1 'Rubik',system-ui,sans-serif;\n    background:#fff; border:2px solid var(--tone, #94a3b8); z-index:2;\n    box-shadow:0 2px 6px rgba(0,0,0,.08);\n  }\n\n  /* --- Nav buttons --- */\n  .p-weekbar__btn,.p-monthbar__btn{ height:36px; padding:0 14px; border-radius:999px; border:1px solid #e5e7eb; background:#fff; }\n  .p-weekbar__btn[data-weeknav=\"prev\"], .p-weekbar__btn[data-weeknav=\"next\"],\n  .p-monthbar__btn[data-monthnav=\"prev\"], .p-monthbar__btn[data-monthnav=\"next\"]{\n    width:36px; padding:0; display:grid; place-items:center; font-size:18px; line-height:1;\n  }\n\n  /* --- Bottom actions: stacked, aligned --- */\n  .c-bottom-cta{ position:sticky; bottom:max(12px, env(safe-area-inset-bottom)); display:grid; justify-items:center; gap:.55rem; }\n  .looz-bottom-stack{ display:grid; gap:.55rem; justify-items:center; }\n  .c-fab{ width:60px; height:60px; border-radius:999px; display:grid; place-items:center;\n          background:radial-gradient(140% 120% at 35% 30%, #fff 0%, rgba(255,255,255,.35) 45%, rgba(255,255,255,0) 70%),\n                     linear-gradient(180deg,#fff4d0,#ffd08a);\n          border:1px solid rgba(0,0,0,.06); box-shadow:inset 0 0 .45rem rgba(255,255,255,.75),0 .35rem 1rem rgba(0,0,0,.14);}\n  .c-fab svg{ width:28px; height:28px; }\n  #btnExit.c-topbtn{ inline-size:2.4rem; height:2.4rem; border-radius:50%; display:grid; place-items:center; }\n\n  /* Confetti */\n  .fx-confetti{position:fixed;inset:0;pointer-events:none;z-index:9999}\n  .fx-c{position:absolute;width:9px;height:9px;background:hsl(calc(360*var(--h,.5)),90%,60%);transform:translate(-50%,-50%);border-radius:2px;animation:confThrow var(--t) ease-out forwards}\n  .fx-c:nth-child(4n){--h:.1}.fx-c:nth-child(4n+1){--h:.22}.fx-c:nth-child(4n+2){--h:.62}.fx-c:nth-child(4n+3){--h:.82}\n  @keyframes confThrow{to{transform:translate(calc(-50% + var(--dx)),calc(-50% + var(--dy))) rotate(var(--r));opacity:0}}\n\n  html[data-theme=\"dark\"] .p-day__count{background:rgba(13,23,44,.92);}\n  html[data-theme=\"dark\"] .p-cell{ background:#0f1b32; box-shadow: inset 0 0 0 2px var(--ring-color,#2a4674); }\n  html[data-theme=\"dark\"] .p-cell__num{ color:#eaf2ff; }\n  html[data-theme=\"dark\"] .p-cell--today .p-cell__num{ color:#eed27b; text-shadow:0 0 10px rgba(241,196,67,.5), 0 0 18px rgba(241,196,67,.28); }\n  html[data-theme=\"dark\"] .p-count{ background:rgba(13,23,44,.92); color:#cbd5e1; border-color:#334155; }\n  ";
+  style.id = 'looz-fixes-v12';
+  style.textContent = "\n  /* --- Week header: name + date (counter centered on day) --- */\n  .p-day__head.p-day__head--flex{\n    display:grid; grid-template-columns:1fr auto; align-items:center; column-gap:.5rem; padding:0 .5rem;\n  }\n  .p-day__name{justify-self:start;font-weight:700}\n  .p-day__date{justify-self:end;opacity:.9;font-weight:800}\n\n  /* Counter centered in the day box */\n  .p-day{ position:relative; }\n  .p-day__count{\n    position:absolute; top:50%; left:50%; transform:translate(-50%,-50%);\n    width:24px; height:24px; border-radius:999px; display:grid; place-items:center;\n    font:800 12px/1 'Rubik',system-ui,sans-serif; background:#fff; border:1.5px solid var(--tone,#e5e7eb);\n    box-shadow:0 2px 6px rgba(0,0,0,.08);\n  }\n  html[data-theme=\"dark\"] .p-day__count{background:rgba(13,23,44,.92);}\n\n  /* Week rows (unchanged) */\n  .p-task{ display:grid; grid-template-columns:auto auto 1fr; align-items:center; gap:.5rem; }\n  .p-task__actions, .p-daytask__actions{ display:flex; gap:.35rem; align-items:center; }\n  .p-task__time{ font-weight:700; min-width:3.2rem; text-align:center; }\n  .p-task__text{ overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }\n\n  /* Day rows: X, V, hour, text */\n  .p-daytask{ display:grid; grid-template-columns:auto auto auto 1fr; align-items:center; gap:.5rem; }\n  .p-daytask__time{ font-weight:700; min-width:3.2rem; text-align:center; }\n  .p-daytask__text{ overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }\n\n  /* Icon pills */\n  .p-ico{\n    width:30px; height:30px; border-radius:999px; display:inline-grid; place-items:center; cursor:pointer;\n    background:\n      radial-gradient(140% 120% at 35% 30%, #fff 0%, rgba(255,255,255,.45) 46%, rgba(255,255,255,0) 70%),\n      linear-gradient(180deg,#fff7df,#f2e5bf);\n    border:1px solid #e2d4a6;\n    box-shadow:0 2px 6px rgba(0,0,0,.08), inset 0 0 .4rem rgba(255,255,255,.75);\n  }\n  .p-ico:active{ transform:translateY(1px); }\n  .p-ico--ok::before,\n  .p-ico--del::before{\n    content:\"\"; display:block; width:18px; height:18px; background:transparent;\n    -webkit-mask-repeat:no-repeat; mask-repeat:no-repeat;\n    -webkit-mask-position:center; mask-position:center;\n    -webkit-mask-size:contain; mask-size:contain;\n  }\n  /* \u2713 */\n  .p-ico--ok::before{\n    background:#0f7b4b;\n    -webkit-mask-image:url('data:image/svg+xml;utf8,<svg xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 20 20\"><path d=\"M7.8 13.6 3.9 9.8l-1.4 1.4 5.3 5.2L18 6.2l-1.4-1.4z\" fill=\"%23000\"/></svg>');\n            mask-image:url('data:image/svg+xml;utf8,<svg xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 20 20\"><path d=\"M7.8 13.6 3.9 9.8l-1.4 1.4 5.3 5.2L18 6.2l-1.4-1.4z\" fill=\"%23000\"/></svg>');\n  }\n  /* \u274C \u2014 stroke with width so it actually shows */\n  .p-ico--del::before{\n    background:#b3261e;\n    -webkit-mask-image:url('data:image/svg+xml;utf8,<svg xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 20 20\"><path d=\"M5 5L15 15M15 5L5 15\" stroke=\"%23000\" stroke-width=\"2.6\" stroke-linecap=\"round\"/></svg>');\n            mask-image:url('data:image/svg+xml;utf8,<svg xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 20 20\"><path d=\"M5 5L15 15M15 5L5 15\" stroke=\"%23000\" stroke-width=\"2.6\" stroke-linecap=\"round\"/></svg>');\n  }\n\n  /* Month grid (unchanged) */\n  .p-month{display:grid;grid-template-columns:repeat(7,1fr);gap:.7rem}\n  .p-cell{\n    position:relative; aspect-ratio:1/1; border-radius:16px; background:#fff;\n    box-shadow: inset 0 0 0 2px var(--ring-color, #e5e7eb), 0 8px 16px rgba(15,23,42,.06);\n    display:grid; place-items:center; cursor:pointer;\n  }\n  .p-cell--pad{background:#f8fafc; opacity:.9}\n  .p-cell__num{ font-weight:900; font-size:1.15rem; color:#0f172a; position:relative; z-index:1; }\n  .p-cell--today{ --ring-color:#e8c65c; }\n  .p-cell--today .p-cell__num{ color:#0f172a; }\n\n  /* Month counter badge */\n  .p-count{\n    position:absolute; top:-9px; left:50%; transform:translateX(-50%);\n    min-width:18px; height:18px; padding:0 6px; border-radius:999px;\n    display:grid; place-items:center; font:800 10px/1 'Rubik',system-ui,sans-serif;\n    background:#fff; border:2px solid var(--tone, #94a3b8); z-index:2;\n    box-shadow:0 2px 6px rgba(0,0,0,.08);\n  }\n\n  /* Day-only nav arrows (same square size as week/month) */\n  .p-weekbar[data-scope=\"day\"] .p-weekbar__btn[data-daynav=\"prev\"],\n  .p-weekbar[data-scope=\"day\"] .p-weekbar__btn[data-daynav=\"next\"]{\n    width:36px; height:36px; padding:0;\n    border-radius:999px; border:1px solid #e5e7eb; background:#fff;\n    display:grid; place-items:center; font-size:18px; font-weight:800; line-height:1;\n  }\n\n  /* Bottom actions & Confetti */\n  .c-bottom-cta{ position:sticky; bottom:max(12px, env(safe-area-inset-bottom)); display:grid; justify-items:center; gap:.55rem; }\n  .looz-bottom-stack{ display:grid; gap:.55rem; justify-items:center; }\n  .c-fab{ width:60px; height:60px; border-radius:999px; display:grid; place-items:center;\n          background:radial-gradient(140% 120% at 35% 30%, #fff 0, rgba(255,255,255,.35) 45%, rgba(255,255,255,0) 70%),\n                     linear-gradient(180deg,#fff4d0,#ffd08a);\n          border:1px solid rgba(0,0,0,.06); box-shadow:inset 0 0 .45rem rgba(255,255,255,.75),0 .35rem 1rem rgba(0,0,0,.14);}\n  .c-fab svg{ width:28px; height:28px; }\n  #btnExit.c-topbtn{ inline-size:2.4rem; height:2.4rem; border-radius:50%; display:grid; place-items:center; }\n\n  /* Confetti */\n  .fx-confetti{position:fixed;inset:0;pointer-events:none;z-index:9999}\n  .fx-c{position:absolute;width:9px;height:9px;background:hsl(calc(360*var(--h,.5)),90%,60%);transform:translate(-50%,-50%);border-radius:2px;animation:confThrow var(--t) ease-out forwards}\n  .fx-c:nth-child(4n){--h:.1}.fx-c:nth-child(4n+1){--h:.22}.fx-c:nth-child(4n+2){--h:.62}.fx-c:nth-child(4n+3){--h:.82}\n  @keyframes confThrow{to{transform:translate(calc(-50% + var(--dx)),calc(-50% + var(--dy))) rotate(var(--r));opacity:0}}\n\n  /* Dark mode tweaks */\n  html[data-theme=\"dark\"] .p-day__count{background:rgba(13,23,44,.92);}\n  html[data-theme=\"dark\"] .p-cell{ background:#0f1b32; box-shadow: inset 0 0 0 2px var(--ring-color,#2a4674); }\n  html[data-theme=\"dark\"] .p-cell__num{ color:#eaf2ff; }\n  html[data-theme=\"dark\"] .p-cell--today .p-cell__num{ color:#eed27b; }\n  html[data-theme=\"dark\"] .p-count{ background:rgba(13,23,44,.92); color:#cbd5e1; border-color:#334155; }\n  ";
   document.head.appendChild(style);
   /* ===================== Bottom buttons (icons & layout) ===================== */
 
@@ -739,7 +742,7 @@ function _defineProperty(obj, key, value) { if (key in obj) { Object.definePrope
     addEventBtn.onclick = function (e) {
       e.preventDefault();
       openSheet();
-    }; // Logout — same size/shape family as profile/settings
+    }; // Logout
 
 
     btnExit.className = 'c-topbtn';

@@ -412,6 +412,7 @@ html[data-theme="dark"] .p-cell::before{background:rgba(13,23,44,.92);color:#cbd
 .p-cell--today .p-cell__num{
   position:relative;
   animation: looz-gold-glow 2.4s ease-in-out infinite;
+  color: #c6522b;
 }
 .p-cell--today .p-cell__num::after{
   display:block;
@@ -441,4 +442,440 @@ html[data-theme="dark"] .p-cell::before{background:rgba(13,23,44,.92);color:#cbd
 html[data-theme="dark"] .p-cell::before{
   background:rgba(13,23,44,.92); color:#cbd5e1;
   border-color:#334155;
+}
+/* === Month view: yellow marker behind today's date (matches header badge) === */
+.p-cell--today .p-cell__num{
+  position:relative;
+  z-index:1;                /* keep number above the marker */
+  color:#0f172a;            /* readable on yellow */
+  font-weight:900;
+}
+
+/* the yellow pill */
+.p-cell--today .p-cell__num::before{
+  content:"";
+  position:absolute;
+  top:50%; left:50%;
+  transform:translate(-50%,-50%);
+  height:1.6em;             /* pill height */
+  padding:0 .6em;           /* pill width auto by padding */
+  border-radius:999px;
+  background:linear-gradient(180deg,#FFE487,#F8CF45);
+  border:1px solid #E6C34A;
+  box-shadow:
+    0 2px 6px rgba(0,0,0,.08),
+    inset 0 0 .4rem rgba(255,255,255,.55);
+  z-index:-1;               /* sit behind the number */
+}
+
+/* keep your elegant gold ring for today’s cell */
+.p-cell--today{
+  --ring-color:#e8c65c;
+}
+/* --- Day-only nav arrows (match week/month style) --- */
+.p-weekbar[data-scope="day"] .p-weekbar__btn[data-daynav="prev"],
+.p-weekbar[data-scope="day"] .p-weekbar__btn[data-daynav="next"] {
+  width:36px;
+  height:36px;
+  padding:0;
+  border-radius:999px;
+  border:1px solid #e5e7eb;
+  background:#fff;
+  display:grid;
+  place-items:center;
+  font-size:18px;
+  font-weight:800;
+  line-height:1;
+}
+/* ===== MONTH VIEW — ring + counter color sync, tomato glow for TODAY ===== */
+
+/* 1) Keep the small counter; color & border = tone/ring-color */
+.p-month .p-count{
+  color: var(--ring-color, #94a3b8) !important;
+  border-color: var(--ring-color, #94a3b8) !important;
+  background: #fff !important;
+}
+
+/* 2) Remove any legacy pill/cap or square highlight behind the number */
+.p-month .p-cell .p-cell__num::before{ display:none !important; }
+.p-month .p-cell.p-cell--today{ box-shadow:none !important; outline:none !important; }
+
+/* 3) Re-enable the circular ring around the number.
+      Its color follows --ring-color which you already set in JS per day. */
+.p-month .p-cell .p-cell__num{
+  position: relative;
+  z-index: 1;
+  font-weight: 900;
+}
+.p-month .p-cell .p-cell__num::after{
+  content: "";
+  display: block !important;            /* override any previous 'display:none' */
+  position: absolute;
+  inset: -7px;
+  border-radius: 50%;
+  pointer-events: none;
+  z-index: 0;
+  background:
+    radial-gradient(closest-side, transparent calc(100% - 3px), var(--ring-color,#94a3b8) 0 100%) top/100% 100% no-repeat,
+    conic-gradient(var(--ring-color,#94a3b8) var(--ring,0%), #e2e8f0 0);
+  opacity: .95;
+  mix-blend-mode: multiply;
+}
+
+/* 4) TODAY: number glows in tomato (no background square). */
+.p-month .p-cell.p-cell--today .p-cell__num{
+  color: tomato !important; /* #FF6347 */
+  text-shadow:
+    0 0 8px rgba(255,99,71,.55),
+    0 0 16px rgba(255,99,71,.35);
+}
+
+/* Dark mode parity */
+html[data-theme="dark"] .p-month .p-count{
+  background: rgba(13,23,44,.92) !important;
+}
+html[data-theme="dark"] .p-month .p-cell .p-cell__num{ color:#eaf2ff; }
+html[data-theme="dark"] .p-month .p-cell .p-cell__num::after{
+  background:
+    radial-gradient(closest-side, transparent calc(100% - 3px), var(--ring-color,#60a5fa) 0 100%) top/100% 100% no-repeat,
+    conic-gradient(var(--ring-color,#60a5fa) var(--ring,0%), rgba(15,23,42,.35) 0);
+  opacity: .92;
+  mix-blend-mode: screen;
+}
+/* ===== Month view — single ring, tone-synced counter, gold glow for TODAY ===== */
+
+/* 0) Neutralize previous multi-ring/halo rules */
+.p-month .p-cell .p-cell__num::before,
+.p-month .p-cell .p-cell__num::after{
+  display:none !important;
+}
+.p-month .p-cell.p-cell--today{
+  box-shadow:none !important;
+  outline:none !important;
+}
+
+/* 1) One border around the date cell; color = tone (set in JS as --ring-color) */
+.p-month .p-cell{
+  border:2px solid var(--ring-color, #cbd5e1) !important;
+  box-shadow:none !important;
+  background:#fff;
+}
+
+/* 2) Date number styling */
+.p-month .p-cell .p-cell__num{
+  position:relative;
+  z-index:1;
+  font-weight:900;
+  color:#0f172a;
+}
+
+/* 3) TODAY: number glows in gold; keep the same tone border */
+.p-month .p-cell.p-cell--today .p-cell__num{
+  color:#0f172a;
+  text-shadow:
+    0 0 6px rgba(232,196,92,.55),
+    0 0 14px rgba(232,196,92,.35);
+}
+
+/* 4) Counter: keep at the top, NO border; text color = tone */
+.p-month .p-count{
+  position:absolute;
+  top:-9px; left:50%; transform:translateX(-50%);
+  min-width:18px; height:18px; padding:0 6px;
+  border-radius:999px; display:grid; place-items:center;
+  font:800 10px/18px 'Rubik',system-ui,sans-serif;
+  background:#fff !important;
+  border:0 !important;                 /* no border */
+  color:var(--ring-color, #94a3b8) !important; /* same color as date border */
+  box-shadow:none !important;
+}
+
+/* 5) Off-month cells muted but still single-ringed */
+.p-month .p-cell.p-cell--pad{
+  background:#fafafc;
+  border-color:#e5e7eb !important;
+}
+.p-month .p-cell.p-cell--pad .p-cell__num{ color:#9aa4b2; }
+
+/* Dark mode parity */
+html[data-theme="dark"] .p-month .p-cell{
+  background:#0f1b32;
+  border-color:var(--ring-color, #2a4674) !important;
+}
+html[data-theme="dark"] .p-month .p-count{
+  background:rgba(13,23,44,.92) !important;
+  color:var(--ring-color, #60a5fa) !important;
+}
+html[data-theme="dark"] .p-month .p-cell .p-cell__num{ color:#eaf2ff; }
+/* === Month view: cleanup === */
+
+/* Remove any background pill or halo that shows up behind counters */
+.p-month .p-cell::before,
+.p-month .p-cell__num::before,
+.p-month .p-cell__num::after {
+  display: none !important;
+}
+
+/* One border around the cell (tone-colored), no extra square */
+.p-month .p-cell {
+  border: 2px solid var(--ring-color, #cbd5e1) !important;
+  box-shadow: none !important;
+  background: #fff;
+  position: relative;
+}
+
+/* Task counter: floating number only, no border, no background */
+.p-month .p-count {
+  position: absolute;
+  top: -9px; left: 50%;
+  transform: translateX(-50%);
+  min-width: 18px; height: 18px; padding: 0 6px;
+  font: 800 10px/18px 'Rubik', system-ui, sans-serif;
+  background: transparent !important;   /* no pill */
+  border: 0 !important;                 /* no border */
+  color: var(--ring-color, #94a3b8) !important; /* same color as cell border */
+  box-shadow: none !important;
+}
+
+/* Number inside cell */
+.p-month .p-cell__num {
+  font-weight: 900;
+  color: #0f172a;
+  position: relative;
+  z-index: 1;
+}
+
+/* TODAY: number itself glows gold, no square behind it */
+.p-month .p-cell--today .p-cell__num {
+  color: tomato; /* number color */
+  text-shadow:
+    0 0 6px rgba(232,196,92,.65),
+    0 0 14px rgba(232,196,92,.45),
+    0 0 22px rgba(232,196,92,.35);
+}
+
+/* Off-month cells muted */
+.p-month .p-cell.p-cell--pad {
+  background: #fafafc;
+  border-color: #e5e7eb !important;
+}
+.p-month .p-cell.p-cell--pad .p-cell__num {
+  color: #9aa4b2;
+}
+
+/* === Dark mode === */
+html[data-theme="dark"] .p-month .p-cell {
+  background: #0f1b32;
+  border-color: var(--ring-color, #2a4674) !important;
+}
+html[data-theme="dark"] .p-month .p-count {
+  background: transparent !important;
+  color: var(--ring-color, #60a5fa) !important;
+}
+html[data-theme="dark"] .p-month .p-cell__num {
+  color: #eaf2ff;
+}
+html[data-theme="dark"] .p-month .p-cell--today .p-cell__num {
+  color: gold;
+  text-shadow:
+    0 0 6px rgba(245,215,115,.65),
+    0 0 14px rgba(245,215,115,.45),
+    0 0 22px rgba(245,215,115,.35);
+}
+/* ===== Month view fixes: counter above ring + number-only glow for TODAY ===== */
+
+/* Make the cell a stacking context so children can layer above its border */
+.p-month .p-cell{
+  position: relative;
+  border: 2px solid var(--ring-color, #cbd5e1) !important;
+  box-shadow: none !important;
+  background: #fff;
+  overflow: visible; /* keep counter visible above the ring */
+}
+
+/* Counter: keep exact position, but ensure it's ABOVE the border/ring */
+.p-month .p-count{
+  position: absolute;
+  top: -9px; left: 50%;
+  transform: translateX(-50%);
+  min-width: 18px; height: 18px; padding: 0 6px;
+  font: 800 10px/18px 'Rubik', system-ui, sans-serif;
+  background: transparent !important; /* no pill */
+  border: 0 !important;               /* no border */
+  color: var(--ring-color, #94a3b8) !important;
+  box-shadow: none !important;
+  z-index: 5;                          /* <-- on top of the border */
+}
+
+/* Nuke any legacy caps/halos behind the number to guarantee "number only" */
+.p-month .p-cell .p-cell__num::before,
+.p-month .p-cell .p-cell__num::after{
+  display: none !important;
+}
+
+/* Date number base style */
+.p-month .p-cell .p-cell__num{
+  position: relative;
+  z-index: 2;            /* below counter, above border */
+  font-weight: 900;
+  color: #0f172a;
+}
+
+/* Number-only glow animation for TODAY (no square/pill) */
+@keyframes looz-number-glow {
+  0%, 100% {
+    text-shadow:
+      0 0 6px rgba(232,196,92,.50),
+      0 0 12px rgba(232,196,92,.35);
+  }
+  50% {
+    text-shadow:
+      0 0 10px rgba(232,196,92,.70),
+      0 0 20px rgba(232,196,92,.50);
+  }
+}
+
+/* Apply the animated glow to the number itself; color = tomato as requested */
+.p-month .p-cell.p-cell--today .p-cell__num{
+  color: tomato !important; /* #FF6347 */
+  animation: looz-number-glow 2.2s ease-in-out infinite;
+}
+
+/* Off-month cells muted */
+.p-month .p-cell.p-cell--pad{
+  background:#fafafc;
+  border-color:#e5e7eb !important;
+}
+.p-month .p-cell.p-cell--pad .p-cell__num{ color:#9aa4b2; }
+
+/* ---- Dark mode parity ---- */
+html[data-theme="dark"] .p-month .p-cell{
+  background:#0f1b32;
+  border-color: var(--ring-color, #2a4674) !important;
+}
+html[data-theme="dark"] .p-month .p-count{
+  color: var(--ring-color, #60a5fa) !important;
+  background: transparent !important;
+}
+html[data-theme="dark"] .p-month .p-cell .p-cell__num{ color:#eaf2ff; }
+html[data-theme="dark"] .p-month .p-cell.p-cell--today .p-cell__num{
+  color: gold !important; /* looks better on dark; change to tomato if you prefer */
+  animation: looz-number-glow 2.2s ease-in-out infinite;
+}
+/* ===== Month view — one border, real top counter pill, tomato glow for TODAY ===== */
+
+/* 0) Kill any legacy pseudo-counter or old halos/squares */
+.p-month .p-cell::before,
+.p-month .p-cell .p-cell__num::before,
+.p-month .p-cell .p-cell__num::after{
+  display:none !important;
+}
+
+/* 1) Cell = single tone-colored border (tone comes from --ring-color set in JS) */
+.p-month .p-cell{
+  position:relative;
+  background:#fff;
+  border:2px solid var(--ring-color, #cbd5e1) !important;
+  box-shadow:none !important;
+  border-radius:16px;
+  overflow:visible; /* allow the counter pill to float above */
+}
+
+/* 2) Date number base */
+.p-month .p-cell .p-cell__num{
+  position:relative;
+  z-index:1;                 /* below counter, above border */
+  font-weight:900;
+  color:#0f172a;
+}
+
+/* 3) Real counter pill (top-center). Text + pill border color = ring/tone */
+.p-month .p-count{
+  position:absolute;
+  top:-9px;
+  left:50%;
+  transform:translateX(-50%);
+  min-width:22px; height:22px;            /* size like in your screenshot */
+  padding:0 8px;
+  border-radius:999px;
+  display:grid; place-items:center;
+  font:800 12px/22px 'Rubik',system-ui,sans-serif;
+
+  color:var(--ring-color, #94a3b8) !important;
+  background:#fff !important;
+  border:2px solid var(--ring-color, #94a3b8) !important;
+  box-shadow:0 2px 6px rgba(0,0,0,.08);
+  z-index:5;                               /* keeps it above the cell border */
+  pointer-events:none;
+}
+
+/* 4) TODAY — number only glows (no square), in tomato with a gentle pulse */
+@keyframes loozTomatoGlow {
+  0%,100% {
+    text-shadow:
+      0 0 6px rgba(255,99,71,.55),
+      0 0 14px rgba(255,99,71,.35);
+  }
+  50% {
+    text-shadow:
+      0 0 10px rgba(255,99,71,.75),
+      0 0 22px rgba(255,99,71,.50);
+  }
+}
+.p-month .p-cell.p-cell--today .p-cell__num{
+  color:tomato !important;                 /* the 23 itself */
+  animation:loozTomatoGlow 2.2s ease-in-out infinite;
+}
+
+/* 5) Off-month cells muted but still single-ringed */
+.p-month .p-cell.p-cell--pad{
+  background:#fafafc;
+  border-color:#e5e7eb !important;
+}
+.p-month .p-cell.p-cell--pad .p-cell__num{ color:#9aa4b2; }
+
+/* 6) Dark mode parity */
+html[data-theme="dark"] .p-month .p-cell{
+  background:#0f1b32;
+  border-color:var(--ring-color, #2a4674) !important;
+}
+html[data-theme="dark"] .p-month .p-count{
+  background:rgba(13,23,44,.92) !important;
+  color:var(--ring-color, #60a5fa) !important;
+  border-color:var(--ring-color, #60a5fa) !important;
+  box-shadow:0 2px 6px rgba(0,0,0,.28);
+}
+html[data-theme="dark"] .p-month .p-cell .p-cell__num{ color:#eaf2ff; }
+html[data-theme="dark"] .p-month .p-cell.p-cell--today .p-cell__num{
+  /* keep tomato in dark too—swap to gold if you prefer */
+  color:tomato !important;
+}
+/* === Month counter pill — smaller size, same position === */
+.p-month .p-count{
+  /* keep same place (adjusted for new height): */
+  top:-7px;                   /* was -9px when height was 22px */
+
+  /* smaller pill */
+  min-width:18px;
+  height:18px;
+  padding:0 6px;
+  border-radius:999px;
+
+  /* smaller number */
+  font:800 10px/18px 'Rubik',system-ui,sans-serif;
+
+  /* same colors/behavior */
+  color:var(--ring-color, #94a3b8) !important;
+  background:#fff !important;
+  border:1.5px solid var(--ring-color, #94a3b8) !important;
+  box-shadow:0 1px 3px rgba(0,0,0,.08);
+  z-index:5;
+}
+
+/* dark mode parity for the smaller pill */
+html[data-theme="dark"] .p-month .p-count{
+  background:rgba(13,23,44,.92) !important;
+  color:var(--ring-color, #60a5fa) !important;
+  border-color:var(--ring-color, #60a5fa) !important;
+  box-shadow:0 1px 3px rgba(0,0,0,.28);
 }

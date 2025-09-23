@@ -1,4 +1,4 @@
-/* ===== LooZ — Planner App (home) — vFinal.3 (icon actions) ===== */
+/* ===== LooZ — Planner App (home) — vFinal.6 (Day: X icon + equal arrows) ===== */
 (function () {
   'use strict';
 
@@ -24,7 +24,7 @@
   const addMonths = (d,n) => new Date(d.getFullYear(), d.getMonth()+n, 1);
 
   const HEB_DAYS   = ['ראשון','שני','שלישי','רביעי','חמישי','שישי','שבת'];
-  const HEB_MONTHS = ['ינואר','פברואר','מרץ','אפריל','מאי','יוני','יולי','אוגוסט','ספטמבר','אוקטובר','נובמבר','דצמבר'];
+  const HEB_MONTHS = ['ינואר','פברואר','מרץ','אפריל','מאי','יוני','יולי','אוגוסט','ספטמבר','אוקטובר','דצמבר'];
 
   const weekLabel = (d, weekStart) => {
     const s = startOfWeek(d, weekStart);
@@ -62,21 +62,20 @@
   const sheetPanel = sheet ? sheet.querySelector('.c-sheet__panel') : null;
   const sheetClose = sheet ? sheet.querySelector('[data-close]') : null;
   const sheetForm  = $('#sheetForm');
-  const titleInput = $('#evtTitle');
-  const dateInput  = $('#evtDate');
-  const timeInput  = $('#evtTime');
+ const titleInput = $('#evtTitle');
+const dateInput  = $('#evtDate');
+const timeInput  = $('#evtTime');
+
 
   const subtitleEl = $('.c-subtitle');
 
   const addEventBtn = $('#addEventBtn');
   const btnExit     = $('#btnExit');
 
-  /* ===================== Greeting (special user – 3 rows) ===================== */
+  /* ===================== Greeting ===================== */
   function getAuth() {
-    try {
-      const raw = localStorage.getItem('authUser') || localStorage.getItem('auth.user');
-      return raw ? JSON.parse(raw) : null;
-    } catch { return null; }
+    try { const raw = localStorage.getItem('authUser') || localStorage.getItem('auth.user'); return raw ? JSON.parse(raw) : null; }
+    catch { return null; }
   }
   function getProfile() {
     try { return JSON.parse(localStorage.getItem('profile') || '{}'); } catch { return {}; }
@@ -97,7 +96,7 @@
 
     if (subtitleEl) {
       subtitleEl.innerHTML = isSpecial
-        ? '<div style="font-weight:800;margin-bottom:.15rem">מלכה שלי</div>'
+        ? '<div style="font-weight:800;margin-bottom:.15rem">נשמולית שלי</div>'
           + '<div>איזה כיף שחזרת <strong>'+name+'</strong></div>'
           + '<div>לוז מושלם מחכה לך</div>'
         : 'ברוכים השבים, <strong id="uiName">'+name+'</strong>!<br>מה בלוז היום?';
@@ -189,6 +188,7 @@
     // Day nav (prev / today / next)
     const bar = document.createElement('div');
     bar.className = 'p-weekbar';
+    bar.setAttribute('data-scope','day'); // scope for day-only CSS
     bar.innerHTML =
       '<button class="p-weekbar__btn" data-daynav="prev" aria-label="יום קודם">‹</button>'+
       `<div class="p-weekbar__title">${HEB_DAYS[state.current.getDay()]} — ${pad2(state.current.getDate())}.${pad2(state.current.getMonth()+1)}.${state.current.getFullYear()}</div>`+
@@ -224,14 +224,14 @@
       items.forEach(t=>{
         const row = document.createElement('div');
         row.className = 'p-daytask';
+        // ORDER (RTL): X, V, hour, text
         row.innerHTML =
-          `<div class="p-daytask__text">${escapeHtml(t.title)}</div>`+
-          `<div class="p-daytask__time">${t.time||''}</div>`+
           '<div class="p-daytask__actions">'+
-            // ——— Icon buttons (keep data-* the same) ———
-            `<button class="p-ico p-ico--ok"  title="בוצע" data-done="${t.id}" aria-label="בוצע"></button>`+
-            `<button class="p-ico p-ico--del" title="מחק"  data-del="${t.id}"  aria-label="מחק"></button>`+
-          '</div>';
+            `<button class="p-ico p-ico--del" title="מחק"  data-del="${t.id}"  aria-label="מחק"></button>`+  // ❌ pill
+            `<button class="p-ico p-ico--ok"  title="בוצע" data-done="${t.id}" aria-label="בוצע"></button>`+ // ✓ pill
+          '</div>'+
+          `<div class="p-daytask__time">${t.time||''}</div>`+
+          `<div class="p-daytask__text">${escapeHtml(t.title)}</div>`;
         wrap.appendChild(row);
       });
     }
@@ -240,7 +240,6 @@
 
   function renderWeek(){
     plannerRoot.innerHTML = '';
-
     const bar = document.createElement('div');
     bar.className = 'p-weekbar';
     bar.innerHTML =
@@ -294,12 +293,12 @@
             const row = document.createElement('div');
             row.className='p-task';
             row.innerHTML =
-              `<div class="p-task__text">${escapeHtml(t.title)}</div>`+
-              `<div class="p-task__time">${t.time||''}</div>`+
               '<div class="p-task__actions">'+
-                `<button class="p-ico p-ico--ok"  title="בוצע" data-done="${t.id}" aria-label="בוצע"></button>`+
                 `<button class="p-ico p-ico--del" title="מחק"  data-del="${t.id}"  aria-label="מחק"></button>`+
-              '</div>';
+                `<button class="p-ico p-ico--ok"  title="בוצע" data-done="${t.id}" aria-label="בוצע"></button>`+
+              '</div>'+
+              `<div class="p-task__time">${t.time||''}</div>`+
+              `<div class="p-task__text">${escapeHtml(t.title)}</div>`;
             list.appendChild(row);
           });
         }
@@ -313,7 +312,6 @@
 
   function renderMonth(){
     plannerRoot.innerHTML = '';
-
     const bar = document.createElement('div');
     bar.className = 'p-monthbar';
     bar.innerHTML =
@@ -409,7 +407,6 @@
       const doneId = e.target && e.target.getAttribute('data-done');
       const delId  = e.target && e.target.getAttribute('data-del');
       if (doneId){
-        // light confetti
         blastConfetti(e.clientX||0, e.clientY||0, 1.0);
         state.tasks = state.tasks.filter(t=>t.id!==doneId);
         saveTasks(); render();
@@ -509,26 +506,40 @@
   }
 
   // Replace previous injected styles
-  const prev = document.getElementById('looz-fixes-v9'); if (prev) prev.remove();
+  const prev = document.getElementById('looz-fixes-v12'); if (prev) prev.remove();
 
   const style = document.createElement('style');
-  style.id = 'looz-fixes-v9';
+  style.id = 'looz-fixes-v12';
   style.textContent = `
-  /* --- Week header: counter to far end --- */
+  /* --- Week header: name + date (counter centered on day) --- */
   .p-day__head.p-day__head--flex{
-    display:grid; grid-template-columns:1fr auto auto; align-items:center; column-gap:.5rem; padding:0 .5rem;
+    display:grid; grid-template-columns:1fr auto; align-items:center; column-gap:.5rem; padding:0 .5rem;
   }
   .p-day__name{justify-self:start;font-weight:700}
-  .p-day__date{justify-self:center;opacity:.9;font-weight:800}
+  .p-day__date{justify-self:end;opacity:.9;font-weight:800}
+
+  /* Counter centered in the day box */
+  .p-day{ position:relative; }
   .p-day__count{
-    justify-self:end; width:22px; height:22px; border-radius:999px; display:grid; place-items:center;
-    font:800 11px/1 'Rubik',system-ui,sans-serif; background:#fff; border:1.5px solid var(--tone,#e5e7eb);
+    position:absolute; top:50%; left:50%; transform:translate(-50%,-50%);
+    width:24px; height:24px; border-radius:999px; display:grid; place-items:center;
+    font:800 12px/1 'Rubik',system-ui,sans-serif; background:#fff; border:1.5px solid var(--tone,#e5e7eb);
     box-shadow:0 2px 6px rgba(0,0,0,.08);
   }
   html[data-theme="dark"] .p-day__count{background:rgba(13,23,44,.92);}
 
-  /* --- Task rows: icon buttons (biblical ink + scroll) --- */
+  /* Week rows (unchanged) */
+  .p-task{ display:grid; grid-template-columns:auto auto 1fr; align-items:center; gap:.5rem; }
   .p-task__actions, .p-daytask__actions{ display:flex; gap:.35rem; align-items:center; }
+  .p-task__time{ font-weight:700; min-width:3.2rem; text-align:center; }
+  .p-task__text{ overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+
+  /* Day rows: X, V, hour, text */
+  .p-daytask{ display:grid; grid-template-columns:auto auto auto 1fr; align-items:center; gap:.5rem; }
+  .p-daytask__time{ font-weight:700; min-width:3.2rem; text-align:center; }
+  .p-daytask__text{ overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+
+  /* Icon pills */
   .p-ico{
     width:30px; height:30px; border-radius:999px; display:inline-grid; place-items:center; cursor:pointer;
     background:
@@ -538,24 +549,27 @@
     box-shadow:0 2px 6px rgba(0,0,0,.08), inset 0 0 .4rem rgba(255,255,255,.75);
   }
   .p-ico:active{ transform:translateY(1px); }
-
   .p-ico--ok::before,
   .p-ico--del::before{
     content:""; display:block; width:18px; height:18px; background:transparent;
-    mask-repeat:no-repeat; mask-position:center; mask-size:contain;
+    -webkit-mask-repeat:no-repeat; mask-repeat:no-repeat;
+    -webkit-mask-position:center; mask-position:center;
+    -webkit-mask-size:contain; mask-size:contain;
   }
-  /* ✓ — deep emerald ink */
+  /* ✓ */
   .p-ico--ok::before{
-    mask-image:url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="%23000"><path d="M7.8 13.6 3.9 9.8l-1.4 1.4 5.3 5.2L18 6.2l-1.4-1.4z"/></svg>');
     background:#0f7b4b;
+    -webkit-mask-image:url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20"><path d="M7.8 13.6 3.9 9.8l-1.4 1.4 5.3 5.2L18 6.2l-1.4-1.4z" fill="%23000"/></svg>');
+            mask-image:url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20"><path d="M7.8 13.6 3.9 9.8l-1.4 1.4 5.3 5.2L18 6.2l-1.4-1.4z" fill="%23000"/></svg>');
   }
-  /* ✗ — lapis/cranberry ink */
+  /* ❌ — stroke with width so it actually shows */
   .p-ico--del::before{
-    mask-image:url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="%23000"><path d="M6 6l8 8M14 6L6 14"/></svg>');
     background:#b3261e;
+    -webkit-mask-image:url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20"><path d="M5 5L15 15M15 5L5 15" stroke="%23000" stroke-width="2.6" stroke-linecap="round"/></svg>');
+            mask-image:url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20"><path d="M5 5L15 15M15 5L5 15" stroke="%23000" stroke-width="2.6" stroke-linecap="round"/></svg>');
   }
 
-  /* --- Month grid: single elegant ring + top counter --- */
+  /* Month grid (unchanged) */
   .p-month{display:grid;grid-template-columns:repeat(7,1fr);gap:.7rem}
   .p-cell{
     position:relative; aspect-ratio:1/1; border-radius:16px; background:#fff;
@@ -563,23 +577,11 @@
     display:grid; place-items:center; cursor:pointer;
   }
   .p-cell--pad{background:#f8fafc; opacity:.9}
-  .p-cell__num{
-    font-weight:900; font-size:1.15rem; color:#0f172a; position:relative; z-index:1;
-  }
-
-  /* TODAY: readable, classy gold glow on the digits */
+  .p-cell__num{ font-weight:900; font-size:1.15rem; color:#0f172a; position:relative; z-index:1; }
   .p-cell--today{ --ring-color:#e8c65c; }
-  .p-cell--today .p-cell__num{
-    color:#b98109;
-    text-shadow:0 1px 0 #fff, 0 0 10px rgba(245,199,70,.55), 0 0 18px rgba(245,199,70,.35);
-  }
+  .p-cell--today .p-cell__num{ color:#0f172a; }
 
-  /* Remove any legacy caps */
-  .p-cell::before, .p-cell::after, .p-cell__num::before, .p-cell__num::after, .p-cap, .p-cap::before, .p-cap::after {
-    display:none !important; content:none !important;
-  }
-
-  /* Counter badge — top/center, clear spacing from date */
+  /* Month counter badge */
   .p-count{
     position:absolute; top:-9px; left:50%; transform:translateX(-50%);
     min-width:18px; height:18px; padding:0 6px; border-radius:999px;
@@ -588,18 +590,19 @@
     box-shadow:0 2px 6px rgba(0,0,0,.08);
   }
 
-  /* --- Nav buttons --- */
-  .p-weekbar__btn,.p-monthbar__btn{ height:36px; padding:0 14px; border-radius:999px; border:1px solid #e5e7eb; background:#fff; }
-  .p-weekbar__btn[data-weeknav="prev"], .p-weekbar__btn[data-weeknav="next"],
-  .p-monthbar__btn[data-monthnav="prev"], .p-monthbar__btn[data-monthnav="next"]{
-    width:36px; padding:0; display:grid; place-items:center; font-size:18px; line-height:1;
+  /* Day-only nav arrows (same square size as week/month) */
+  .p-weekbar[data-scope="day"] .p-weekbar__btn[data-daynav="prev"],
+  .p-weekbar[data-scope="day"] .p-weekbar__btn[data-daynav="next"]{
+    width:36px; height:36px; padding:0;
+    border-radius:999px; border:1px solid #e5e7eb; background:#fff;
+    display:grid; place-items:center; font-size:18px; font-weight:800; line-height:1;
   }
 
-  /* --- Bottom actions: stacked, aligned --- */
+  /* Bottom actions & Confetti */
   .c-bottom-cta{ position:sticky; bottom:max(12px, env(safe-area-inset-bottom)); display:grid; justify-items:center; gap:.55rem; }
   .looz-bottom-stack{ display:grid; gap:.55rem; justify-items:center; }
   .c-fab{ width:60px; height:60px; border-radius:999px; display:grid; place-items:center;
-          background:radial-gradient(140% 120% at 35% 30%, #fff 0%, rgba(255,255,255,.35) 45%, rgba(255,255,255,0) 70%),
+          background:radial-gradient(140% 120% at 35% 30%, #fff 0, rgba(255,255,255,.35) 45%, rgba(255,255,255,0) 70%),
                      linear-gradient(180deg,#fff4d0,#ffd08a);
           border:1px solid rgba(0,0,0,.06); box-shadow:inset 0 0 .45rem rgba(255,255,255,.75),0 .35rem 1rem rgba(0,0,0,.14);}
   .c-fab svg{ width:28px; height:28px; }
@@ -611,10 +614,11 @@
   .fx-c:nth-child(4n){--h:.1}.fx-c:nth-child(4n+1){--h:.22}.fx-c:nth-child(4n+2){--h:.62}.fx-c:nth-child(4n+3){--h:.82}
   @keyframes confThrow{to{transform:translate(calc(-50% + var(--dx)),calc(-50% + var(--dy))) rotate(var(--r));opacity:0}}
 
+  /* Dark mode tweaks */
   html[data-theme="dark"] .p-day__count{background:rgba(13,23,44,.92);}
   html[data-theme="dark"] .p-cell{ background:#0f1b32; box-shadow: inset 0 0 0 2px var(--ring-color,#2a4674); }
   html[data-theme="dark"] .p-cell__num{ color:#eaf2ff; }
-  html[data-theme="dark"] .p-cell--today .p-cell__num{ color:#eed27b; text-shadow:0 0 10px rgba(241,196,67,.5), 0 0 18px rgba(241,196,67,.28); }
+  html[data-theme="dark"] .p-cell--today .p-cell__num{ color:#eed27b; }
   html[data-theme="dark"] .p-count{ background:rgba(13,23,44,.92); color:#cbd5e1; border-color:#334155; }
   `;
   document.head.appendChild(style);
@@ -642,7 +646,7 @@
       </svg>`;
     addEventBtn.onclick = (e)=>{ e.preventDefault(); openSheet(); };
 
-    // Logout — same size/shape family as profile/settings
+    // Logout
     btnExit.className = 'c-topbtn';
     btnExit.setAttribute('aria-label','התנתקות');
     btnExit.innerHTML = `
