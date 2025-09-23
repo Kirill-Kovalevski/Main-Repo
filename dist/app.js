@@ -1,7 +1,7 @@
 "use strict";
 
 function _typeof(o) { "@babel/helpers - typeof"; return _typeof = "function" == typeof Symbol && "symbol" == typeof Symbol.iterator ? function (o) { return typeof o; } : function (o) { return o && "function" == typeof Symbol && o.constructor === Symbol && o !== Symbol.prototype ? "symbol" : typeof o; }, _typeof(o); }
-/* ===== LooZ — Planner App (home) — FULL ===== */
+/* ===== LooZ — Planner App (home) — visible tiny counter + tidy month + matched logout size ===== */
 (function () {
   'use strict';
 
@@ -57,6 +57,24 @@ function _typeof(o) { "@babel/helpers - typeof"; return _typeof = "function" == 
   function addMonths(d, n) {
     return new Date(d.getFullYear(), d.getMonth() + n, 1);
   }
+
+  // hex -> rgba
+  function hexToRgb(hex) {
+    var h = (hex || '').replace('#', '');
+    if (h.length === 3) h = h.split('').map(function (c) {
+      return c + c;
+    }).join('');
+    var num = parseInt(h, 16);
+    return {
+      r: num >> 16 & 255,
+      g: num >> 8 & 255,
+      b: num & 255
+    };
+  }
+  function rgbaFromHex(hex, a) {
+    var c = hexToRgb(hex);
+    return 'rgba(' + c.r + ',' + c.g + ',' + c.b + ',' + (a == null ? 1 : a) + ')';
+  }
   var HEB_DAYS = ['ראשון', 'שני', 'שלישי', 'רביעי', 'חמישי', 'שישי', 'שבת'];
   var HEB_MONTHS = ['ינואר', 'פברואר', 'מרץ', 'אפריל', 'מאי', 'יוני', 'יולי', 'אוגוסט', 'ספטמבר', 'אוקטובר', 'נובמבר', 'דצמבר'];
   function weekLabel(d, weekStart) {
@@ -65,9 +83,7 @@ function _typeof(o) { "@babel/helpers - typeof"; return _typeof = "function" == 
     e.setDate(s.getDate() + 6);
     var sM = HEB_MONTHS[s.getMonth()],
       eM = HEB_MONTHS[e.getMonth()];
-    if (s.getMonth() === e.getMonth()) {
-      return s.getDate() + '–' + e.getDate() + ' ' + sM + ' ' + e.getFullYear();
-    }
+    if (s.getMonth() === e.getMonth()) return s.getDate() + '–' + e.getDate() + ' ' + sM + ' ' + e.getFullYear();
     return s.getDate() + ' ' + sM + ' – ' + e.getDate() + ' ' + eM + ' ' + e.getFullYear();
   }
 
@@ -89,7 +105,6 @@ function _typeof(o) { "@babel/helpers - typeof"; return _typeof = "function" == 
     return go('social.html');
   });
   var lemonToggle = document.getElementById('lemonToggle');
-  var lemonHost = document.getElementById('lemonIcon');
   var appNav = document.getElementById('appNav');
   var navPanel = appNav ? appNav.querySelector('.c-nav__panel') : null;
   var titleDay = document.getElementById('titleDay');
@@ -108,9 +123,9 @@ function _typeof(o) { "@babel/helpers - typeof"; return _typeof = "function" == 
   var timeInput = document.getElementById('evtTime');
   var subtitleEl = document.querySelector('.c-subtitle');
 
-  // small icon buttons pinned at bottom
-  var addEventBtn = document.getElementById('addEventBtn'); // reuse existing
-  var btnExit = document.getElementById('btnExit');
+  // bottom buttons
+  var addEventBtn = document.getElementById('addEventBtn'); // big circular
+  var btnExit = document.getElementById('btnExit'); // exact same size & shape as header small icons
 
   /* ===================== Greeting ===================== */
   function getAuth() {
@@ -142,10 +157,10 @@ function _typeof(o) { "@babel/helpers - typeof"; return _typeof = "function" == 
   (function setGreeting() {
     var name = escapeHtml(getDisplayName());
     var au = getAuth();
-    var SPECIAL_EMAIL = 'special.person@example.com';
+    var SPECIAL_EMAIL = 'daniellagg21@gmail.com';
     var isSpecial = au && String(au.email || '').toLowerCase() === SPECIAL_EMAIL.toLowerCase();
     if (subtitleEl) {
-      subtitleEl.innerHTML = isSpecial ? '✨ שמחים לראותך שוב, <strong>' + name + '</strong>. לוח מושלם מחכה לך.' : 'ברוכים השבים, <strong id="uiName">' + name + '</strong>!<br>מה בלוז היום?';
+      subtitleEl.innerHTML = isSpecial ? '<span style="display:block;font-weight:800">מלכה שלי</span>' + '<span style="display:block">איזה כיף שחזרת <strong>' + name + '</strong></span>' + '<span style="display:block">לוז מושלם מחכה לך</span>' : 'ברוכים השבים, <strong id="uiName">' + name + '</strong>!<br>מה בלוז היום?';
     } else {
       var u = document.getElementById('uiName');
       if (u) u.textContent = name;
@@ -197,7 +212,7 @@ function _typeof(o) { "@babel/helpers - typeof"; return _typeof = "function" == 
     if (titleBadge) titleBadge.setAttribute('data-today', '1');
   }
 
-  /* ===================== Lemon nav open/close ===================== */
+  /* ===================== Nav open/close ===================== */
   (function initNav() {
     if (!lemonToggle || !appNav || !navPanel) return;
     appNav.classList.add('u-is-collapsed');
@@ -231,48 +246,22 @@ function _typeof(o) { "@babel/helpers - typeof"; return _typeof = "function" == 
   })();
 
   /* ===================== Color scales ===================== */
-  // Pastel ladder — changes every 3 tasks (0..∞)
-  function pastelFor(n) {
-    // bucket: 0:(0), 1:(1-3), 2:(4-6), 3:(7-9), 4:(10-12), 5:(13-15), 6:(16+)
-    var bucket = n <= 0 ? 0 : Math.floor((n - 1) / 3) + 1;
-    if (bucket > 6) bucket = 6;
-    // soft, biblical palette
-    var tones = [{
-      fg: '#64748b',
-      ring: '#cbd5e1'
-    },
+  function toneFor(n) {
+    var bucket = n <= 0 ? 0 : Math.min(6, Math.floor((n - 1) / 3) + 1);
+    return ['#D9DEE7',
     // 0
-    {
-      fg: '#0e7490',
-      ring: '#a5f3fc'
-    },
-    // 1 cyan
-    {
-      fg: '#7c3aed',
-      ring: '#ddd6fe'
-    },
-    // 2 violet
-    {
-      fg: '#a16207',
-      ring: '#fde68a'
-    },
-    // 3 amber
-    {
-      fg: '#16a34a',
-      ring: '#bbf7d0'
-    },
-    // 4 green
-    {
-      fg: '#0ea5e9',
-      ring: '#bae6fd'
-    },
-    // 5 blue
-    {
-      fg: '#db2777',
-      ring: '#fbcfe8'
-    } // 6 rose
-    ];
-    return tones[bucket];
+    '#93C5FD',
+    // 1–3
+    '#86EFAC',
+    // 4–6
+    '#FBCB6A',
+    // 7–9
+    '#C4B5FD',
+    // 10–12
+    '#F9A8D4',
+    // 13–15
+    '#60A5FA' // 16+
+    ][bucket];
   }
 
   /* ===================== Renderers ===================== */
@@ -287,12 +276,22 @@ function _typeof(o) { "@babel/helpers - typeof"; return _typeof = "function" == 
   }
   function renderDay() {
     plannerRoot.innerHTML = '';
+
+    // Day header with prev/today/next
+    var bar = document.createElement('div');
+    bar.className = 'p-weekbar';
+    bar.innerHTML = '<button class="p-weekbar__btn" data-daynav="prev" aria-label="אתמול">‹</button>' + '<div class="p-weekbar__title">' + HEB_DAYS[state.current.getDay()] + ' – ' + pad2(state.current.getDate()) + '.' + pad2(state.current.getMonth() + 1) + '.' + state.current.getFullYear() + '</div>' + '<div class="p-weekbar__right">' + '<button class="p-weekbar__btn" data-daynav="today">היום</button>' + '<button class="p-weekbar__btn" data-daynav="next" aria-label="מחר">›</button>' + '</div>';
+    plannerRoot.appendChild(bar);
+    bar.addEventListener('click', function (e) {
+      var a = e.target.closest('[data-daynav]');
+      if (!a) return;
+      var kind = a.getAttribute('data-daynav');
+      if (kind === 'prev') state.current.setDate(state.current.getDate() - 1);else if (kind === 'next') state.current.setDate(state.current.getDate() + 1);else state.current = new Date();
+      render();
+      persistPrefs();
+    });
     var wrap = document.createElement('div');
     wrap.className = 'p-dayview';
-    var head = document.createElement('div');
-    head.className = 'p-dayview__head';
-    head.innerHTML = '<div class="p-dayview__title">' + HEB_DAYS[state.current.getDay()] + '</div>' + '<div class="p-dayview__date">' + pad2(state.current.getDate()) + '.' + pad2(state.current.getMonth() + 1) + '.' + state.current.getFullYear() + '</div>';
-    wrap.appendChild(head);
     var ymd = dateKey(state.current);
     var items = state.tasks.filter(function (t) {
       return t.date === ymd;
@@ -344,16 +343,13 @@ function _typeof(o) { "@babel/helpers - typeof"; return _typeof = "function" == 
       var count = state.tasks.filter(function (t) {
         return t.date === ymd;
       }).length;
-      var tone = pastelFor(count);
       var box = document.createElement('div');
       box.className = 'p-day' + (sameDay(day, new Date()) ? ' p-day--today' : '');
       box.dataset["goto"] = ymd;
       var head = document.createElement('div');
       head.className = 'p-day__head';
-      head.innerHTML = '<span class="p-day__name">' + HEB_DAYS[day.getDay()] + '</span>' + '<span class="p-day__date">' + pad2(day.getDate()) + '.' + pad2(day.getMonth() + 1) + '</span>' + '<button class="p-day__count" style="color:' + tone.fg + ';border-color:' + tone.fg + ';" data-open="' + ymd + '">' + count + '</button>';
+      head.innerHTML = '<span class="p-day__name">' + HEB_DAYS[day.getDay()] + '</span>' + '<span class="p-day__date">' + pad2(day.getDate()) + '.' + pad2(day.getMonth() + 1) + '</span>' + '<span class="p-day__count" data-open="' + ymd + '">' + count + '</span>';
       box.appendChild(head);
-
-      // expanded list if open (on first click)
       if (state._openWeek && state._openWeek === ymd) {
         var items = state.tasks.filter(function (t) {
           return t.date === ymd;
@@ -404,8 +400,8 @@ function _typeof(o) { "@babel/helpers - typeof"; return _typeof = "function" == 
     var firstDow = (anchor.getDay() - weekStart + 7) % 7;
     var start = new Date(anchor);
     start.setDate(anchor.getDate() - firstDow);
-    var curKey = dateKey(state.current);
     var now = new Date();
+    var curKey = dateKey(state.current);
     for (var i = 0; i < 42; i++) {
       var day = new Date(start);
       day.setDate(start.getDate() + i);
@@ -413,31 +409,32 @@ function _typeof(o) { "@babel/helpers - typeof"; return _typeof = "function" == 
       var count = state.tasks.filter(function (t) {
         return t.date === ymd;
       }).length;
-      var tone = pastelFor(count);
-      // degree for conic ring; cap at 24 tasks
-      var pct = Math.max(0, Math.min(100, Math.round(Math.min(count, 24) / 24 * 100)));
+      var ring = toneFor(count);
+      var chipBg = rgbaFromHex(ring, 0.22);
+      var chipFg = ring;
+      var isToday = sameDay(day, now);
       var cell = document.createElement('div');
       var cls = 'p-cell';
-      if (sameDay(day, now)) cls += ' p-cell--today';
       if (ymd === curKey) cls += ' p-cell--selected';
       if (day.getMonth() !== state.current.getMonth()) cls += ' p-cell--pad';
       cell.className = cls;
       cell.dataset["goto"] = ymd;
-      var num = document.createElement('div');
-      num.className = 'p-cell__num';
-      num.textContent = day.getDate();
-      // Ring variables: very thin ring via CSS, and tone color varies by load
-      num.style.setProperty('--ring', pct + '%');
-      num.style.setProperty('--tone', tone.ring);
 
-      // tiny badge (top-left) — avoids the number
-      var badge = document.createElement('div');
-      badge.className = 'p-cell__count';
-      badge.textContent = count > 0 ? String(count) : '';
-      badge.style.color = tone.fg;
-      badge.style.borderColor = tone.fg;
+      // match ring & chip colors
+      cell.style.setProperty('--ring', ring);
+      cell.style.setProperty('--chipBg', chipBg);
+      cell.style.setProperty('--chipFg', chipFg);
+      var num = document.createElement('div');
+      num.className = 'p-date';
+      num.textContent = day.getDate();
+      if (isToday) num.classList.add('is-today');
       cell.appendChild(num);
-      if (count > 0) cell.appendChild(badge);
+      if (count > 0) {
+        var chip = document.createElement('div');
+        chip.className = 'p-chip';
+        chip.textContent = String(count);
+        cell.appendChild(chip);
+      }
       grid.appendChild(cell);
     }
     plannerRoot.appendChild(grid);
@@ -490,7 +487,6 @@ function _typeof(o) { "@babel/helpers - typeof"; return _typeof = "function" == 
       var openBtn = e.target && e.target.closest('[data-open]');
       if (openBtn) {
         var dayKey = openBtn.getAttribute('data-open');
-        // toggle expand in week view
         state._openWeek = state._openWeek === dayKey ? null : dayKey;
         render();
         return;
@@ -505,7 +501,6 @@ function _typeof(o) { "@babel/helpers - typeof"; return _typeof = "function" == 
       var doneId = e.target && e.target.getAttribute('data-done');
       var delId = e.target && e.target.getAttribute('data-del');
       if (doneId) {
-        // lighter confetti in WEEK (vs day)
         blastConfetti(e.clientX, e.clientY, 1.0);
         state.tasks = state.tasks.filter(function (t) {
           return t.id !== doneId;
@@ -535,16 +530,6 @@ function _typeof(o) { "@babel/helpers - typeof"; return _typeof = "function" == 
   }
 
   /* ===================== Bottom Sheet ===================== */
-  if (addEventBtn) {
-    // Turn the big CTA into a small circular icon button (same as header buttons)
-    addEventBtn.className = 'c-topbtn c-topbtn--action';
-    addEventBtn.setAttribute('aria-label', 'יצירת אירוע חדש');
-    addEventBtn.innerHTML = "\n      <svg viewBox=\"0 0 48 48\" width=\"22\" height=\"22\" aria-hidden=\"true\">\n        <defs>\n          <linearGradient id=\"t1\" x1=\"0\" y1=\"0\" x2=\"0\" y2=\"1\">\n            <stop offset=\"0%\" stop-color=\"#fff8e1\"/><stop offset=\"100%\" stop-color=\"#f3e1b5\"/>\n          </linearGradient>\n          <linearGradient id=\"ink1\" x1=\"0\" y1=\"0\" x2=\"1\" y2=\"1\">\n            <stop offset=\"0%\" stop-color=\"#1e3a8a\"/><stop offset=\"100%\" stop-color=\"#0ea5e9\"/>\n          </linearGradient>\n        </defs>\n        <rect x=\"12\" y=\"10\" rx=\"5\" ry=\"5\" width=\"20\" height=\"28\" fill=\"url(#t1)\" stroke=\"#bda77a\"/>\n        <g stroke=\"#374151\" stroke-width=\"2\" stroke-linecap=\"round\">\n          <line x1=\"16\" y1=\"16\" x2=\"28\" y2=\"16\"/>\n          <line x1=\"16\" y1=\"21\" x2=\"28\" y2=\"21\"/>\n        </g>\n        <circle cx=\"34\" cy=\"12\" r=\"6\" fill=\"url(#ink1)\"/>\n        <path d=\"M34 9v6M31 12h6\" stroke=\"#fff\" stroke-width=\"2\" stroke-linecap=\"round\"/>\n      </svg>";
-    addEventBtn.addEventListener('click', function (e) {
-      e.preventDefault();
-      openSheet();
-    });
-  }
   function openSheet() {
     if (!sheet) return;
     var now = new Date();
@@ -564,24 +549,21 @@ function _typeof(o) { "@babel/helpers - typeof"; return _typeof = "function" == 
     }, 220);
   }
   if (sheet) {
-    // X button and backdrop use [data-close] or backdrop click
     if (sheetClose) sheetClose.addEventListener('click', function (e) {
       e.preventDefault();
       closeSheet();
     });
     if (sheetPanel) {
       sheetPanel.addEventListener('click', function (e) {
-        // Quick date chips (4 options)
         var qd = e.target && e.target.closest('.qp__chip[data-date]');
         if (qd) {
           e.preventDefault();
           var kind = qd.getAttribute('data-date');
           var base = new Date();
-          if (kind === 'today') {/* no change */} else if (kind === 'tomorrow') base.setDate(base.getDate() + 1);else if (kind === 'nextweek') base.setDate(base.getDate() + 7);else if (/^\+\d+$/.test(kind)) base.setDate(base.getDate() + parseInt(kind.slice(1), 10));
+          if (kind === 'today') {/* keep */} else if (kind === 'tomorrow') base.setDate(base.getDate() + 1);else if (kind === 'nextweek') base.setDate(base.getDate() + 7);else if (/^\+\d+$/.test(kind)) base.setDate(base.getDate() + parseInt(kind.slice(1), 10));
           if (dateInput) dateInput.value = dateKey(base);
           return;
         }
-        // Quick time chips
         var qt = e.target && e.target.closest('.qp__chip[data-time]');
         if (qt) {
           e.preventDefault();
@@ -628,19 +610,42 @@ function _typeof(o) { "@babel/helpers - typeof"; return _typeof = "function" == 
     });
   }
 
-  /* ===================== Exit button (small icon, same size as header) ===================== */
-  function wireExitButton() {
-    if (!btnExit) return;
-    btnExit.className = 'c-topbtn';
-    btnExit.innerHTML = "\n      <svg viewBox=\"0 0 28 28\" width=\"18\" height=\"18\" aria-hidden=\"true\">\n        <defs>\n          <linearGradient id=\"exDoor2\" x1=\"0\" y1=\"0\" x2=\"1\" y2=\"1\">\n            <stop offset=\"0%\" stop-color=\"#F4D27A\"/><stop offset=\"100%\" stop-color=\"#C8A043\"/>\n          </linearGradient>\n          <linearGradient id=\"exArrow2\" x1=\"0\" y1=\"0\" x2=\"1\" y2=\"0\">\n            <stop offset=\"0%\" stop-color=\"#22D3EE\"/><stop offset=\"100%\" stop-color=\"#60A5FA\"/>\n          </linearGradient>\n        </defs>\n        <rect x=\"4\" y=\"6\" width=\"10\" height=\"16\" rx=\"2\" fill=\"url(#exDoor2)\" stroke=\"#9A7A2E\"/>\n        <circle cx=\"11\" cy=\"14\" r=\"1\" fill=\"#7C5B13\"/>\n        <path d=\"M14 14h8m0 0-3-3m3 3-3 3\" fill=\"none\" stroke=\"url(#exArrow2)\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\"/>\n      </svg>";
-    btnExit.addEventListener('click', function (e) {
-      e.preventDefault();
-      handleLogout();
-    });
-  }
-  wireExitButton();
+  /* ===================== Bottom icons (Create big, Logout same size as profile/settings) ===================== */
+  (function wireBottomIcons() {
+    var host = document.querySelector('.c-bottom-cta');
+    if (!host) return;
+    host.style.display = 'grid';
+    host.style.gridAutoFlow = 'row';
+    host.style.justifyItems = 'center';
+    host.style.alignContent = 'end';
+    host.style.gap = '12px';
 
-  /* ===================== Logout ===================== */
+    // CREATE — bigger circular fab
+    if (addEventBtn) {
+      addEventBtn.className = 'c-fab c-fab--create';
+      addEventBtn.setAttribute('aria-label', 'יצירת אירוע חדש');
+      addEventBtn.innerHTML = "\n        <svg viewBox=\"0 0 64 64\" width=\"28\" height=\"28\" aria-hidden=\"true\">\n          <defs>\n            <linearGradient id=\"tabBg\" x1=\"0\" y1=\"0\" x2=\"0\" y2=\"1\">\n              <stop offset=\"0%\" stop-color=\"#FFFFFF\"/><stop offset=\"100%\" stop-color=\"#F0FFF4\"/>\n            </linearGradient>\n            <linearGradient id=\"tabPlus\" x1=\"0\" y1=\"0\" x2=\"1\" y2=\"1\">\n              <stop offset=\"0%\" stop-color=\"#047857\"/><stop offset=\"100%\" stop-color=\"#22C55E\"/>\n            </linearGradient>\n            <linearGradient id=\"tabInk\" x1=\"0\" y1=\"0\" x2=\"1\" y2=\"1\">\n              <stop offset=\"0%\" stop-color=\"#1F2937\"/><stop offset=\"100%\" stop-color=\"#2563EB\"/>\n            </linearGradient>\n          </defs>\n          <rect x=\"18\" y=\"14\" rx=\"6\" ry=\"6\" width=\"28\" height=\"36\" fill=\"url(#tabBg)\" stroke=\"#CDE7D5\"/>\n          <g stroke=\"url(#tabInk)\" stroke-width=\"2\" stroke-linecap=\"round\">\n            <line x1=\"22\" y1=\"22\" x2=\"42\" y2=\"22\"/>\n            <line x1=\"22\" y1=\"28\" x2=\"42\" y2=\"28\"/>\n          </g>\n          <circle cx=\"48\" cy=\"16\" r=\"8\" fill=\"#fff\"/>\n          <path d=\"M48 12v8M44 16h8\" stroke=\"url(#tabPlus)\" stroke-width=\"3\" stroke-linecap=\"round\"/>\n        </svg>";
+      addEventBtn.onclick = function (e) {
+        e.preventDefault();
+        openSheet();
+      };
+      if (!host.contains(addEventBtn)) host.appendChild(addEventBtn);
+    }
+
+    // LOGOUT — EXACT same size & shape as small round header icons (44x44 circle)
+    if (btnExit) {
+      btnExit.className = 'c-fab c-fab--small';
+      btnExit.setAttribute('aria-label', 'התנתקות');
+      btnExit.innerHTML = "\n        <svg viewBox=\"0 0 28 28\" width=\"18\" height=\"18\" aria-hidden=\"true\">\n          <defs>\n            <linearGradient id=\"doorBg\" x1=\"0\" y1=\"0\" x2=\"1\" y2=\"1\">\n              <stop offset=\"0%\" stop-color=\"#FFF1C7\"/><stop offset=\"100%\" stop-color=\"#FFE6A9\"/>\n            </linearGradient>\n            <linearGradient id=\"exitArr\" x1=\"0\" y1=\"0\" x2=\"1\" y2=\"0\">\n              <stop offset=\"0%\" stop-color=\"#22D3EE\"/><stop offset=\"100%\" stop-color=\"#60A5FA\"/>\n            </linearGradient>\n          </defs>\n          <rect x=\"5\" y=\"6\" width=\"12\" height=\"16\" rx=\"3\" fill=\"url(#doorBg)\" stroke=\"#E8C75E\"/>\n          <circle cx=\"14\" cy=\"14\" r=\"1\" fill=\"#AF8A2E\"/>\n          <path d=\"M16 14h7m0 0-2.5-2.5M23 14l-2.5 2.5\" fill=\"none\" stroke=\"url(#exitArr)\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\"/>\n        </svg>";
+      btnExit.addEventListener('click', function (e) {
+        e.preventDefault();
+        handleLogout();
+      });
+      if (!host.contains(btnExit)) host.appendChild(btnExit);
+    }
+  })();
+
+  /* ===================== Logout helpers ===================== */
   function clearAuthAll() {
     try {
       ['authUser', 'authName', 'token', 'auth.token', 'auth.user', 'looz:justLoggedIn', 'looz:loggedOut'].forEach(function (k) {
@@ -686,11 +691,11 @@ function _typeof(o) { "@babel/helpers - typeof"; return _typeof = "function" == 
   if (!document.getElementById('looz-inline-fixes')) {
     var s = document.createElement('style');
     s.id = 'looz-inline-fixes';
-    s.textContent = "\n      /* week chip alignment + count chip baseline */\n      .p-day__head{display:grid;grid-template-columns:1fr auto 1fr;align-items:center;padding:0 8px}\n      .p-day__name{justify-self:start;font-weight:700}\n      .p-day__date{justify-self:end;opacity:.85}\n      .p-day__count{justify-self:center;inline-size:26px;block-size:26px;border-radius:999px;font:700 12px/26px 'Rubik',system-ui,sans-serif;\n        background:#fff;border:1px solid currentColor;box-shadow:0 2px 6px rgba(0,0,0,.08)}\n      html[data-theme=\"dark\"] .p-day__count{background:rgba(13,23,44,.92)}\n      /* confetti */\n      .fx-confetti{position:fixed;inset:0;pointer-events:none;z-index:9999}\n      .fx-c{position:absolute;width:9px;height:9px;background: hsl(calc(360*var(--h, .5)), 90%, 60%); \n        transform:translate(-50%,-50%); border-radius:2px; animation:confThrow var(--t) ease-out forwards;}\n      .fx-c:nth-child(4n){--h:.1}.fx-c:nth-child(4n+1){--h:.22}.fx-c:nth-child(4n+2){--h:.62}.fx-c:nth-child(4n+3){--h:.82}\n      @keyframes confThrow{ to{ transform: translate(calc(-50% + var(--dx)), calc(-50% + var(--dy))) rotate(var(--r)); opacity:0;} }\n\n      /* Month ring \u2014 thinner */\n      .p-month .p-cell{position:relative}\n      .p-month .p-cell__num{position:relative;z-index:1;font-weight:900}\n      .p-month .p-cell__num::after{\n        content:\"\";position:absolute;inset:-6px;border-radius:50%;pointer-events:none;z-index:0;\n        background:\n          radial-gradient(closest-side, transparent calc(100% - 4px), var(--tone,#93c5fd) 0 100%) top/100% 100% no-repeat,\n          conic-gradient(var(--tone,#3b82f6) var(--ring,0%), #e2e8f0 0);\n        opacity:.95;mix-blend-mode:multiply;\n      }\n      html[data-theme=\"dark\"] .p-month .p-cell__num::after{\n        background:\n          radial-gradient(closest-side, transparent calc(100% - 4px), rgba(96,165,250,.85) 0 100%) top/100% 100% no-repeat,\n          conic-gradient(#60a5fa var(--ring,0%), rgba(15,23,42,.35) 0);\n        mix-blend-mode:screen;opacity:.9;\n      }\n      /* tiny badge */\n      .p-cell__count{position:absolute;top:6px;left:8px;min-width:14px;height:14px;border-radius:999px;\n        font:700 9px/14px 'Rubik',system-ui,sans-serif;border:1px solid currentColor;background:rgba(255,255,255,.96);box-shadow:0 1px 2px rgba(0,0,0,.06)}\n      html[data-theme=\"dark\"] .p-cell__count{background:rgba(13,23,44,.92)}\n\n      /* small bottom buttons container */\n      .c-bottom-cta{position:sticky;bottom:max(12px,env(safe-area-inset-bottom));display:grid;justify-items:center;background:transparent;padding:0;margin-top:.5rem}\n      .c-bottom-cta .c-topbtn{inline-size:2.4rem;height:2.4rem;border-radius:50%}\n      .c-exit-wrap{display:flex;justify-content:center;padding:6px 0}\n      #btnExit.c-topbtn{inline-size:2.4rem;height:2.4rem;border-radius:50%}\n\n      /* center lemon button under title */\n      .o-header{grid-template-columns:1fr auto 1fr;grid-template-rows:auto auto auto auto}\n      #lemonToggle.c-icon-btn--lemon{grid-column:2;grid-row:2;justify-self:center;margin-top:.1rem}\n    ";
+    s.textContent = "\n      /* --- Bars --- */\n      .p-weekbar{display:grid;grid-template-columns:1fr auto 1fr;align-items:center;margin:.35rem 0 .6rem;gap:.6rem}\n      .p-weekbar__right{justify-self:end;display:flex;gap:.4rem}\n      .p-weekbar__btn{border:1px solid #e5e7eb;background:#fff;border-radius:999px;height:36px;padding:0 14px;font-weight:700}\n      .p-weekbar__btn[data-weeknav=\"prev\"],.p-weekbar__btn[data-weeknav=\"next\"],\n      .p-weekbar__btn[data-daynav=\"prev\"], .p-weekbar__btn[data-daynav=\"next\"]{width:36px;padding:0;display:grid;place-items:center;font-size:18px;line-height:1}\n      .p-weekbar__title{text-align:center;font-weight:800}\n\n      .p-day__head{display:grid;grid-template-columns:1fr auto 1fr;align-items:center;padding:0 8px}\n      .p-day__name{justify-self:start;font-weight:700}\n      .p-day__date{justify-self:end;opacity:.85}\n      .p-day__count{justify-self:center;inline-size:26px;height:26px;border-radius:999px;font:700 12px/26px 'Rubik',system-ui,sans-serif;background:#fff;border:1px solid #e5e7eb}\n\n      /* --- MONTH: airy grid, one circle, visible tiny counter --- */\n      .p-month{display:grid;grid-template-columns:repeat(7,1fr);gap:1.35rem 1.2rem;padding:.4rem .2rem}\n      .p-cell{\n        position:relative; aspect-ratio:1/1; border-radius:18px;\n        background:#fff; border:2px solid var(--ring,#D9DEE7);\n        box-shadow:0 6px 14px rgba(2,6,23,.05);\n        display:flex; align-items:center; justify-content:center;\n        overflow:visible; /* so the chip can breathe */\n        padding-top:10px; /* make room inside for chip without touching number */\n      }\n      /* Kill any theme hooks/semi-circles */\n      .p-cell::before,.p-cell::after,.p-cell .p-date::before,.p-cell .p-date::after{display:none !important;content:none !important;}\n\n      .p-cell--pad{opacity:.92; background:#fafbff; border-color:#EEF2F7}\n      .p-cell--selected{box-shadow:0 8px 18px rgba(2,6,23,.08)}\n\n      .p-date{font:900 20px/1 'Rubik',system-ui,sans-serif;color:#0f172a;margin-top:6px}\n      .p-date.is-today{color:#C6921A;} /* gold number only */\n\n      /* Tiny counter chip \u2014 small, fully visible, color-matched, not touching date */\n      .p-chip{\n        position:absolute; top:4px; left:50%; transform:translateX(-50%);\n        min-width:14px; height:14px; padding:0 4px; border-radius:999px;\n        font:800 9px/14px 'Rubik',system-ui,sans-serif;\n        background:var(--chipBg,rgba(0,0,0,.12)); color:var(--chipFg,#111827);\n        border:1px solid var(--ring,#D9DEE7);\n        box-shadow:0 1px 2px rgba(2,6,23,.08);\n        z-index:2;\n      }\n\n      /* --- Bottom buttons --- */\n      .c-bottom-cta{position:sticky;bottom:max(12px,env(safe-area-inset-bottom));background:transparent;margin-top:.75rem}\n      .c-fab{display:grid;place-items:center;border-radius:999px; border:1px solid #e5e7eb;\n             background:linear-gradient(180deg,#ffffff,#f7fbff); box-shadow:0 10px 20px rgba(2,6,23,.10)}\n      .c-fab--create{inline-size:64px; block-size:64px}\n      /* EXACT same size/shape as profile/settings for logout */\n      .c-fab--small{inline-size:44px; block-size:44px}\n      .c-fab svg{display:block}\n\n      /* Dark mode */\n      html[data-theme=\"dark\"] .p-cell{background:#0f1b32;border-color:#27406f;box-shadow:0 6px 14px rgba(13,99,255,.12)}\n      html[data-theme=\"dark\"] .p-cell--pad{background:#0c1529;border-color:#1b305a}\n      html[data-theme=\"dark\"] .p-date{color:#eaf2ff}\n      html[data-theme=\"dark\"] .p-date.is-today{color:#FFD56B}\n      html[data-theme=\"dark\"] .c-fab{background:linear-gradient(180deg,#0f1b32,#0b1529);border-color:#243b6b;box-shadow:0 10px 20px rgba(13,99,255,.18)}\n\n      /* Confetti */\n      .fx-confetti{position:fixed;inset:0;pointer-events:none;z-index:9999}\n      .fx-c{position:absolute;width:9px;height:9px;background:hsl(calc(360*var(--h,.5)),90%,60%);transform:translate(-50%,-50%);border-radius:2px;animation:confThrow var(--t) ease-out forwards}\n      .fx-c:nth-child(4n){--h:.1}.fx-c:nth-child(4n+1){--h:.22}.fx-c:nth-child(4n+2){--h:.62}.fx-c:nth-child(4n+3){--h:.82}\n      @keyframes confThrow{to{transform:translate(calc(-50% + var(--dx)),calc(-50% + var(--dy))) rotate(var(--r));opacity:0}}\n    ";
     document.head.appendChild(s);
   }
 
-  /* ===================== Login Intro (lemon splash -> icon) ===================== */
+  /* ===================== Intro (unchanged) ===================== */
   (function intro() {
     var lemonBtn = document.getElementById('lemonToggle');
     if (!lemonBtn) return;
@@ -702,14 +707,12 @@ function _typeof(o) { "@babel/helpers - typeof"; return _typeof = "function" == 
     screen.className = 'intro-screen';
     var wrap = document.createElement('div');
     wrap.className = 'intro-wrap';
-    wrap.innerHTML = "\n      <svg class=\"intro-lemon\" viewBox=\"0 0 24 24\" aria-hidden=\"true\">\n        <defs>\n          <radialGradient id=\"introLem\" cx=\"50%\" cy=\"40%\" r=\"75%\">\n            <stop offset=\"0%\" stop-color=\"#FFF8C6\"/><stop offset=\"50%\" stop-color=\"#FFE36E\"/><stop offset=\"100%\" stop-color=\"#F7C843\"/>\n          </radialGradient>\n          <linearGradient id=\"introSweepG\" x1=\"0\" y1=\"1\" x2=\"0\" y2=\"0\">\n            <stop offset=\"0\" stop-color=\"rgba(0,229,255,0)\"/><stop offset=\".28\" stop-color=\"rgba(0,229,255,.30)\"/>\n            <stop offset=\".54\" stop-color=\"rgba(255,215,102,.70)\"/><stop offset=\".78\" stop-color=\"rgba(136,167,255,.40)\"/>\n            <stop offset=\"1\" stop-color=\"rgba(0,229,255,0)\"/>\n          </linearGradient>\n          <radialGradient id=\"introGlintG\" cx=\"50%\" cy=\"50%\" r=\"60%\">\n            <stop offset=\"0%\" stop-color=\"rgba(255,248,198,.98)\"/><stop offset=\"70%\" stop-color=\"rgba(255,214,100,.45)\"/>\n            <stop offset=\"100%\" stop-color=\"rgba(255,214,100,0)\"/>\n          </radialGradient>\n          <clipPath id=\"introClip\"><path d=\"M19 7c-3-3-8-3-11 0-2 2.3-2 6 0 8 2.2 2.1 5.8 2.4 8 0 2.2-2.1 2.6-5.4 1-7.6\"/></clipPath>\n        </defs>\n        <g>\n          <path d=\"M19 7c-3-3-8-3-11 0-2 2.3-2 6 0 8 2.2 2.1 5.8 2.4 8 0 2.2-2.1 2.6-5.4 1-7.6\" fill=\"url(#introLem)\" stroke=\"#C59A21\" stroke-width=\"1.1\"/>\n          <path d=\"M18 6c.9-.9 1.7-1.8 2.3-2.8\" stroke=\"#6FA14D\" stroke-linecap=\"round\" stroke-width=\"1.2\"/>\n        </g>\n        <g clip-path=\"url(#introClip)\">\n          <rect class=\"intro-sweep\" x=\"0\" y=\"0\" width=\"100%\" height=\"140%\" fill=\"url(#introSweepG)\"/>\n          <circle class=\"intro-glint\" cx=\"12\" cy=\"22\" r=\"3.6\" fill=\"url(#introGlintG)\"/>\n        </g>\n      </svg>";
+    wrap.innerHTML = "\n      <svg class=\"intro-lemon\" viewBox=\"0 0 24 24\" aria-hidden=\"true\">\n        <defs>\n          <radialGradient id=\"introLem\" cx=\"50%\" cy=\"40%\" r=\"75%\">\n            <stop offset=\"0%\" stop-color=\"#FFF8C6\"/><stop offset=\"50%\" stop-color=\"#FFE36E\"/><stop offset=\"100%\" stop-color=\"#F7C843\"/>\n          </radialGradient>\n          <linearGradient id=\"introSweepG\" x1=\"0\" y1=\"1\" x2=\"0\" y2=\"0\">\n            <stop offset=\"0\" stop-color=\"rgba(0,229,255,0)\"/><stop offset=\".28\" stop-color=\"rgba(0,229,255,.30)\"/>\n            <stop offset=\".54\" stop-color=\"rgba(255,215,102,.70)\"/><stop offset=\".78\" stop-color=\"rgba(136,167,255,.40)\"/>\n            <stop offset=\"1\" stop-color=\"rgba(0,229,255,0)\"/>\n          </linearGradient>\n          <radialGradient id=\"introGlintG\" cx=\"50%\" cy=\"50%\" r=\"60%\">\n            <stop offset=\"0%\" stop-color=\"rgba(255,248,198,.98)\"/><stop offset=\"70%\" stop-color=\"rgba(255,214,100,.45)\"/>\n            <stop offset=\"100%\" stop-color=\"rgba(255,214,100,0)\"/>\n          </radialGradient>\n          <clipPath id=\"introClip\"><path d=\"M19 7c-3-3-8-3-11 0-2 2.3-2 6 0 8 2.2 2.1 5.8 2.4 8 0 2.2-2.1 2.6-5.4 1-7.6\"/></clipPath>\n        </defs>\n        <g>\n          <path d=\"M19 7c-3-3-8-3-11 0-2 2.3-2 6 0 8 2.2 2.1 5.8 2.4 8 0 2.2-2.1 2.6-5.4 1-7.6\" fill=\"url(#introLem)\" stroke=\"#C59A21\" stroke-width=\"1.1\"/>\n          <path d=\"M18 6c.9-.9 1.7-1.8 2.3-2.8\" stroke=\"#6FA14D\" stroke-linecap=\"round\" stroke-width=\"1.2\"/>\n        </g>\n        <g clip-path=\"url(#introClip)\"><rect class=\"intro-sweep\" x=\"0\" y=\"0\" width=\"100%\" height=\"140%\" fill=\"url(#introSweepG)\"/><circle class=\"intro-glint\" cx=\"12\" cy=\"22\" r=\"3.6\" fill=\"url(#introGlintG)\"/></g>\n      </svg>";
     screen.appendChild(wrap);
     document.body.appendChild(screen);
     requestAnimationFrame(function () {
       wrap.classList.add('is-in');
     });
-
-    // Hold ~3s then glide to lemon button and fade
     setTimeout(function () {
       var r = lemonBtn.getBoundingClientRect();
       var w = wrap.getBoundingClientRect();
@@ -732,14 +735,6 @@ function _typeof(o) { "@babel/helpers - typeof"; return _typeof = "function" == 
   })();
 
   /* ===================== Initial ===================== */
-  // convert bottom CTA container to host the two small buttons stacked
-  (function pinBottomIcons() {
-    var ctaWrap = document.querySelector('.c-bottom-cta');
-    if (!ctaWrap || !addEventBtn) return;
-    ctaWrap.innerHTML = '';
-    ctaWrap.appendChild(addEventBtn);
-    // exit lives just below in .c-exit-wrap already; sizes handled by CSS/JS
-  })();
   var _today = new Date();
   formatTitle(_today);
   state.current = _today;
@@ -751,7 +746,7 @@ function _typeof(o) { "@babel/helpers - typeof"; return _typeof = "function" == 
   try {
     if (/auth\.html(?:$|\?)/.test(location.pathname)) return;
     var u = localStorage.getItem('authUser') || localStorage.getItem('auth.user');
-    if (!u) location.replace('auth.html'); // relative, works on GH Pages
+    if (!u) location.replace('auth.html');
   } catch (_) {
     location.replace('auth.html');
   }
