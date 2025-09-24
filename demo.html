@@ -3,25 +3,28 @@
 <head>
   <meta charset="UTF-8">
   <title>LooZ Demo Redirect</title>
-<script>
-(function(){
-  const user = { id:'demo', email:'demo@example.com', name:'Demo User' };
-  try {
-    // fake login
-    localStorage.setItem('authUser', JSON.stringify(user));
-    localStorage.removeItem('looz:loggedOut');
-    localStorage.setItem('looz:justLoggedIn','1');
+  <script>
+    (function () {
+      // 1) Fake login so the app skips auth
+      const demoUser = { id: 'demo', email: 'demo@example.com', name: 'Demo User' };
+      try {
+        localStorage.setItem('authUser', JSON.stringify(demoUser));
+        localStorage.removeItem('looz:loggedOut');
+        localStorage.setItem('looz:justLoggedIn', '1');
+      } catch (_) {}
 
-    // force default view = month
-    localStorage.setItem('looz:view', 'month');
-  } catch(e){}
-  // redirect into the app
-  location.replace('index.html');
-})();
-</script>
+      // 2) Force default view = month (merge with existing prefs if any)
+      try {
+        const key = 'plannerPrefs';
+        const existing = JSON.parse(localStorage.getItem(key) || '{}');
+        const merged = { ...existing, defaultView: 'month' };   // <- the important part
+        localStorage.setItem(key, JSON.stringify(merged));
+      } catch (_) {}
 
+      // 3) Go to the app
+      location.replace('index.html'); // stays within the same repo
+    })();
+  </script>
 </head>
-<body>
-  <p>Redirecting to demo…</p>
-</body>
+<body>Redirecting…</body>
 </html>
