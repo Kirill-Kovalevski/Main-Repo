@@ -1,4 +1,4 @@
-/* ===== LooZ — Planner App (home) — vFinal.6 (Day: X icon + equal arrows) ===== */
+/* ===== LooZ — Planner App (home) — vFinal.7 (✓/✖ counters + streak support) ===== */
 (function () {
   'use strict';
 
@@ -36,18 +36,18 @@
   };
 
   /* ===================== DOM refs ===================== */
-  const btnProfile = $('#btnProfile');
-  const btnMenu = $('#btnMenu');
+  const btnProfile    = $('#btnProfile');
+  const btnMenu       = $('#btnMenu');
   const btnCategories = $('#btnCategories');
-  const btnSocial = $('#btnSocial');
+  const btnSocial     = $('#btnSocial');
   if (btnProfile)    btnProfile.addEventListener('click', () => go('profile.html'));
   if (btnMenu)       btnMenu.addEventListener('click', () => go('settings.html'));
   if (btnCategories) btnCategories.addEventListener('click', () => go('categories.html'));
   if (btnSocial)     btnSocial.addEventListener('click', () => go('social.html'));
 
   const lemonToggle = $('#lemonToggle');
-  const appNav = $('#appNav');
-  const navPanel = appNav ? appNav.querySelector('.c-nav__panel') : null;
+  const appNav      = $('#appNav');
+  const navPanel    = appNav ? appNav.querySelector('.c-nav__panel') : null;
 
   const titleDay   = $('#titleDay');
   const titleDate  = $('#titleDate');
@@ -62,13 +62,11 @@
   const sheetPanel = sheet ? sheet.querySelector('.c-sheet__panel') : null;
   const sheetClose = sheet ? sheet.querySelector('[data-close]') : null;
   const sheetForm  = $('#sheetForm');
- const titleInput = $('#evtTitle');
-const dateInput  = $('#evtDate');
-const timeInput  = $('#evtTime');
+  const titleInput = $('#evtTitle');
+  const dateInput  = $('#evtDate');
+  const timeInput  = $('#evtTime');
 
-
-  const subtitleEl = $('.c-subtitle');
-
+  const subtitleEl  = $('.c-subtitle');
   const addEventBtn = $('#addEventBtn');
   const btnExit     = $('#btnExit');
 
@@ -153,7 +151,7 @@ const timeInput  = $('#evtTime');
     });
   })();
 
-  /* ===================== Color scale (counter & rings) ===================== */
+  /* ===================== Color scale ===================== */
   function pastelFor(n){
     let b = n<=0 ? 0 : Math.min(6, Math.floor((n-1)/3)+1);
     const tones = [
@@ -185,10 +183,10 @@ const timeInput  = $('#evtTime');
   function renderDay(){
     plannerRoot.innerHTML = '';
 
-    // Day nav (prev / today / next)
+    // Day nav
     const bar = document.createElement('div');
     bar.className = 'p-weekbar';
-    bar.setAttribute('data-scope','day'); // scope for day-only CSS
+    bar.setAttribute('data-scope','day');
     bar.innerHTML =
       '<button class="p-weekbar__btn" data-daynav="prev" aria-label="יום קודם">‹</button>'+
       `<div class="p-weekbar__title">${HEB_DAYS[state.current.getDay()]} — ${pad2(state.current.getDate())}.${pad2(state.current.getMonth()+1)}.${state.current.getFullYear()}</div>`+
@@ -227,8 +225,8 @@ const timeInput  = $('#evtTime');
         // ORDER (RTL): X, V, hour, text
         row.innerHTML =
           '<div class="p-daytask__actions">'+
-            `<button class="p-ico p-ico--del" title="מחק"  data-del="${t.id}"  aria-label="מחק"></button>`+  // ❌ pill
-            `<button class="p-ico p-ico--ok"  title="בוצע" data-done="${t.id}" aria-label="בוצע"></button>`+ // ✓ pill
+            `<button class="p-ico p-ico--del" title="מחק"  data-del="${t.id}"  aria-label="מחק"></button>`+
+            `<button class="p-ico p-ico--ok"  title="בוצע" data-done="${t.id}" aria-label="בוצע"></button>`+
           '</div>'+
           `<div class="p-daytask__time">${t.time||''}</div>`+
           `<div class="p-daytask__text">${escapeHtml(t.title)}</div>`;
@@ -406,11 +404,25 @@ const timeInput  = $('#evtTime');
 
       const doneId = e.target && e.target.getAttribute('data-done');
       const delId  = e.target && e.target.getAttribute('data-del');
+
+      // --- NEW: persist cumulative stats for profile page (loozStats) ---
+      function bumpStat(kind){
+        try {
+          const k = 'loozStats';
+          const o = JSON.parse(localStorage.getItem(k) || '{"doneTotal":0,"removedTotal":0}');
+          if (kind === 'done')    o.doneTotal    = (o.doneTotal||0) + 1;
+          if (kind === 'removed') o.removedTotal = (o.removedTotal||0) + 1;
+          localStorage.setItem(k, JSON.stringify(o));
+        } catch(_) {}
+      }
+
       if (doneId){
+        bumpStat('done');
         blastConfetti(e.clientX||0, e.clientY||0, 1.0);
         state.tasks = state.tasks.filter(t=>t.id!==doneId);
         saveTasks(); render();
       } else if (delId){
+        bumpStat('removed');
         const row = e.target.closest('.p-task,.p-daytask');
         if (row){
           row.classList.add('is-scratching');
@@ -528,7 +540,7 @@ const timeInput  = $('#evtTime');
   }
   html[data-theme="dark"] .p-day__count{background:rgba(13,23,44,.92);}
 
-  /* Week rows (unchanged) */
+  /* Week rows */
   .p-task{ display:grid; grid-template-columns:auto auto 1fr; align-items:center; gap:.5rem; }
   .p-task__actions, .p-daytask__actions{ display:flex; gap:.35rem; align-items:center; }
   .p-task__time{ font-weight:700; min-width:3.2rem; text-align:center; }
@@ -569,7 +581,7 @@ const timeInput  = $('#evtTime');
             mask-image:url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20"><path d="M5 5L15 15M15 5L5 15" stroke="%23000" stroke-width="2.6" stroke-linecap="round"/></svg>');
   }
 
-  /* Month grid (unchanged) */
+  /* Month grid */
   .p-month{display:grid;grid-template-columns:repeat(7,1fr);gap:.7rem}
   .p-cell{
     position:relative; aspect-ratio:1/1; border-radius:16px; background:#fff;
@@ -590,7 +602,7 @@ const timeInput  = $('#evtTime');
     box-shadow:0 2px 6px rgba(0,0,0,.08);
   }
 
-  /* Day-only nav arrows (same square size as week/month) */
+  /* Day-only nav arrows */
   .p-weekbar[data-scope="day"] .p-weekbar__btn[data-daynav="prev"],
   .p-weekbar[data-scope="day"] .p-weekbar__btn[data-daynav="next"]{
     width:36px; height:36px; padding:0;
