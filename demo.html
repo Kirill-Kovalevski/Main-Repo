@@ -3,26 +3,23 @@
 <head>
   <meta charset="UTF-8">
   <title>LooZ Demo Redirect</title>
-  <script>
-    (function(){
-      // 1. Fake demo user
-      const demoUser = {
-        id: 'demo',
-        email: 'demo@example.com',
-        name: 'Demo User'
-      };
+<script>
+(function(){
+  const user = { id:'demo', email:'demo@example.com', name:'Demo User' };
+  try {
+    // fake login
+    localStorage.setItem('authUser', JSON.stringify(user));
+    localStorage.removeItem('looz:loggedOut');
+    localStorage.setItem('looz:justLoggedIn','1');
 
-      // 2. Save it in the same keys your app uses
-      try {
-        localStorage.setItem('authUser', JSON.stringify(demoUser));
-        localStorage.removeItem('looz:loggedOut');
-        localStorage.setItem('looz:justLoggedIn','1');
-      } catch(e){}
+    // force default view = month
+    localStorage.setItem('looz:view', 'month');
+  } catch(e){}
+  // redirect into the app
+  location.replace('index.html');
+})();
+</script>
 
-      // 3. Redirect straight to app homepage
-      location.replace('index.html');
-    })();
-  </script>
 </head>
 <body>
   <p>Redirecting to demo…</p>
