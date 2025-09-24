@@ -211,7 +211,7 @@ function _defineProperty(obj, key, value) { if (key in obj) { Object.definePrope
   var prefs = loadPrefs();
   var weekStart = prefs.weekStart === 'mon' ? 1 : 0;
   var state = {
-    view: prefs.defaultView || 'week',
+    view: prefs.defaultView || 'month',
     current: new Date(),
     tasks: loadTasks()
   };

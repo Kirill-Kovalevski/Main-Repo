@@ -112,7 +112,7 @@
   const prefs = loadPrefs();
   const weekStart = (prefs.weekStart==='mon') ? 1 : 0;
 
-  let state = { view: (prefs.defaultView || 'week'), current: new Date(), tasks: loadTasks() };
+  let state = { view: (prefs.defaultView || 'month'), current: new Date(), tasks: loadTasks() };
 
   const formatTitle = (d) => {
     if (titleDay)  titleDay.textContent  = HEB_DAYS[d.getDay()];
