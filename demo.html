@@ -1,37 +1,30 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Demo Bootstrap</title>
+  <meta charset="UTF-8">
+  <title>LooZ Demo Redirect</title>
   <script>
-    (function () {
-      // Helpers to resolve paths correctly on GitHub Pages or locally
-      function appUrl(file){
-        var b = document.querySelector('base');
-        if (b && b.href) return new URL(file, b.href).href;
-        if (/github\.io$/.test(location.hostname)) {
-          var seg = location.pathname.split('/').filter(Boolean)[0] || '';
-          return '/' + (seg ? seg + '/' : '') + file;
-        }
-        return file;
-      }
-      function go(file){ location.replace(appUrl(file)); }
+    (function(){
+      // 1. Fake demo user
+      const demoUser = {
+        id: 'demo',
+        email: 'demo@example.com',
+        name: 'Demo User'
+      };
 
+      // 2. Save it in the same keys your app uses
       try {
-        // Seed a demo user so the app thinks we’re logged in
-        var demo = JSON.stringify({ id: 'demo', email: 'kirill@gmail.com', name: 'Demo User' });
-        localStorage.setItem('authUser', demo);
-        localStorage.setItem('auth.user', demo);
+        localStorage.setItem('authUser', JSON.stringify(demoUser));
         localStorage.removeItem('looz:loggedOut');
         localStorage.setItem('looz:justLoggedIn','1');
-      } catch (e) {
-        /* ignore */
-      }
-      // Jump straight into the app’s real entry file (change if yours is different)
-      go('index.html');
+      } catch(e){}
+
+      // 3. Redirect straight to app homepage
+      location.replace('index.html');
     })();
   </script>
 </head>
-<body></body>
+<body>
+  <p>Redirecting to demo…</p>
+</body>
 </html>
