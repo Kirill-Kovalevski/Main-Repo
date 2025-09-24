@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Demo Bootstrap</title>
+  <script>
+    (function () {
+      // Helpers to resolve paths correctly on GitHub Pages or locally
+      function appUrl(file){
+        var b = document.querySelector('base');
+        if (b && b.href) return new URL(file, b.href).href;
+        if (/github\.io$/.test(location.hostname)) {
+          var seg = location.pathname.split('/').filter(Boolean)[0] || '';
+          return '/' + (seg ? seg + '/' : '') + file;
+        }
+        return file;
+      }
+      function go(file){ location.replace(appUrl(file)); }
+
+      try {
+        // Seed a demo user so the app thinks we’re logged in
+        var demo = JSON.stringify({ id: 'demo', email: 'kirill@gmail.com', name: 'Demo User' });
+        localStorage.setItem('authUser', demo);
+        localStorage.setItem('auth.user', demo);
+        localStorage.removeItem('looz:loggedOut');
+        localStorage.setItem('looz:justLoggedIn','1');
+      } catch (e) {
+        /* ignore */
+      }
+      // Jump straight into the app’s real entry file (change if yours is different)
+      go('index.html');
+    })();
+  </script>
+</head>
+<body></body>
+</html>
